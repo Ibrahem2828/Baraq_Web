@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "baraq-web-dev",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": ["D:\\baraaq\\web\\scripts\\run-dev.mjs"],
+      "port": 3010
+    }
+  ]
+}

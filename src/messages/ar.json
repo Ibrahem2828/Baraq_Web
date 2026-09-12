@@ -1,0 +1,403 @@
+{
+  "common": {
+    "appName": "برّاق",
+    "loading": "جارٍ التحميل...",
+    "retry": "إعادة المحاولة",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "menu": "القائمة",
+    "back": "رجوع",
+    "next": "التالي",
+    "skip": "تخطي",
+    "seeAll": "عرض الكل",
+    "comingSoon": "قريبًا",
+    "offline": "لا يوجد اتصال بالإنترنت. سيتم إعادة المحاولة تلقائيًا.",
+    "requiredField": "هذا الحقل مطلوب"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "characters": "الشخصيات",
+    "library": "المكتبة",
+    "studyPlans": "خطط الدراسة",
+    "quizzes": "الاختبارات",
+    "projects": "المشاريع",
+    "recommendations": "التوصيات",
+    "summaries": "الملخصات",
+    "transcriptions": "النصوص الصوتية",
+    "notifications": "الإشعارات",
+    "subscription": "الاشتراك",
+    "support": "الدعم",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "أهلًا بعودتك إلى برّاق",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "دخول",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "noAccount": "ليس لديك حساب؟",
+      "createAccount": "إنشاء حساب",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    },
+    "register": {
+      "title": "إنشاء حساب",
+      "subtitle": "ابدأ رحلتك التعليمية مع برّاق",
+      "fullName": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "phoneNumber": "رقم الهاتف (اختياري)",
+      "password": "كلمة المرور",
+      "passwordConfirm": "تأكيد كلمة المرور",
+      "submit": "إنشاء الحساب",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "login": "تسجيل الدخول",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين",
+      "emailTaken": "هذا البريد الإلكتروني مستخدم بالفعل"
+    },
+    "forgotPassword": {
+      "title": "استعادة كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين",
+      "email": "البريد الإلكتروني",
+      "submit": "إرسال الرابط",
+      "success": "إذا كان البريد الإلكتروني مسجلًا لدينا، فستصلك رسالة تحتوي على رابط إعادة التعيين",
+      "backToLogin": "العودة لتسجيل الدخول"
+    },
+    "resetPassword": {
+      "title": "تعيين كلمة مرور جديدة",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "submit": "تعيين كلمة المرور",
+      "success": "تم تعيين كلمة المرور بنجاح",
+      "invalidLink": "رابط إعادة التعيين غير صالح أو منتهي الصلاحية"
+    },
+    "passwordTooShort": "يجب ألا تقل كلمة المرور عن 10 أحرف",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين"
+  },
+  "characters": {
+    "khota": { "name": "خُطى", "role": "التخطيط الدراسي" },
+    "fahes": { "name": "فاحص", "role": "الاختبارات والتقييم" },
+    "rasheed": { "name": "رشيد", "role": "تحليل الأداء والتوصيات" },
+    "kholasa": { "name": "خُلاصة", "role": "التلخيص الذكي" },
+    "sada": { "name": "صدى", "role": "تحويل الصوت إلى نص" },
+    "hub": {
+      "title": "شخصيات برّاق",
+      "subtitle": "اختر رفيقك الذكي لهذه المهمة"
+    }
+  },
+  "home": {
+    "greeting": "أهلًا بك",
+    "todayTasks": "مهام اليوم",
+    "quickActions": "إجراءات سريعة"
+  },
+  "emptyStates": {
+    "generic": {
+      "title": "لا يوجد محتوى بعد",
+      "description": "ستظهر العناصر هنا بمجرد إضافتها"
+    },
+    "sources": {
+      "title": "مكتبتك فارغة",
+      "description": "ارفع أول مصدر دراسي لتبدأ",
+      "action": "رفع مصدر"
+    },
+    "studyPlans": {
+      "title": "لا توجد خطط دراسية",
+      "description": "أنشئ خطة دراسية جديدة أو دع خُطى يصمم واحدة لك",
+      "action": "خطة جديدة"
+    },
+    "quizzes": {
+      "title": "لا توجد اختبارات",
+      "description": "أنشئ اختبارًا جديدًا أو دع فاحص يولّد واحدًا من مصادرك",
+      "action": "اختبار جديد"
+    },
+    "notifications": {
+      "title": "لا توجد إشعارات",
+      "description": "ستظهر هنا التحديثات المهمة"
+    },
+    "search": {
+      "title": "لا توجد نتائج",
+      "description": "جرّب كلمات بحث مختلفة"
+    }
+  },
+  "errors": {
+    "NETWORK": "تعذّر الاتصال بالخادم. تحقق من اتصالك بالإنترنت",
+    "TIMEOUT": "استغرق الطلب وقتًا طويلًا. حاول مرة أخرى",
+    "UNAUTHORIZED": "انتهت صلاحية الجلسة. الرجاء تسجيل الدخول مرة أخرى",
+    "FORBIDDEN": "لا تملك صلاحية الوصول إلى هذا المحتوى",
+    "NOT_FOUND": "العنصر المطلوب غير موجود",
+    "VALIDATION": "تحقق من البيانات المدخلة",
+    "CONFLICT": "تعارض في البيانات، حاول مرة أخرى",
+    "PAYLOAD_TOO_LARGE": "حجم الملف أكبر من الحد المسموح",
+    "RATE_LIMIT": "عدد كبير من المحاولات، حاول لاحقًا",
+    "SUBSCRIPTION_LIMIT": "لقد وصلت إلى الحد المسموح في خطتك الحالية",
+    "SERVER": "حدث خطأ في الخادم. حاول لاحقًا",
+    "UNKNOWN": "حدث خطأ غير متوقع"
+  },
+  "library": {
+    "title": "المكتبة",
+    "subtitle": "مصادرك الدراسية ومجلداتك",
+    "uploadAction": "رفع مصدر",
+    "newCollection": "مجلد جديد",
+    "tabs": { "sources": "المصادر", "collections": "المجلدات" },
+    "status": {
+      "uploaded": "تم الرفع",
+      "processing": "قيد المعالجة",
+      "ready": "جاهز",
+      "failed": "فشل"
+    },
+    "upload": {
+      "title": "رفع مصدر جديد",
+      "titleField": "العنوان",
+      "description": "الوصف (اختياري)",
+      "file": "الملف",
+      "submit": "رفع",
+      "maxSize": "الحد الأقصى 25 ميجابايت",
+      "unsupportedType": "نوع الملف غير مدعوم",
+      "fileTooLarge": "حجم الملف أكبر من الحد المسموح"
+    },
+    "detail": {
+      "process": "معالجة المصدر",
+      "useWithCharacter": "استخدم مع شخصية",
+      "extractedText": "النص المستخرج",
+      "noExtractedText": "لا يوجد نص مستخرج بعد",
+      "processingRequiredTitle": "المصدر قيد المعالجة",
+      "processingRequiredDescription": "لا يمكن استخدام هذا المصدر مع الشخصيات حتى تكتمل معالجته."
+    },
+    "collection": {
+      "createTitle": "مجلد جديد",
+      "nameField": "اسم المجلد",
+      "sourcesCount": "{count} مصدر"
+    }
+  },
+  "projects": {
+    "title": "المشاريع",
+    "subtitle": "نظّم مصادرك وخططك حسب المشروع",
+    "newProject": "مشروع جديد",
+    "createTitle": "مشروع جديد",
+    "titleField": "عنوان المشروع",
+    "goal": "الهدف (اختياري)",
+    "archive": "أرشفة",
+    "restore": "استعادة",
+    "activity": "النشاط",
+    "status": { "active": "نشط", "archived": "مؤرشف" },
+    "activityEvents": {
+      "project_created": "تم إنشاء المشروع",
+      "project_updated": "تم تحديث المشروع",
+      "project_deleted": "تم حذف المشروع",
+      "project_archived": "تمت أرشفة المشروع",
+      "project_restored": "تمت استعادة المشروع"
+    }
+  },
+  "aiJobs": {
+    "status": {
+      "created": "بدء الطلب",
+      "queued": "في الانتظار",
+      "submitted": "تم الإرسال",
+      "processing": "قيد المعالجة",
+      "validating": "قيد التحقق",
+      "output_ready": "النتيجة جاهزة",
+      "materializing": "جارٍ الحفظ",
+      "completed": "مكتمل",
+      "failed": "فشل",
+      "canceled": "أُلغي"
+    }
+  },
+  "studyPlans": {
+    "title": "خطط الدراسة",
+    "subtitle": "نظّم وقتك الدراسي وتابع مهامك",
+    "newPlan": "خطة جديدة",
+    "generateWithKhota": "أنشئ مع خُطى",
+    "createTitle": "خطة دراسية جديدة",
+    "titleField": "عنوان الخطة",
+    "subjectField": "المادة",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "dailyMinutes": "دقائق الدراسة اليومية",
+    "progress": "{completed}/{total} مهمة",
+    "tasks": "المهام",
+    "status": {
+      "draft": "مسودة",
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    },
+    "taskStatus": {
+      "pending": "قيد الانتظار",
+      "in_progress": "قيد التنفيذ",
+      "completed": "مكتملة",
+      "skipped": "متخطاة"
+    },
+    "taskActions": {
+      "complete": "إتمام",
+      "skip": "تخطي",
+      "reopen": "إعادة فتح"
+    },
+    "today": {
+      "title": "مهام اليوم",
+      "empty": "لا توجد مهام مجدولة اليوم"
+    },
+    "week": {
+      "title": "خطة الأسبوع",
+      "range": "{start} – {end}",
+      "emptyDay": "لا مهام"
+    }
+  },
+  "khota": {
+    "hubSubtitle": "رفيقك في التخطيط الدراسي",
+    "todayLink": "مهام اليوم",
+    "todayLinkDescription": "تابع مهامك المجدولة لهذا اليوم",
+    "weekLink": "خطة الأسبوع",
+    "weekLinkDescription": "نظرة عامة على أسبوعك الدراسي",
+    "plansLink": "كل الخطط",
+    "activePlans": "الخطط النشطة",
+    "noActivePlans": "لا توجد خطط نشطة بعد",
+    "createFirstPlan": "أنشئ خطتك الأولى مع خُطى"
+  },
+  "quizzes": {
+    "title": "الاختبارات",
+    "subtitle": "اختبر فهمك وتابع تقدمك",
+    "newQuiz": "اختبار جديد",
+    "start": "ابدأ الاختبار",
+    "submit": "إرسال الإجابات",
+    "timeLimit": "{minutes} دقيقة",
+    "questionsCount": "{count} سؤال",
+    "status": { "draft": "مسودة", "published": "منشور", "archived": "مؤرشف" },
+    "result": {
+      "title": "نتيجة الاختبار",
+      "score": "النتيجة",
+      "correct": "إجابات صحيحة",
+      "wrong": "إجابات خاطئة",
+      "unanswered": "بدون إجابة",
+      "recommendations": "توصيات"
+    }
+  },
+  "recommendations": {
+    "title": "التوصيات",
+    "subtitle": "تحليل أداء رشيد ونصائحه",
+    "markRead": "تحديد كمقروء",
+    "overallScore": "التقييم العام",
+    "strengths": "نقاط القوة",
+    "weaknesses": "نقاط الضعف",
+    "recommendationsList": "التوصيات",
+    "nextAction": "الخطوة التالية"
+  },
+  "summaries": {
+    "title": "الملخصات",
+    "subtitle": "ملخصات خُلاصة الذكية لمصادرك",
+    "keyPoints": "النقاط الرئيسية",
+    "importantTerms": "المصطلحات المهمة",
+    "reviewQuestions": "أسئلة المراجعة"
+  },
+  "transcriptions": {
+    "title": "النصوص الصوتية",
+    "subtitle": "تفريغ صدى الصوتي لمصادرك",
+    "duration": "{minutes} دقيقة",
+    "fullTranscript": "النص الكامل",
+    "detectedTopics": "المواضيع المكتشفة"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "markAllRead": "تحديد الكل كمقروء",
+    "markRead": "تحديد كمقروء"
+  },
+  "subscription": {
+    "title": "الاشتراك",
+    "subtitle": "خطتك واستخدامك الحالي",
+    "currentPlan": "خطتك الحالية",
+    "usage": "الاستخدام",
+    "limits": "الحدود",
+    "upgrade": "ترقية الخطة",
+    "upgradeUnavailable": "ترقية الخطط ستتوفر قريبًا",
+    "remaining": "{count} متبقٍ"
+  },
+  "support": {
+    "title": "الدعم",
+    "subtitle": "تواصل مع فريق الدعم",
+    "newTicket": "تذكرة جديدة",
+    "subjectField": "الموضوع",
+    "category": "الفئة",
+    "priority": "الأولوية",
+    "message": "الرسالة",
+    "send": "إرسال",
+    "close": "إغلاق التذكرة",
+    "reply": "الرد",
+    "status": {
+      "open": "مفتوحة",
+      "in_progress": "قيد المعالجة",
+      "waiting_user": "بانتظار ردك",
+      "resolved": "تم الحل",
+      "closed": "مغلقة"
+    },
+    "categories": {
+      "technical": "تقني",
+      "account": "الحساب",
+      "billing": "الفوترة",
+      "content": "المحتوى",
+      "ai_result": "نتيجة الذكاء الاصطناعي",
+      "other": "أخرى"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "sections": {
+      "account": "الحساب",
+      "preferences": "التفضيلات",
+      "legal": "قانوني"
+    },
+    "profile": {
+      "title": "الملف الشخصي",
+      "fullName": "الاسم الكامل",
+      "phoneNumber": "رقم الهاتف",
+      "email": "البريد الإلكتروني (غير قابل للتعديل)"
+    },
+    "subjects": {
+      "title": "المواد الدراسية",
+      "addSubject": "إضافة مادة",
+      "empty": "لم تُضِف أي مادة بعد"
+    },
+    "changePassword": {
+      "title": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "success": "تم تغيير كلمة المرور بنجاح"
+    },
+    "theme": "المظهر",
+    "language": "اللغة",
+    "about": "عن برّاق",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الاستخدام",
+    "accountDeletion": {
+      "title": "حذف الحساب",
+      "unavailable": "حذف الحساب غير متاح حاليًا حتى يكتمل عقد الخادم"
+    },
+    "logout": "تسجيل الخروج"
+  },
+  "onboarding": {
+    "profileSetup": {
+      "title": "أكمل ملفك الدراسي",
+      "educationStage": "المرحلة الدراسية",
+      "gradeLevel": "الصف",
+      "specialization": "التخصص (اختياري)",
+      "studyGoal": "هدفك الدراسي (اختياري)",
+      "dailyStudyHours": "ساعات الدراسة اليومية",
+      "submit": "متابعة"
+    },
+    "subjectsSelection": {
+      "title": "اختر موادك الدراسية",
+      "subtitle": "اختر مادة واحدة على الأقل للمتابعة",
+      "submit": "إنهاء الإعداد"
+    }
+  },
+  "footer": {
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الاستخدام",
+    "about": "عن برّاق",
+    "rights": "جميع الحقوق محفوظة"
+  }
+}

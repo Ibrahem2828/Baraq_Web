@@ -1,0 +1,403 @@
+{
+  "common": {
+    "appName": "Baraq",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "menu": "Menu",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "seeAll": "See all",
+    "comingSoon": "Coming soon",
+    "offline": "No internet connection. We'll retry automatically.",
+    "requiredField": "This field is required"
+  },
+  "nav": {
+    "home": "Home",
+    "characters": "Characters",
+    "library": "Library",
+    "studyPlans": "Study Plans",
+    "quizzes": "Quizzes",
+    "projects": "Projects",
+    "recommendations": "Recommendations",
+    "summaries": "Summaries",
+    "transcriptions": "Transcriptions",
+    "notifications": "Notifications",
+    "subscription": "Subscription",
+    "support": "Support",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back to Baraq",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create account",
+      "invalidCredentials": "Incorrect email or password"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Start your learning journey with Baraq",
+      "fullName": "Full name",
+      "email": "Email",
+      "phoneNumber": "Phone number (optional)",
+      "password": "Password",
+      "passwordConfirm": "Confirm password",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "login": "Sign in",
+      "passwordMismatch": "Passwords do not match",
+      "emailTaken": "This email is already in use"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we'll send you a reset link",
+      "email": "Email",
+      "submit": "Send link",
+      "success": "If that email is registered, a reset link has been sent",
+      "backToLogin": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Set a new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Set password",
+      "success": "Your password has been reset successfully",
+      "invalidLink": "This reset link is invalid or has expired"
+    },
+    "passwordTooShort": "Password must be at least 10 characters",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "characters": {
+    "khota": { "name": "Khota", "role": "Study planning" },
+    "fahes": { "name": "Fahes", "role": "Quizzes & assessment" },
+    "rasheed": { "name": "Rasheed", "role": "Performance analysis & recommendations" },
+    "kholasa": { "name": "Kholasa", "role": "Smart summarization" },
+    "sada": { "name": "Sada", "role": "Voice-to-text" },
+    "hub": {
+      "title": "Baraq characters",
+      "subtitle": "Choose your smart companion for this task"
+    }
+  },
+  "home": {
+    "greeting": "Welcome",
+    "todayTasks": "Today's tasks",
+    "quickActions": "Quick actions"
+  },
+  "emptyStates": {
+    "generic": {
+      "title": "Nothing here yet",
+      "description": "Items will appear here once added"
+    },
+    "sources": {
+      "title": "Your library is empty",
+      "description": "Upload your first study source to get started",
+      "action": "Upload a source"
+    },
+    "studyPlans": {
+      "title": "No study plans yet",
+      "description": "Create a new plan, or let Khota design one for you",
+      "action": "New plan"
+    },
+    "quizzes": {
+      "title": "No quizzes yet",
+      "description": "Create a new quiz, or let Fahes generate one from your sources",
+      "action": "New quiz"
+    },
+    "notifications": {
+      "title": "No notifications",
+      "description": "Important updates will show up here"
+    },
+    "search": {
+      "title": "No results",
+      "description": "Try different search terms"
+    }
+  },
+  "errors": {
+    "NETWORK": "Couldn't reach the server. Check your internet connection",
+    "TIMEOUT": "The request took too long. Please try again",
+    "UNAUTHORIZED": "Your session has expired. Please sign in again",
+    "FORBIDDEN": "You don't have access to this content",
+    "NOT_FOUND": "The requested item was not found",
+    "VALIDATION": "Please check the information you entered",
+    "CONFLICT": "There's a data conflict. Please try again",
+    "PAYLOAD_TOO_LARGE": "The file is larger than the allowed limit",
+    "RATE_LIMIT": "Too many attempts. Please try again later",
+    "SUBSCRIPTION_LIMIT": "You've reached the limit on your current plan",
+    "SERVER": "A server error occurred. Please try again later",
+    "UNKNOWN": "An unexpected error occurred"
+  },
+  "library": {
+    "title": "Library",
+    "subtitle": "Your study sources and folders",
+    "uploadAction": "Upload a source",
+    "newCollection": "New folder",
+    "tabs": { "sources": "Sources", "collections": "Folders" },
+    "status": {
+      "uploaded": "Uploaded",
+      "processing": "Processing",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "upload": {
+      "title": "Upload a new source",
+      "titleField": "Title",
+      "description": "Description (optional)",
+      "file": "File",
+      "submit": "Upload",
+      "maxSize": "Maximum 25MB",
+      "unsupportedType": "Unsupported file type",
+      "fileTooLarge": "File is larger than the allowed limit"
+    },
+    "detail": {
+      "process": "Process source",
+      "useWithCharacter": "Use with a character",
+      "extractedText": "Extracted text",
+      "noExtractedText": "No extracted text yet",
+      "processingRequiredTitle": "Source is still processing",
+      "processingRequiredDescription": "This source can't be used with a character until processing finishes."
+    },
+    "collection": {
+      "createTitle": "New folder",
+      "nameField": "Folder name",
+      "sourcesCount": "{count} sources"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Organize your sources and plans by project",
+    "newProject": "New project",
+    "createTitle": "New project",
+    "titleField": "Project title",
+    "goal": "Goal (optional)",
+    "archive": "Archive",
+    "restore": "Restore",
+    "activity": "Activity",
+    "status": { "active": "Active", "archived": "Archived" },
+    "activityEvents": {
+      "project_created": "Project created",
+      "project_updated": "Project updated",
+      "project_deleted": "Project deleted",
+      "project_archived": "Project archived",
+      "project_restored": "Project restored"
+    }
+  },
+  "aiJobs": {
+    "status": {
+      "created": "Getting started",
+      "queued": "Queued",
+      "submitted": "Submitted",
+      "processing": "Processing",
+      "validating": "Validating",
+      "output_ready": "Result ready",
+      "materializing": "Saving",
+      "completed": "Completed",
+      "failed": "Failed",
+      "canceled": "Canceled"
+    }
+  },
+  "studyPlans": {
+    "title": "Study Plans",
+    "subtitle": "Organize your study time and track your tasks",
+    "newPlan": "New plan",
+    "generateWithKhota": "Generate with Khota",
+    "createTitle": "New study plan",
+    "titleField": "Plan title",
+    "subjectField": "Subject",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "dailyMinutes": "Daily study minutes",
+    "progress": "{completed}/{total} tasks",
+    "tasks": "Tasks",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "taskStatus": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "skipped": "Skipped"
+    },
+    "taskActions": {
+      "complete": "Complete",
+      "skip": "Skip",
+      "reopen": "Reopen"
+    },
+    "today": {
+      "title": "Today's tasks",
+      "empty": "No tasks scheduled for today"
+    },
+    "week": {
+      "title": "Week plan",
+      "range": "{start} – {end}",
+      "emptyDay": "No tasks"
+    }
+  },
+  "khota": {
+    "hubSubtitle": "Your study-planning companion",
+    "todayLink": "Today's tasks",
+    "todayLinkDescription": "Track what's scheduled for today",
+    "weekLink": "Week plan",
+    "weekLinkDescription": "An overview of your study week",
+    "plansLink": "All plans",
+    "activePlans": "Active plans",
+    "noActivePlans": "No active plans yet",
+    "createFirstPlan": "Create your first plan with Khota"
+  },
+  "quizzes": {
+    "title": "Quizzes",
+    "subtitle": "Test your understanding and track progress",
+    "newQuiz": "New quiz",
+    "start": "Start quiz",
+    "submit": "Submit answers",
+    "timeLimit": "{minutes} minutes",
+    "questionsCount": "{count} questions",
+    "status": { "draft": "Draft", "published": "Published", "archived": "Archived" },
+    "result": {
+      "title": "Quiz result",
+      "score": "Score",
+      "correct": "Correct answers",
+      "wrong": "Wrong answers",
+      "unanswered": "Unanswered",
+      "recommendations": "Recommendations"
+    }
+  },
+  "recommendations": {
+    "title": "Recommendations",
+    "subtitle": "Rasheed's performance analysis and advice",
+    "markRead": "Mark as read",
+    "overallScore": "Overall score",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses",
+    "recommendationsList": "Recommendations",
+    "nextAction": "Next best action"
+  },
+  "summaries": {
+    "title": "Summaries",
+    "subtitle": "Kholasa's smart summaries of your sources",
+    "keyPoints": "Key points",
+    "importantTerms": "Important terms",
+    "reviewQuestions": "Review questions"
+  },
+  "transcriptions": {
+    "title": "Transcriptions",
+    "subtitle": "Sada's audio transcripts of your sources",
+    "duration": "{minutes} minutes",
+    "fullTranscript": "Full transcript",
+    "detectedTopics": "Detected topics"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read"
+  },
+  "subscription": {
+    "title": "Subscription",
+    "subtitle": "Your plan and current usage",
+    "currentPlan": "Your current plan",
+    "usage": "Usage",
+    "limits": "Limits",
+    "upgrade": "Upgrade plan",
+    "upgradeUnavailable": "Plan upgrades are coming soon",
+    "remaining": "{count} remaining"
+  },
+  "support": {
+    "title": "Support",
+    "subtitle": "Get in touch with our support team",
+    "newTicket": "New ticket",
+    "subjectField": "Subject",
+    "category": "Category",
+    "priority": "Priority",
+    "message": "Message",
+    "send": "Send",
+    "close": "Close ticket",
+    "reply": "Reply",
+    "status": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "waiting_user": "Waiting on you",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "categories": {
+      "technical": "Technical",
+      "account": "Account",
+      "billing": "Billing",
+      "content": "Content",
+      "ai_result": "AI result",
+      "other": "Other"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "sections": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "legal": "Legal"
+    },
+    "profile": {
+      "title": "Profile",
+      "fullName": "Full name",
+      "phoneNumber": "Phone number",
+      "email": "Email (not editable)"
+    },
+    "subjects": {
+      "title": "Subjects",
+      "addSubject": "Add subject",
+      "empty": "You haven't added any subjects yet"
+    },
+    "changePassword": {
+      "title": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "success": "Your password was changed successfully"
+    },
+    "theme": "Theme",
+    "language": "Language",
+    "about": "About Baraq",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "accountDeletion": {
+      "title": "Delete account",
+      "unavailable": "Account deletion isn't available yet until the backend contract is complete"
+    },
+    "logout": "Log out"
+  },
+  "onboarding": {
+    "profileSetup": {
+      "title": "Complete your study profile",
+      "educationStage": "Education stage",
+      "gradeLevel": "Grade level",
+      "specialization": "Specialization (optional)",
+      "studyGoal": "Study goal (optional)",
+      "dailyStudyHours": "Daily study hours",
+      "submit": "Continue"
+    },
+    "subjectsSelection": {
+      "title": "Choose your subjects",
+      "subtitle": "Pick at least one subject to continue",
+      "submit": "Finish setup"
+    }
+  },
+  "footer": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "about": "About Baraq",
+    "rights": "All rights reserved"
+  }
+}

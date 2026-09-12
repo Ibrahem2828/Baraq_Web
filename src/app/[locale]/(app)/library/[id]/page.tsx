@@ -1,0 +1,181 @@
+"use client";
+
+import { use, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@/i18n/navigation";
+import {
+  useSource,
+  useProcessSource,
+  useSourceCapabilities,
+} from "@/features/sources/hooks/useSources";
+import {
+  useSourceWithCharacter as postUseWithCharacter,
+  type UseWithCharacterInput,
+} from "@/features/sources/api/sourcesApi";
+import { CHARACTER_LIST, type CharacterKey } from "@/config/characters";
+import type { SourceStatus } from "@/types/domain";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { LoadingState } from "@/components/feedback/LoadingState";
+import { ErrorState } from "@/components/feedback/ErrorState";
+import { EmptyState } from "@/components/feedback/EmptyState";
+
+const STATUS_VARIANT: Record<SourceStatus, "neutral" | "info" | "success" | "destructive"> = {
+  uploaded: "neutral",
+  processing: "info",
+  ready: "success",
+  failed: "destructive",
+};
+
+export default function SourceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const t = useTranslations();
+  const router = useRouter();
+  const source = useSource(id);
+  const capabilities = useSourceCapabilities(id);
+  const processSource = useProcessSource();
+  const [pendingCharacter, setPendingCharacter] = useState<CharacterKey | null>(null);
+
+  const useWithCharacter = useMutation({
+    mutationFn: (input: UseWithCharacterInput) => postUseWithCharacter(id, input),
+    onSuccess: (response) => {
+      if (response.ai_job?.public_id) {
+        router.push(`/ai-jobs/${response.ai_job.public_id}`);
+      }
+    },
+  });
+
+  if (source.isPending) return <LoadingState label={t("common.loading")} />;
+  if (source.isError || !source.data) {
+    return (
+      <ErrorState
+        title={t("errors.UNKNOWN")}
+        retryLabel={t("common.retry")}
+        onRetry={() => source.refetch()}
+      />
+    );
+  }
+
+  const data = source.data;
+  const isProcessingRequired = data.status !== "ready";
+
+  return (
+    <div>
+      <PageHeader
+        title={data.title}
+        description={data.source_type}
+        actions={
+          <Badge variant={STATUS_VARIANT[data.status]}>{t(`library.status.${data.status}`)}</Badge>
+        }
+      />
+
+      <Card className="mb-6 flex flex-col items-start gap-3">
+        <h2 className="text-sm font-bold text-[color:var(--color-ink)]">
+          {t("library.detail.extractedText")}
+        </h2>
+        <p className="text-sm whitespace-pre-line text-[color:var(--color-ink-soft)]">
+          {data.extracted_text_preview || t("library.detail.noExtractedText")}
+        </p>
+        {data.status !== "ready" ? (
+          <Button
+            variant="outline"
+            onClick={() => processSource.mutate(data.id)}
+            loading={processSource.isPending}
+          >
+            {t("library.detail.process")}
+          </Button>
+        ) : null}
+      </Card>
+
+      <Card className="flex flex-col gap-3">
+        <h2 className="text-sm font-bold text-[color:var(--color-ink)]">
+          {t("library.detail.useWithCharacter")}
+        </h2>
+        {isProcessingRequired ? (
+          <EmptyState
+            title={t("library.detail.processingRequiredTitle")}
+            description={t("library.detail.processingRequiredDescription")}
+          />
+        ) : capabilities.isPending ? (
+          <LoadingState label={t("common.loading")} />
+        ) : capabilities.isError || !capabilities.data ? (
+          <ErrorState
+            title={t("errors.UNKNOWN")}
+            retryLabel={t("common.retry")}
+            onRetry={() => capabilities.refetch()}
+          />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {useWithCharacter.isError ? (
+              <p role="alert" className="text-sm text-[color:var(--color-destructive)]">
+                {t("errors.UNKNOWN")}
+              </p>
+            ) : null}
+            <div className="flex flex-wrap gap-3">
+              {CHARACTER_LIST.map((character) => {
+                const capability = capabilities.data[character.key];
+                // COMING_SOON: product rollout gate (independent of this
+                // source/backend — Kholasa/Sada aren't launched yet, see
+                // config/characters.ts). BLOCKED/UNAVAILABLE both read from
+                // the backend's own `available`/`message` — the API doesn't
+                // distinguish a separate "blocked" reason code, so the real
+                // Arabic message (e.g. a plan limit) is shown verbatim rather
+                // than inventing a fake distinct category.
+                if (!character.isLive) {
+                  return (
+                    <div
+                      key={character.key}
+                      className="flex flex-col gap-1 rounded-[var(--radius-md)] border border-dashed border-[color:var(--color-border)] px-4 py-3 text-sm"
+                    >
+                      <span className="font-semibold text-[color:var(--color-ink-faint)]">
+                        {t(`characters.${character.key}.name`)}
+                      </span>
+                      <span className="text-xs text-[color:var(--color-ink-faint)]">
+                        {t("common.comingSoon")}
+                      </span>
+                    </div>
+                  );
+                }
+                if (!capability?.available) {
+                  return (
+                    <div
+                      key={character.key}
+                      className="flex flex-col gap-1 rounded-[var(--radius-md)] border border-[color:var(--color-border)] px-4 py-3 text-sm"
+                    >
+                      <span className="font-semibold text-[color:var(--color-ink-faint)]">
+                        {t(`characters.${character.key}.name`)}
+                      </span>
+                      {capability?.message ? (
+                        <span className="text-xs text-[color:var(--color-ink-faint)]">
+                          {capability.message}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                }
+                return (
+                  <Button
+                    key={character.key}
+                    variant="secondary"
+                    title={capability.message}
+                    loading={useWithCharacter.isPending && pendingCharacter === character.key}
+                    disabled={useWithCharacter.isPending && pendingCharacter !== character.key}
+                    onClick={() => {
+                      setPendingCharacter(character.key);
+                      useWithCharacter.mutate({ character: character.key });
+                    }}
+                  >
+                    {t(`characters.${character.key}.name`)}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}

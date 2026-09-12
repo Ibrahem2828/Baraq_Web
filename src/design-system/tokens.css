@@ -1,0 +1,194 @@
+/**
+ * Baraq design tokens.
+ *
+ * Light/dark values are sourced verbatim from `Baraq_Website/css/style.css`
+ * (`:root` block) — sampled by the brand team from the real character
+ * artwork and logo, not invented. The "fire" theme does not exist on the
+ * marketing site; its values are ported from the mobile app's
+ * `src/theme/themes.ts` "fire" theme (a warm/ember palette already shipped
+ * in production) and mapped onto the same semantic token names used here.
+ *
+ * All spacing/sizing tokens use logical properties in components (see
+ * DESIGN_SYSTEM.md) so RTL (Arabic, default) and LTR (English) both work
+ * from the same token set without per-direction overrides.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-bg: #f5f3fb;
+  --color-bg-soft: #ebe7f6;
+  --color-surface: #ffffff;
+  --color-surface-2: #fbfafe;
+  --color-surface-elevated: #ffffff;
+
+  /* Text */
+  --color-ink: #14172b;
+  --color-ink-soft: #565a72;
+  --color-ink-faint: #8b8fa8;
+  --color-ink-inverse: #f4f2fb;
+
+  /* Borders */
+  --color-border: #e1dcef;
+  --color-border-strong: #cfc7e6;
+
+  /* Brand accent (gold) */
+  --color-accent: #c9871b;
+  --color-accent-solid: #e8a025;
+  --color-accent-contrast: #14172b;
+
+  /* Semantic */
+  --color-success: #2f8f4e;
+  --color-success-bg: color-mix(in srgb, #2f8f4e 14%, transparent);
+  --color-warning: #c9871b;
+  --color-warning-bg: color-mix(in srgb, #c9871b 14%, transparent);
+  --color-destructive: #c0392b;
+  --color-destructive-bg: color-mix(in srgb, #c0392b 14%, transparent);
+  --color-info: #2e7fbe;
+  --color-info-bg: color-mix(in srgb, #2e7fbe 14%, transparent);
+
+  /* Character identity colors */
+  --color-character-fahes: #2e7fbe;
+  --color-character-khota: #a6392a;
+  --color-character-rasheed: #2f7a3b;
+  --color-character-sada: #623793;
+  --color-character-kholasa: #b23a5c;
+
+  /* Shadows */
+  --shadow-sm: 0 8px 20px -12px rgba(20, 23, 43, 0.3);
+  --shadow-md: 0 20px 45px -25px rgba(20, 23, 43, 0.35);
+
+  /* Shape */
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
+  --radius-full: 999px;
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-accent-solid) 45%, transparent);
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
+  --duration-slow: 320ms;
+
+  /* Layout */
+  --container-max: 1180px;
+}
+
+/* Dark — system preference, unless explicitly overridden */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="fire"]) {
+    --color-bg: #0b0e1a;
+    --color-bg-soft: #10152a;
+    --color-surface: #141a2c;
+    --color-surface-2: #191f35;
+    --color-surface-elevated: #1c2338;
+
+    --color-ink: #f4f2fb;
+    --color-ink-soft: #abb0c8;
+    --color-ink-faint: #6c7290;
+    --color-ink-inverse: #14172b;
+
+    --color-border: #262c46;
+    --color-border-strong: #333b5c;
+
+    --color-accent: #f2b84e;
+    --color-accent-solid: #f2b84e;
+    --color-accent-contrast: #14172b;
+
+    --color-character-fahes: #6fb2e8;
+    --color-character-khota: #e0725f;
+    --color-character-rasheed: #6bcb74;
+    --color-character-sada: #a57ad1;
+    --color-character-kholasa: #e37da0;
+
+    --shadow-sm: 0 10px 24px -14px rgba(0, 0, 0, 0.55);
+    --shadow-md: 0 24px 55px -20px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Dark — explicit toggle */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0b0e1a;
+  --color-bg-soft: #10152a;
+  --color-surface: #141a2c;
+  --color-surface-2: #191f35;
+  --color-surface-elevated: #1c2338;
+
+  --color-ink: #f4f2fb;
+  --color-ink-soft: #abb0c8;
+  --color-ink-faint: #6c7290;
+  --color-ink-inverse: #14172b;
+
+  --color-border: #262c46;
+  --color-border-strong: #333b5c;
+
+  --color-accent: #f2b84e;
+  --color-accent-solid: #f2b84e;
+  --color-accent-contrast: #14172b;
+
+  --color-character-fahes: #6fb2e8;
+  --color-character-khota: #e0725f;
+  --color-character-rasheed: #6bcb74;
+  --color-character-sada: #a57ad1;
+  --color-character-kholasa: #e37da0;
+
+  --shadow-sm: 0 10px 24px -14px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 24px 55px -20px rgba(0, 0, 0, 0.6);
+}
+
+/*
+ * Fire theme — ported from Baraq-App/src/theme/themes.ts ("fire"), the
+ * mobile app's warm/ember alternate theme. Not present on the marketing
+ * site; ink/surface/border values below are derived from the same palette
+ * family to stay legible while matching the mobile app's warm accent.
+ */
+:root[data-theme="fire"] {
+  color-scheme: dark;
+  --color-bg: #1a0f0a;
+  --color-bg-soft: #24150d;
+  --color-surface: #2a180f;
+  --color-surface-2: #331c11;
+  --color-surface-elevated: #3a2013;
+
+  --color-ink: #fbe9dd;
+  --color-ink-soft: #d9ab8f;
+  --color-ink-faint: #a97a5e;
+  --color-ink-inverse: #1a0f0a;
+
+  --color-border: #402315;
+  --color-border-strong: #532c1a;
+
+  --color-accent: #ff6b2c;
+  --color-accent-solid: #ff6b2c;
+  --color-accent-contrast: #1a0f0a;
+
+  --color-success: #6bcb74;
+  --color-destructive: #ff5757;
+  --color-info: #6fb2e8;
+  --color-warning: #ff6b2c;
+
+  --color-character-fahes: #6fb2e8;
+  --color-character-khota: #ff8a5c;
+  --color-character-rasheed: #8fd97a;
+  --color-character-sada: #c99bf2;
+  --color-character-kholasa: #ff7fa3;
+
+  --shadow-sm: 0 10px 24px -14px rgba(0, 0, 0, 0.65);
+  --shadow-md: 0 24px 55px -20px rgba(0, 0, 0, 0.7);
+}
+
+/* Typography — Arabic-first, English override per html[lang] */
+:root {
+  --font-display: var(--font-almarai), Tahoma, sans-serif;
+  --font-body: var(--font-ibm-plex-arabic), Tahoma, sans-serif;
+}
+
+html[lang="en"] {
+  --font-display: var(--font-poppins), "Segoe UI", sans-serif;
+  --font-body: var(--font-ibm-plex-sans), "Segoe UI", sans-serif;
+}
