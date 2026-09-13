@@ -35,7 +35,17 @@ jobs:
       - run: npm run test
       - run: npm run build
       - name: Build production Docker image
-        run: docker build --tag baraq-web:ci .
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! docker build --progress=plain --tag baraq-web:ci . 2>&1 | tee docker-build.log; then
+            error=$(tail -n 20 docker-build.log)
+            error=${error//'%'/'%25'}
+            error=${error//$'\n'/'%0A'}
+            error=${error//$'\r'/'%0D'}
+            echo "::error title=Docker build failed::$error"
+            exit 1
+          fi
       - name: Smoke-test production Docker image
         shell: bash
         run: |
