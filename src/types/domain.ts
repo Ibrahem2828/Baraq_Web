@@ -162,6 +162,27 @@ export interface QuizQuestion {
   choices: QuizChoice[];
 }
 
+/**
+ * The `quiz` object nested inside `QuizAttemptDetail` (`QuizAttemptDetailQuizSerializer`
+ * on the backend) — a distinct, narrower shape than the standalone `Quiz` read type:
+ * it always includes `questions` but omits `project`/`attempts_count`/`last_attempt`/
+ * `ai_request_id`/`created_at`/`updated_at`.
+ */
+export interface QuizAttemptQuizSummary {
+  id: number;
+  title: string;
+  description: string | null;
+  topic: string | null;
+  difficulty_level: DifficultyLevel;
+  quiz_type: QuizType;
+  generation_type: GenerationType;
+  status: QuizStatus;
+  questions_count: number;
+  time_limit_minutes: number | null;
+  subject: Subject;
+  questions: QuizQuestion[];
+}
+
 /** A previous attempt's headline result, embedded on `Quiz.last_attempt`. */
 export interface QuizAttemptMini {
   id: number;
@@ -359,6 +380,8 @@ export interface AIJob {
 
 export interface StudentRecommendation {
   id: number;
+  /** The Project's public_id. Only present once the backend serializer exposes it — treat as possibly absent on an older deployed backend. */
+  project?: string | null;
   subject: number | null;
   title: string;
   summary: string;
@@ -385,6 +408,8 @@ export interface StudentRecommendation {
 
 export interface Summary {
   id: number;
+  /** The Project's public_id. Only present once the backend serializer exposes it (see docs/AUTH_SECURITY.md §12-adjacent Phase 0 fix) — treat as possibly absent on an older deployed backend. */
+  project?: string | null;
   source: number | null;
   collection: number | null;
   title: string;
@@ -394,23 +419,29 @@ export interface Summary {
   important_terms: string[];
   covered_topics: string[];
   review_questions: string[];
+  source_references?: string[];
   /** Decimal, serialized as a string. */
   quality_score: string | null;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface Transcription {
   id: number;
+  /** The Project's public_id. Only present once the backend serializer exposes it — treat as possibly absent on an older deployed backend. */
+  project?: string | null;
   source: number;
   title: string;
   language: string;
   full_transcript: string;
   cleaned_transcript: string;
+  segments?: unknown[];
   detected_topics: string[];
   duration_seconds: number;
   /** Decimal, serialized as a string. */
   confidence_score: string | null;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface SubscriptionPlan {
@@ -497,8 +528,10 @@ export type SupportTicketStatus = "open" | "in_progress" | "waiting_user" | "res
 
 export interface SupportMessage {
   id: number;
+  /** The sending user's id. Compare against the current user's id to tell staff replies from the student's own messages — `is_internal` is always omitted/false here since staff-only notes never reach this endpoint. */
+  sender: number;
+  sender_name: string;
   body: string;
-  is_staff: boolean;
   created_at: string;
 }
 

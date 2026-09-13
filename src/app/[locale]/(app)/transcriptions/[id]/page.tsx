@@ -3,6 +3,7 @@
 import { use } from "react";
 import { useTranslations } from "next-intl";
 import { useTranscription } from "@/features/results/hooks/useResults";
+import { OpenSourceLink, OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -35,6 +36,12 @@ export default function TranscriptionDetailPage({ params }: { params: Promise<{ 
         description={t("transcriptions.duration", {
           minutes: Math.round(data.duration_seconds / 60),
         })}
+        actions={
+          <>
+            <OpenSourceLink sourceId={data.source} />
+            <OpenProjectLink projectId={data.project} />
+          </>
+        }
       />
 
       <div className="flex flex-col gap-6">

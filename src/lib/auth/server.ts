@@ -19,6 +19,9 @@ interface LoginResponseData {
   user: Record<string, unknown>;
 }
 
+/** Whatever JSON body the backend sent back for a failed auth request — forwarded to the client as-is (see login()/verifyEmail() below) so real error codes/messages survive instead of being discarded. */
+type AuthFailureBody = Record<string, unknown> | null;
+
 interface RefreshResponseData {
   access: string;
   refresh: string;
@@ -97,10 +100,11 @@ export async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
-export async function login(
-  email: string,
-  password: string,
-): Promise<{ ok: true; user: Record<string, unknown> } | { ok: false; status: number }> {
+type AuthResult =
+  | { ok: true; user: Record<string, unknown> }
+  | { ok: false; status: number; body: AuthFailureBody };
+
+export async function login(email: string, password: string): Promise<AuthResult> {
   const response = await backendFetch(endpoints.auth.login, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -108,7 +112,26 @@ export async function login(
   });
 
   if (!response.ok) {
-    return { ok: false, status: response.status };
+    const body = (await response.json().catch(() => null)) as AuthFailureBody;
+    return { ok: false, status: response.status, body };
+  }
+
+  const envelope = (await response.json()) as SuccessEnvelope<LoginResponseData>;
+  await setAuthCookies({ access: envelope.data.access, refresh: envelope.data.refresh });
+  return { ok: true, user: envelope.data.user };
+}
+
+/** Verifies a registration email-OTP code. On success the backend logs the user in directly (same `{access, refresh, user}` shape as login), so this sets cookies exactly like `login()` does. */
+export async function verifyEmail(email: string, code: string): Promise<AuthResult> {
+  const response = await backendFetch(endpoints.auth.verifyEmail, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code }),
+  });
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as AuthFailureBody;
+    return { ok: false, status: response.status, body };
   }
 
   const envelope = (await response.json()) as SuccessEnvelope<LoginResponseData>;

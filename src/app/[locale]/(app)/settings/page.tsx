@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { useLogout } from "@/lib/auth/client";
+import { useDeleteAccount } from "@/features/auth/hooks/useAuthMutations";
 import { useThemeStore, type ThemePreference } from "@/stores/theme-store";
 import { featureFlags } from "@/config/feature-flags";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -65,9 +66,11 @@ export default function SettingsPage() {
   const t = useTranslations();
   const router = useRouter();
   const logout = useLogout();
+  const deleteAccount = useDeleteAccount();
   const preference = useThemeStore((state) => state.preference);
   const setPreference = useThemeStore((state) => state.setPreference);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // No per-option i18n keys exist for theme names yet (mirrors the same gap in
   // components/layout/ThemeToggle.tsx's Topbar usage) — hardcoded pending a
@@ -163,11 +166,14 @@ export default function SettingsPage() {
         </section>
 
         <section>
-          <Card>
-            <div
+          <Card className="p-0">
+            <button
+              type="button"
+              disabled={!featureFlags.accountDeletion}
+              onClick={() => setDeleteOpen(true)}
               className={cn(
-                "flex items-center gap-3",
-                !featureFlags.accountDeletion && "opacity-60",
+                "flex w-full items-center gap-3 px-5 py-4 text-start transition-colors hover:bg-[color:var(--color-bg-soft)]",
+                !featureFlags.accountDeletion && "cursor-not-allowed opacity-60",
               )}
             >
               <Trash2
@@ -179,10 +185,10 @@ export default function SettingsPage() {
                   {t("settings.accountDeletion.title")}
                 </p>
                 <p className="mt-0.5 text-xs text-[color:var(--color-ink-soft)]">
-                  {t("settings.accountDeletion.unavailable")}
+                  {t("settings.accountDeletion.description")}
                 </p>
               </div>
-            </div>
+            </button>
           </Card>
         </section>
 
@@ -197,6 +203,29 @@ export default function SettingsPage() {
           </Button>
         </section>
       </div>
+
+      <ConfirmationDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title={t("settings.accountDeletion.title")}
+        description={
+          deleteAccount.error instanceof Error
+            ? deleteAccount.error.message
+            : t("settings.accountDeletion.confirmation")
+        }
+        confirmLabel={t("settings.accountDeletion.confirm")}
+        cancelLabel={t("common.cancel")}
+        destructive
+        loading={deleteAccount.isPending}
+        onConfirm={() =>
+          deleteAccount.mutate(undefined, {
+            onSuccess: () => {
+              setDeleteOpen(false);
+              router.replace("/login");
+            },
+          })
+        }
+      />
 
       <ConfirmationDialog
         open={logoutOpen}

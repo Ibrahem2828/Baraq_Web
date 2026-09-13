@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { backendFetch } from "@/lib/api/backend";
+import { serverEnv } from "@/config/env";
+import { NO_STORE_HEADERS } from "@/lib/http/no-store";
+import { endpoints } from "@/lib/api/endpoints";
 import {
   getAccessToken,
   refreshAccessToken,
@@ -24,6 +27,10 @@ import {
  */
 
 const MUTATING_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
+
+function jsonError(body: Record<string, unknown>, status: number): NextResponse {
+  return NextResponse.json(body, { status, headers: NO_STORE_HEADERS });
+}
 
 function buildTargetPath(segments: string[], search: string): string {
   if (segments.some((segment) => segment === ".." || segment.includes("\\"))) {
@@ -65,9 +72,9 @@ async function handle(
   try {
     targetPath = buildTargetPath(path ?? [], request.nextUrl.searchParams.toString());
   } catch {
-    return NextResponse.json(
+    return jsonError(
       { success: false, message: "Invalid request path", code: "invalid_path" },
-      { status: 400 },
+      400,
     );
   }
 
@@ -75,15 +82,33 @@ async function handle(
   if (isMutating) {
     const csrfOk = await validateMutationCsrf(request);
     if (!csrfOk) {
-      return NextResponse.json(
+      return jsonError(
         { success: false, message: "CSRF validation failed", code: "csrf_invalid" },
-        { status: 403 },
+        403,
       );
     }
   }
 
+  // Reject oversized bodies before buffering them in memory. Checked twice: the
+  // declared Content-Length (cheap, catches almost every real client) and the
+  // actual buffered size (catches a missing/lying Content-Length header).
+  const declaredLength = Number(request.headers.get("content-length") ?? 0);
+  if (declaredLength > serverEnv.BFF_MAX_BODY_BYTES) {
+    return jsonError(
+      { success: false, message: "Request body too large", code: "payload_too_large" },
+      413,
+    );
+  }
+
   const body =
     request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
+
+  if (body && body.byteLength > serverEnv.BFF_MAX_BODY_BYTES) {
+    return jsonError(
+      { success: false, message: "Request body too large", code: "payload_too_large" },
+      413,
+    );
+  }
 
   let accessToken = await getAccessToken();
   if (!accessToken) {
@@ -103,7 +128,14 @@ async function handle(
     await clearAuthCookies();
   }
 
-  const responseHeaders = new Headers();
+  // Account deletion invalidates every backend token. Remove the browser's
+  // HttpOnly tokens in the same response so the deleted session disappears
+  // immediately rather than waiting for a later 401/refresh attempt.
+  if (request.method === "DELETE" && targetPath === endpoints.users.me && upstream.ok) {
+    await clearAuthCookies();
+  }
+
+  const responseHeaders = new Headers(NO_STORE_HEADERS);
   const contentType = upstream.headers.get("content-type");
   if (contentType) responseHeaders.set("Content-Type", contentType);
   const upstreamRequestId = upstream.headers.get("x-request-id");

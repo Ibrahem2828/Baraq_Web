@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: production
+      BACKEND_API_URL: https://api.baraqapp.com
+      FRONTEND_PASSWORD_RESET_URL: https://web.baraqapp.com/ar/reset-password
+      AUTH_COOKIE_SECURE: "true"
+      NEXT_PUBLIC_SITE_URL: https://web.baraqapp.com
+      NEXT_PUBLIC_DEFAULT_LOCALE: ar
+      NEXT_PUBLIC_APP_NAME: Baraq
+      NEXT_PUBLIC_APP_VERSION: rc
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run validate:env
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - name: Build and smoke-test production Docker image
+        shell: bash
+        run: |
+          docker build --tag baraq-web:ci .
+          container_id=$(docker run --detach --publish 127.0.0.1:3000:3000 baraq-web:ci)
+          trap 'docker rm --force "$container_id"' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "$container_id"
+          exit 1

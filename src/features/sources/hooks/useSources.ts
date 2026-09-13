@@ -6,14 +6,19 @@ import {
   listSources,
   getSource,
   uploadSource,
+  updateSource,
   deleteSource,
   processSource,
   getSourceCapabilities,
   listCollections,
   getCollection,
   createCollection,
+  updateCollection,
+  deleteCollection,
   type SourceFilters,
   type CollectionFilters,
+  type UpdateSourceInput,
+  type UpdateCollectionInput,
 } from "../api/sourcesApi";
 
 export function useSources(filters: SourceFilters = {}) {
@@ -36,6 +41,17 @@ export function useUploadSource() {
   return useMutation({
     mutationFn: uploadSource,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
+    },
+  });
+}
+
+export function useUpdateSource(id: number | string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (patch: UpdateSourceInput) => updateSource(id, patch),
+    onSuccess: (source) => {
+      queryClient.setQueryData(queryKeys.sources.detail(source.id), source);
       queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
     },
   });
@@ -89,6 +105,27 @@ export function useCreateCollection() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createCollection,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sources.collections() });
+    },
+  });
+}
+
+export function useUpdateCollection(id: number | string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (patch: UpdateCollectionInput) => updateCollection(id, patch),
+    onSuccess: (collection) => {
+      queryClient.setQueryData(queryKeys.sources.collection(collection.id), collection);
+      queryClient.invalidateQueries({ queryKey: queryKeys.sources.collections() });
+    },
+  });
+}
+
+export function useDeleteCollection() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteCollection,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sources.collections() });
     },

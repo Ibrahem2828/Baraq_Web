@@ -21,7 +21,13 @@ import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/auth/cookie-names";
  *     nothing downstream may assume the proxy already verified the session.
  */
 
-const PUBLIC_SEGMENTS = new Set(["login", "register", "forgot-password", "reset-password"]);
+const PUBLIC_SEGMENTS = new Set([
+  "login",
+  "register",
+  "verify-email",
+  "forgot-password",
+  "reset-password",
+]);
 
 const handleI18nRouting = createMiddleware(routing);
 

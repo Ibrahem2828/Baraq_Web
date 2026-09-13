@@ -5,7 +5,9 @@ import type {
   DifficultyLevel,
   Quiz,
   QuizAttempt,
+  QuizAttemptQuizSummary,
   QuizQuestion,
+  QuizResult,
   QuizStatus,
   QuizType,
 } from "@/types/domain";
@@ -13,6 +15,8 @@ import type {
 export interface QuizFilters {
   status?: QuizStatus;
   subject?: number;
+  /** The Project's public_id. */
+  project?: string;
   search?: string;
   [key: string]: string | number | boolean | undefined;
 }
@@ -43,50 +47,47 @@ export interface StartQuizAttemptResponse {
   status: AttemptStatus;
 }
 
-/** A single recorded answer within an attempt. `is_correct` is only populated after submit. */
+/**
+ * A single recorded answer within an attempt, as returned by `StudentAnswerSerializer`.
+ * Does not include `is_correct` — that only appears in the graded `QuizResult.answers`
+ * (`GradedQuestion`/`GradedChoice`) once the attempt is submitted.
+ */
 export interface QuizAttemptAnswerRecord {
+  id: number;
   question: number;
   selected_choice: number | null;
-  text_answer: string | null;
-  is_correct?: boolean | null;
+  text_answer: string;
+  created_at: string;
+  updated_at: string;
 }
 
 /**
- * Full attempt detail, as returned by `GET /quiz-attempts/{id}/`. Extends the
- * slim `QuizAttempt` domain type with the nested quiz, question set, and any
- * answers recorded so far. `QuizAttemptDetailSerializer` hides
- * `QuizChoice.is_correct` and question `explanation` while `status ===
- * "in_progress"` — they only appear once the attempt is submitted.
+ * Full attempt detail, as returned by `GET /quiz-attempts/{id}/` and by the
+ * `answer` action (`QuizAttemptDetailSerializer`). The nested `quiz` always
+ * carries its `questions`; score/percentage fields default to zero on the
+ * backend model until the attempt is submitted.
  */
 export interface QuizAttemptDetail {
   id: number;
-  quiz: Quiz;
+  quiz: QuizAttemptQuizSummary;
   status: AttemptStatus;
   started_at: string;
   submitted_at: string | null;
-  time_limit_minutes?: number | null;
-  questions: QuizQuestion[];
-  answers?: QuizAttemptAnswerRecord[];
+  /** Decimal fields, serialized as strings by DRF; default `"0.00"` until submitted. */
+  score: string;
+  max_score: string;
+  percentage: string;
+  correct_answers_count: number;
+  wrong_answers_count: number;
+  unanswered_count: number;
+  duration_seconds: number | null;
+  answers: QuizAttemptAnswerRecord[];
 }
 
 export interface AnswerQuestionInput {
   question: number;
   selected_choice?: number;
   text_answer?: string;
-}
-
-export interface QuizAttemptResult {
-  attempt_id: number;
-  quiz: Quiz;
-  status: AttemptStatus;
-  score: number;
-  total_points?: number;
-  earned_points?: number;
-  correct_count: number;
-  wrong_count: number;
-  unanswered_count: number;
-  recommendations?: string[];
-  questions?: (QuizQuestion & { student_answer?: QuizAttemptAnswerRecord | null })[];
 }
 
 export function listQuizzes(filters: QuizFilters = {}) {
@@ -123,18 +124,18 @@ export function getAttempt(id: number | string) {
 }
 
 export function answerQuestion(attemptId: number | string, input: AnswerQuestionInput) {
-  return apiClient.post<QuizAttemptAnswerRecord>(endpoints.quizzes.attemptAnswer(attemptId), input);
+  return apiClient.post<QuizAttemptDetail>(endpoints.quizzes.attemptAnswer(attemptId), input);
 }
 
 export function submitAttempt(attemptId: number | string, answers?: AnswerQuestionInput[]) {
-  return apiClient.post<QuizAttemptDetail>(
+  return apiClient.post<QuizResult>(
     endpoints.quizzes.attemptSubmit(attemptId),
     answers ? { answers } : undefined,
   );
 }
 
 export function getAttemptResult(attemptId: number | string) {
-  return apiClient.get<QuizAttemptResult>(endpoints.quizzes.attemptResult(attemptId));
+  return apiClient.get<QuizResult>(endpoints.quizzes.attemptResult(attemptId));
 }
 
 export function abandonAttempt(attemptId: number | string) {

@@ -79,7 +79,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
   const remainingSeconds = useRemainingSeconds(
     attempt.data?.started_at,
-    attempt.data?.time_limit_minutes ?? attempt.data?.quiz.time_limit_minutes,
+    attempt.data?.quiz.time_limit_minutes,
   );
 
   // Seed local answer state from the attempt's already-recorded answers, once per attempt.
@@ -168,7 +168,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
             <Card className="flex flex-col gap-5">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-bold text-[color:var(--color-ink)]">
-                  {Math.round(result.data.score)}%
+                  {Math.round(Number(result.data.percentage))}%
                 </span>
                 <span className="text-sm text-[color:var(--color-ink-soft)]">
                   {t("quizzes.result.score")}
@@ -176,10 +176,10 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
               </div>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="success">
-                  {t("quizzes.result.correct")}: {result.data.correct_count}
+                  {t("quizzes.result.correct")}: {result.data.correct_answers_count}
                 </Badge>
                 <Badge variant="destructive">
-                  {t("quizzes.result.wrong")}: {result.data.wrong_count}
+                  {t("quizzes.result.wrong")}: {result.data.wrong_answers_count}
                 </Badge>
                 <Badge variant="neutral">
                   {t("quizzes.result.unanswered")}: {result.data.unanswered_count}
@@ -210,7 +210,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
   }
 
   // in_progress: quiz-taking form.
-  const questions = data.questions;
+  const questions = data.quiz.questions;
   const totalQuestions = questions.length;
 
   if (totalQuestions === 0) {

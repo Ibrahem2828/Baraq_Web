@@ -20,6 +20,8 @@ const serverEnvSchema = z.object({
     .url()
     .refine((value) => !value.endsWith("/"), "BACKEND_API_URL must not end with a trailing slash"),
   BACKEND_API_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
+  /** Hard cap on request bodies the BFF proxy will forward upstream (bytes). Default gives headroom above `SOURCE_UPLOAD.maxSizeBytes` (25MB) for multipart overhead. */
+  BFF_MAX_BODY_BYTES: z.coerce.number().int().positive().default(30 * 1024 * 1024),
   AUTH_COOKIE_SECURE: z
     .string()
     .optional()
@@ -34,6 +36,7 @@ function loadServerEnv() {
     APP_ENV: process.env.APP_ENV,
     BACKEND_API_URL: process.env.BACKEND_API_URL,
     BACKEND_API_TIMEOUT_MS: process.env.BACKEND_API_TIMEOUT_MS,
+    BFF_MAX_BODY_BYTES: process.env.BFF_MAX_BODY_BYTES,
     AUTH_COOKIE_SECURE: process.env.AUTH_COOKIE_SECURE,
     AUTH_COOKIE_DOMAIN: process.env.AUTH_COOKIE_DOMAIN,
     FRONTEND_PASSWORD_RESET_URL: process.env.FRONTEND_PASSWORD_RESET_URL,

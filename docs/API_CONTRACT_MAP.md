@@ -140,8 +140,9 @@ array in `data` and `{count, next, previous}` in `meta` — **not** DRF's raw
 | POST | `password-reset/confirm/` | Public | `{uid, token, new_password}` |
 
 Access token lifetime 30 min, refresh 14 days (both env-configurable on the backend, must
-match cookie max-ages in `src/lib/auth/cookies.ts`). **No self-service account deletion
-endpoint exists anywhere in this API.**
+match cookie max-ages in `src/lib/auth/cookies.ts`). Self-service account deletion is
+available as authenticated `DELETE /users/me/`; the backend anonymizes the user and
+revokes outstanding tokens.
 
 ## Users / students / subjects
 
@@ -259,11 +260,10 @@ public marketing-site-only, not used by this app.
 
 ## Known backend gaps (flagged to the backend team, not fabricated in the frontend)
 
-1. No self-service account deletion endpoint.
-2. No subscription checkout/payment-provider integration.
-3. `FRONTEND_PASSWORD_RESET_URL` defaults to a mobile deep link scheme, not a web URL —
-   needs an env override (or a second, web-specific setting) once this app is deployed.
-4. `frontend_api_contract.json`/`frontend_api_contract_summary.md` in the backend repo
+1. No subscription checkout/payment-provider integration.
+2. Production must set `FRONTEND_PASSWORD_RESET_URL` to
+   `https://web.baraqapp.com/ar/reset-password`; the deployment contract now does so.
+3. `frontend_api_contract.json`/`frontend_api_contract_summary.md` in the backend repo
    reference a stale host (`api.barraq.xn--mgbaab0cxheq.tech`) — the actual
    production host per `docker-compose`/`.env` is `api.baraqapp.com`. Trust the
    deployment config over that doc file if they ever disagree again.

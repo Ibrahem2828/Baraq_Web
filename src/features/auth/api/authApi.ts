@@ -30,3 +30,17 @@ export function confirmPasswordReset(input: ResetPasswordInput) {
 export function changePassword(input: { current_password: string; new_password: string }) {
   return apiClient.post<{ message: string }>(endpoints.auth.changePassword, input);
 }
+
+/** Deletes and anonymizes the authenticated account through the Backend contract. */
+export function deleteAccount() {
+  return apiClient.delete<{ message: string }>(endpoints.users.me);
+}
+
+/**
+ * Re-sends the registration email-OTP code. No cookie side effects (unlike
+ * `verifyEmail` in `lib/auth/server.ts`), so this goes through the generic
+ * BFF proxy like `register` above.
+ */
+export function resendOtp(email: string) {
+  return apiClient.post<{ message: string }>(endpoints.auth.resendOtp, { email });
+}
