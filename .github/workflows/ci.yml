@@ -34,10 +34,11 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
-      - name: Build and smoke-test production Docker image
+      - name: Build production Docker image
+        run: docker build --tag baraq-web:ci .
+      - name: Smoke-test production Docker image
         shell: bash
         run: |
-          docker build --tag baraq-web:ci .
           container_id=$(docker run --detach --publish 127.0.0.1:3000:3000 baraq-web:ci)
           trap 'docker rm --force "$container_id"' EXIT
           for attempt in {1..30}; do
