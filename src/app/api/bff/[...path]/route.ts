@@ -128,6 +128,22 @@ async function handle(
     await clearAuthCookies();
   }
 
+  // A 3xx from Django should never happen for a well-formed proxied request
+  // (see buildTargetPath, which already normalizes the trailing slash), but
+  // relaying one raw to the browser as-is would surface a broken redirect
+  // response instead of a usable API error. Fail closed with a clear 502.
+  if (upstream.status >= 300 && upstream.status < 400) {
+    console.error("[bff] unexpected upstream redirect", {
+      targetPath,
+      status: upstream.status,
+      location: upstream.headers.get("location"),
+    });
+    return jsonError(
+      { success: false, message: "Upstream service error", code: "upstream_redirect" },
+      502,
+    );
+  }
+
   // Account deletion invalidates every backend token. Remove the browser's
   // HttpOnly tokens in the same response so the deleted session disappears
   // immediately rather than waiting for a later 401/refresh attempt.

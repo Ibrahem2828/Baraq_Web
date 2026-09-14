@@ -104,12 +104,49 @@ type AuthResult =
   | { ok: true; user: Record<string, unknown> }
   | { ok: false; status: number; body: AuthFailureBody };
 
-export async function login(email: string, password: string): Promise<AuthResult> {
-  const response = await backendFetch(endpoints.auth.login, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+/**
+ * Classifies a thrown network error for safe internal logging and an
+ * accurate (but non-sensitive) HTTP status — never the same flat status for
+ * every failure kind. `backendFetch` uses `redirect: "manual"`, so an
+ * unexpected upstream 3xx surfaces as a resolved (non-throwing) response
+ * with an unparseable body and is handled by the `!response.ok` branch
+ * above/below, not here; this only covers connect/timeout/DNS failures.
+ */
+function classifyAuthTransportError(error: unknown): { status: number; code: string } {
+  if (error instanceof DOMException && error.name === "TimeoutError") {
+    return { status: 504, code: "upstream_timeout" };
+  }
+  const cause = error instanceof Error ? (error.cause as { code?: string } | undefined) : undefined;
+  if (cause?.code === "ECONNREFUSED" || cause?.code === "ENOTFOUND" || cause?.code === "EAI_AGAIN") {
+    return { status: 502, code: "upstream_unreachable" };
+  }
+  return { status: 502, code: "upstream_error" };
+}
+
+function logAuthTransportError(operation: string, error: unknown, startedAt: number): { status: number; code: string } {
+  const classified = classifyAuthTransportError(error);
+  console.error(`[auth:${operation}] request failed`, {
+    code: classified.code,
+    status: classified.status,
+    durationMs: Date.now() - startedAt,
+    message: error instanceof Error ? error.message : String(error),
   });
+  return classified;
+}
+
+export async function login(email: string, password: string): Promise<AuthResult> {
+  const startedAt = Date.now();
+  let response: Response;
+  try {
+    response = await backendFetch(endpoints.auth.login, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (error) {
+    const { status } = logAuthTransportError("login", error, startedAt);
+    return { ok: false, status, body: null };
+  }
 
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as AuthFailureBody;
@@ -123,11 +160,18 @@ export async function login(email: string, password: string): Promise<AuthResult
 
 /** Verifies a registration email-OTP code. On success the backend logs the user in directly (same `{access, refresh, user}` shape as login), so this sets cookies exactly like `login()` does. */
 export async function verifyEmail(email: string, code: string): Promise<AuthResult> {
-  const response = await backendFetch(endpoints.auth.verifyEmail, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, code }),
-  });
+  const startedAt = Date.now();
+  let response: Response;
+  try {
+    response = await backendFetch(endpoints.auth.verifyEmail, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+  } catch (error) {
+    const { status } = logAuthTransportError("verify-email", error, startedAt);
+    return { ok: false, status, body: null };
+  }
 
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as AuthFailureBody;

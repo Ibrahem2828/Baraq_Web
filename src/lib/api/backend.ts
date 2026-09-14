@@ -23,6 +23,14 @@ export async function backendFetch(path: string, init: BackendFetchInit = {}): P
   if (!finalHeaders.has("Accept")) {
     finalHeaders.set("Accept", "application/json");
   }
+  // This call always goes to the real Django backend over the internal
+  // Docker network, bypassing the Caddy gateway that normally sets this
+  // header for public traffic. Django trusts X-Forwarded-Proto
+  // (SECURE_PROXY_SSL_HEADER in config/settings.py) to decide whether the
+  // request arrived over HTTPS; without it, SECURE_SSL_REDIRECT=True makes
+  // Django 301-redirect this plain-HTTP internal request to an HTTPS URL
+  // that nothing internally serves.
+  finalHeaders.set("X-Forwarded-Proto", "https");
 
   return fetch(backendUrl(path), {
     ...rest,
