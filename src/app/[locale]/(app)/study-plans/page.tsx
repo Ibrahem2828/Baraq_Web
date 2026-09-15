@@ -1,22 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Sparkles, Plus } from "lucide-react";
-import { z } from "zod";
-import { Link, useRouter } from "@/i18n/navigation";
-import { useStudyPlans, useCreateStudyPlan } from "@/features/study-plans/hooks/useStudyPlans";
-import { useCreateAIJob } from "@/features/ai-jobs/hooks/useAIJob";
-import { createStudyPlanSchema, type CreateStudyPlanInput } from "@/lib/validation/study-plans";
+import { FolderKanban } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { useStudyPlans } from "@/features/study-plans/hooks/useStudyPlans";
 import type { StudyPlanStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Modal } from "@/components/ui/Modal";
 import { Progress } from "@/components/ui/Progress";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
@@ -30,46 +22,15 @@ const STATUS_VARIANT: Record<StudyPlanStatus, "neutral" | "info" | "success" | "
   cancelled: "destructive",
 };
 
-const generateSchema = z.object({ source: z.number().int().positive() });
-type GenerateInput = z.infer<typeof generateSchema>;
-
+/**
+ * A read-only, cross-project browse of every study plan the user owns. Per
+ * 04_WEB_APP.md §4/§11, no plan (manual or AI-generated) may be created
+ * without a Project in context — creating one now only happens inside a
+ * project's workspace (Khota's hub, reached via `/characters/khota`).
+ */
 export default function StudyPlansPage() {
   const t = useTranslations();
-  const router = useRouter();
   const plans = useStudyPlans();
-  const createPlan = useCreateStudyPlan();
-  const createAIJob = useCreateAIJob();
-
-  const [createOpen, setCreateOpen] = useState(false);
-  const [generateOpen, setGenerateOpen] = useState(false);
-
-  const createForm = useForm<CreateStudyPlanInput>({
-    resolver: zodResolver(createStudyPlanSchema),
-  });
-  const generateForm = useForm<GenerateInput>({ resolver: zodResolver(generateSchema) });
-
-  const onCreate = createForm.handleSubmit((values) => {
-    createPlan.mutate(values, {
-      onSuccess: (plan) => {
-        setCreateOpen(false);
-        createForm.reset();
-        router.push(`/study-plans/${plan.id}`);
-      },
-    });
-  });
-
-  const onGenerate = generateForm.handleSubmit((values) => {
-    createAIJob.mutate(
-      { task_type: "khota_generate_plan", source: values.source },
-      {
-        onSuccess: (job) => {
-          setGenerateOpen(false);
-          generateForm.reset();
-          router.push(`/ai-jobs/${job.public_id}`);
-        },
-      },
-    );
-  });
 
   return (
     <div>
@@ -77,16 +38,12 @@ export default function StudyPlansPage() {
         title={t("studyPlans.title")}
         description={t("studyPlans.subtitle")}
         actions={
-          <>
-            <Button variant="outline" onClick={() => setGenerateOpen(true)}>
-              <Sparkles className="size-4" aria-hidden="true" />
-              {t("studyPlans.generateWithKhota")}
-            </Button>
-            <Button onClick={() => setCreateOpen(true)}>
-              <Plus className="size-4" aria-hidden="true" />
-              {t("studyPlans.newPlan")}
-            </Button>
-          </>
+          <Button asChild>
+            <Link href="/projects">
+              <FolderKanban className="size-4" aria-hidden="true" />
+              {t("studyPlans.goToProject")}
+            </Link>
+          </Button>
         }
       />
 
@@ -103,8 +60,8 @@ export default function StudyPlansPage() {
           title={t("emptyStates.studyPlans.title")}
           description={t("emptyStates.studyPlans.description")}
           action={
-            <Button onClick={() => setCreateOpen(true)}>
-              {t("emptyStates.studyPlans.action")}
+            <Button asChild>
+              <Link href="/projects">{t("studyPlans.goToProject")}</Link>
             </Button>
           }
         />
@@ -136,91 +93,6 @@ export default function StudyPlansPage() {
           ))}
         </StaggerIn>
       )}
-
-      <Modal
-        open={createOpen}
-        onOpenChange={(open) => {
-          setCreateOpen(open);
-          if (!open) createForm.reset();
-        }}
-        title={t("studyPlans.createTitle")}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setCreateOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={onCreate} loading={createPlan.isPending}>
-              {t("common.save")}
-            </Button>
-          </>
-        }
-      >
-        <form onSubmit={onCreate} noValidate className="flex flex-col gap-4">
-          <Input
-            label={t("studyPlans.titleField")}
-            error={createForm.formState.errors.title ? t("common.requiredField") : undefined}
-            {...createForm.register("title")}
-          />
-          <Input
-            label={t("studyPlans.subjectField")}
-            type="number"
-            error={createForm.formState.errors.subject ? t("common.requiredField") : undefined}
-            {...createForm.register("subject", { valueAsNumber: true })}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Input
-              label={t("studyPlans.startDate")}
-              type="date"
-              error={createForm.formState.errors.start_date ? t("common.requiredField") : undefined}
-              {...createForm.register("start_date")}
-            />
-            <Input
-              label={t("studyPlans.endDate")}
-              type="date"
-              error={createForm.formState.errors.end_date ? t("common.requiredField") : undefined}
-              {...createForm.register("end_date")}
-            />
-          </div>
-          <Input
-            label={t("studyPlans.dailyMinutes")}
-            type="number"
-            error={
-              createForm.formState.errors.daily_study_minutes
-                ? t("common.requiredField")
-                : undefined
-            }
-            {...createForm.register("daily_study_minutes", { valueAsNumber: true })}
-          />
-        </form>
-      </Modal>
-
-      <Modal
-        open={generateOpen}
-        onOpenChange={(open) => {
-          setGenerateOpen(open);
-          if (!open) generateForm.reset();
-        }}
-        title={t("studyPlans.generateWithKhota")}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setGenerateOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={onGenerate} loading={createAIJob.isPending}>
-              {t("common.confirm")}
-            </Button>
-          </>
-        }
-      >
-        <form onSubmit={onGenerate} noValidate>
-          <Input
-            label={t("library.title")}
-            type="number"
-            error={generateForm.formState.errors.source ? t("common.requiredField") : undefined}
-            {...generateForm.register("source", { valueAsNumber: true })}
-          />
-        </form>
-      </Modal>
     </div>
   );
 }

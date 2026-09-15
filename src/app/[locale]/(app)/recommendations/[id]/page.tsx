@@ -4,6 +4,7 @@ import { use } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2, TrendingDown, TrendingUp } from "lucide-react";
 import { useRecommendation, useMarkRecommendationRead } from "@/features/results/hooks/useResults";
+import { OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -36,16 +37,19 @@ export default function RecommendationDetailPage({ params }: { params: Promise<{
         title={data.title}
         description={data.summary}
         actions={
-          !data.is_read ? (
-            <Button
-              variant="outline"
-              size="sm"
-              loading={markRead.isPending}
-              onClick={() => markRead.mutate(data.id)}
-            >
-              {t("recommendations.markRead")}
-            </Button>
-          ) : null
+          <>
+            <OpenProjectLink projectId={data.project} />
+            {!data.is_read ? (
+              <Button
+                variant="outline"
+                size="sm"
+                loading={markRead.isPending}
+                onClick={() => markRead.mutate(data.id)}
+              >
+                {t("recommendations.markRead")}
+              </Button>
+            ) : null}
+          </>
         }
       />
 

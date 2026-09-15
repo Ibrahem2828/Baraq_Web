@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_NAME: z.string().default("برّاق"),
-  NEXT_PUBLIC_SITE_URL: z.string().url().default("https://baraqapp.com"),
+  NEXT_PUBLIC_SITE_URL: z.string().url().default("https://web.baraqapp.com"),
   NEXT_PUBLIC_DEFAULT_LOCALE: z.enum(["ar", "en"]).default("ar"),
   NEXT_PUBLIC_APP_VERSION: z.string().default("0.1.0"),
   NEXT_PUBLIC_FEATURE_KHOLASA: z

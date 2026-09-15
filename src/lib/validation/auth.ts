@@ -28,6 +28,11 @@ export const forgotPasswordSchema = z.object({
 });
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
+export const verifyEmailOtpSchema = z.object({
+  code: z.string().regex(/^\d{6}$/, { message: "auth.verifyEmail.invalidCode" }),
+});
+export type VerifyEmailOtpInput = z.infer<typeof verifyEmailOtpSchema>;
+
 export const resetPasswordSchema = z
   .object({
     uid: z.string().min(1),

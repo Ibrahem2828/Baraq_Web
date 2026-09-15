@@ -59,7 +59,24 @@
       "haveAccount": "Already have an account?",
       "login": "Sign in",
       "passwordMismatch": "Passwords do not match",
-      "emailTaken": "This email is already in use"
+      "emailTaken": "This email is already in use",
+      "otpSent": "A verification code has been sent to your email"
+    },
+    "verifyEmail": {
+      "title": "Verify your email",
+      "subtitle": "We sent a 6-digit code to {email}",
+      "codeField": "Verification code",
+      "submit": "Verify",
+      "noCode": "Didn't get the code?",
+      "resend": "Resend",
+      "resendCooldown": "Resend in {seconds}s",
+      "resendSuccess": "A new code has been sent to your email",
+      "resendCooldownToast": "Please wait a bit before requesting a new code",
+      "invalidCode": "The code must be 6 digits",
+      "codeInvalid": "Incorrect code",
+      "codeExpired": "This code has expired — request a new one",
+      "tooManyAttempts": "Too many attempts — request a new code",
+      "missingEmail": "This page can't be opened directly — please register first"
     },
     "forgotPassword": {
       "title": "Reset your password",
@@ -175,15 +192,32 @@
       "sourcesCount": "{count} sources"
     }
   },
+  "sourceScope": {
+    "title": "Choose the source scope",
+    "selectedCount": "Selected sources: {selected} of {total}",
+    "emptyTitle": "No sources in this project yet",
+    "emptyDescription": "Upload a source from the Sources tab first",
+    "groupPrompt": "Multiple sources are automatically grouped into a folder",
+    "newCollection": "New folder",
+    "newCollectionNamePlaceholder": "New folder name"
+  },
   "projects": {
     "title": "Projects",
     "subtitle": "Organize your sources and plans by project",
     "newProject": "New project",
+    "emptyTitle": "No projects yet",
+    "emptyDescription": "Create your first project to start uploading sources and using the characters",
+    "pickTitle": "Choose a project",
+    "pickDescription": "This feature works within a specific project — choose one to continue",
+    "pickInvalidDescription": "We couldn't find that project — choose another one to continue",
     "createTitle": "New project",
     "titleField": "Project title",
     "goal": "Goal (optional)",
     "archive": "Archive",
     "restore": "Restore",
+    "archiveConfirmTitle": "Archive this project?",
+    "archiveConfirmDescription": "You can restore it later from the projects list",
+    "restoreConfirmTitle": "Restore this project?",
     "activity": "Activity",
     "status": { "active": "Active", "archived": "Archived" },
     "activityEvents": {
@@ -192,6 +226,30 @@
       "project_deleted": "Project deleted",
       "project_archived": "Project archived",
       "project_restored": "Project restored"
+    }
+  },
+  "workspace": {
+    "tabs": {
+      "sources": "Sources",
+      "characters": "Characters",
+      "artifacts": "Results",
+      "timeline": "Activity"
+    },
+    "sources": {
+      "emptyTitle": "No sources in this project yet",
+      "emptyDescription": "Upload the first study source for this project",
+      "deleteTitle": "Delete this source?"
+    },
+    "artifacts": {
+      "emptyTitle": "No results yet",
+      "emptyDescription": "Use one of the characters to create the first result in this project",
+      "types": {
+        "quiz": "Quiz",
+        "studyPlan": "Study plan",
+        "summary": "Summary",
+        "transcription": "Transcription",
+        "recommendation": "Recommendation"
+      }
     }
   },
   "aiJobs": {
@@ -212,6 +270,7 @@
     "title": "Study Plans",
     "subtitle": "Organize your study time and track your tasks",
     "newPlan": "New plan",
+    "goToProject": "Go to a project to create a plan",
     "generateWithKhota": "Generate with Khota",
     "createTitle": "New study plan",
     "titleField": "Plan title",
@@ -259,10 +318,35 @@
     "noActivePlans": "No active plans yet",
     "createFirstPlan": "Create your first plan with Khota"
   },
+  "fahes": {
+    "hubSubtitle": "Your character for quizzes & assessment",
+    "generate": "Generate a quiz",
+    "emptyTitle": "No quizzes in this project yet",
+    "emptyDescription": "Generate the first quiz from this project's sources"
+  },
+  "rasheed": {
+    "hubSubtitle": "Your character for performance analysis & recommendations",
+    "generate": "Generate a recommendation",
+    "emptyTitle": "No recommendations in this project yet",
+    "emptyDescription": "Generate the first recommendation from this project's sources"
+  },
+  "kholasa": {
+    "hubSubtitle": "Your character for smart summarization",
+    "generate": "Generate a summary",
+    "emptyTitle": "No summaries in this project yet",
+    "emptyDescription": "Generate the first summary from this project's sources"
+  },
+  "sada": {
+    "hubSubtitle": "Your character for voice-to-text",
+    "generate": "Transcribe audio",
+    "emptyTitle": "No transcriptions in this project yet",
+    "emptyDescription": "Pick one audio source from this project to transcribe"
+  },
   "quizzes": {
     "title": "Quizzes",
     "subtitle": "Test your understanding and track progress",
     "newQuiz": "New quiz",
+    "goToProject": "Go to a project to create a quiz",
     "start": "Start quiz",
     "submit": "Submit answers",
     "timeLimit": "{minutes} minutes",
@@ -293,6 +377,10 @@
     "keyPoints": "Key points",
     "importantTerms": "Important terms",
     "reviewQuestions": "Review questions"
+  },
+  "relatedArtifacts": {
+    "openSource": "Open original source",
+    "openProject": "Project"
   },
   "transcriptions": {
     "title": "Transcriptions",
@@ -374,7 +462,9 @@
     "termsOfService": "Terms of Service",
     "accountDeletion": {
       "title": "Delete account",
-      "unavailable": "Account deletion isn't available yet until the backend contract is complete"
+      "description": "Permanently delete and anonymize your account",
+      "confirmation": "This permanently disables your account, revokes active sessions, and anonymizes personal details. This action cannot be undone.",
+      "confirm": "Delete my account"
     },
     "logout": "Log out"
   },

@@ -9,6 +9,7 @@ import {
   useSkipTask,
   useReopenTask,
 } from "@/features/study-plans/hooks/useStudyPlans";
+import { OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -47,7 +48,12 @@ export default function StudyPlanDetailPage({ params }: { params: Promise<{ id: 
       <PageHeader
         title={data.title}
         description={data.description ?? undefined}
-        actions={<Badge variant="info">{t(`studyPlans.status.${data.status}`)}</Badge>}
+        actions={
+          <>
+            <OpenProjectLink projectId={data.project} />
+            <Badge variant="info">{t(`studyPlans.status.${data.status}`)}</Badge>
+          </>
+        }
       />
 
       <Card className="mb-6">

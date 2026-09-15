@@ -101,8 +101,12 @@ export function useSubmitAttempt(attemptId: number | string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (answers?: AnswerQuestionInput[]) => submitAttempt(attemptId, answers),
-    onSuccess: (updatedAttempt) => {
-      queryClient.setQueryData(queryKeys.quizzes.attempt(attemptId), updatedAttempt);
+    onSuccess: (result) => {
+      // submit returns the graded QuizResult, not a QuizAttemptDetail — cache it
+      // under the same key useAttemptResult reads, and refetch the attempt detail
+      // (separately shaped) so its `status` flips to "submitted".
+      queryClient.setQueryData([...queryKeys.quizzes.attempt(attemptId), "result"] as const, result);
+      queryClient.invalidateQueries({ queryKey: queryKeys.quizzes.attempt(attemptId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.quizzes.attempts() });
     },
   });

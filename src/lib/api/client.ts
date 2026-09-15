@@ -64,7 +64,13 @@ async function request<T>(
   body: unknown,
   options: RequestOptions = {},
 ): Promise<T> {
-  const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
+  // Strip both leading and trailing slashes: `endpoints.ts` paths are
+  // written with a trailing slash for Django's benefit (APPEND_SLASH), but
+  // a `/api/bff/...` URL that itself ends in `/` doesn't match this route's
+  // canonical (non-trailing-slash) form, so Next.js's own redirect handling
+  // 308s it before the route handler runs. The trailing slash Django wants
+  // is re-added downstream by `buildTargetPath` in the BFF route handler.
+  const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
   const url = `/api/bff/${normalizedPath}${buildQuery(options.params)}`;
 
   const headers = new Headers();
@@ -148,7 +154,7 @@ export async function requestPaginated<T>(
   path: string,
   options?: RequestOptions,
 ): Promise<{ items: T[]; count: number; next: string | null; previous: string | null }> {
-  const normalizedPath = path.startsWith("/") ? path.slice(1) : path;
+  const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
   const url = `/api/bff/${normalizedPath}${buildQuery(options?.params)}`;
   const headers = new Headers({ "X-Request-ID": createRequestId() });
 

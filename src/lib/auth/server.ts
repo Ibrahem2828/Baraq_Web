@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
-import { backendFetch } from "@/lib/api/backend";
+import { backendFetch, logBackendFailure } from "@/lib/api/backend";
 import { endpoints } from "@/lib/api/endpoints";
 import type { SuccessEnvelope } from "@/lib/api/envelope";
 import {
@@ -18,6 +18,9 @@ interface LoginResponseData {
   refresh: string;
   user: Record<string, unknown>;
 }
+
+/** Whatever JSON body the backend sent back for a failed auth request — forwarded to the client as-is (see login()/verifyEmail() below) so real error codes/messages survive instead of being discarded. */
+type AuthFailureBody = Record<string, unknown> | null;
 
 interface RefreshResponseData {
   access: string;
@@ -97,18 +100,66 @@ export async function refreshAccessToken(): Promise<string | null> {
   }
 }
 
+type AuthResult =
+  | { ok: true; user: Record<string, unknown> }
+  | { ok: false; status: number; body: AuthFailureBody };
+
 export async function login(
   email: string,
   password: string,
-): Promise<{ ok: true; user: Record<string, unknown> } | { ok: false; status: number }> {
-  const response = await backendFetch(endpoints.auth.login, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-  });
+  requestId?: string | null,
+): Promise<AuthResult> {
+  const startedAt = Date.now();
+  let response: Response;
+  try {
+    response = await backendFetch(endpoints.auth.login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(requestId ? { "X-Request-ID": requestId } : {}),
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (error) {
+    const { status } = logBackendFailure("auth/login", error, startedAt, requestId);
+    return { ok: false, status, body: null };
+  }
 
   if (!response.ok) {
-    return { ok: false, status: response.status };
+    const body = (await response.json().catch(() => null)) as AuthFailureBody;
+    return { ok: false, status: response.status, body };
+  }
+
+  const envelope = (await response.json()) as SuccessEnvelope<LoginResponseData>;
+  await setAuthCookies({ access: envelope.data.access, refresh: envelope.data.refresh });
+  return { ok: true, user: envelope.data.user };
+}
+
+/** Verifies a registration email-OTP code. On success the backend logs the user in directly (same `{access, refresh, user}` shape as login), so this sets cookies exactly like `login()` does. */
+export async function verifyEmail(
+  email: string,
+  code: string,
+  requestId?: string | null,
+): Promise<AuthResult> {
+  const startedAt = Date.now();
+  let response: Response;
+  try {
+    response = await backendFetch(endpoints.auth.verifyEmail, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(requestId ? { "X-Request-ID": requestId } : {}),
+      },
+      body: JSON.stringify({ email, code }),
+    });
+  } catch (error) {
+    const { status } = logBackendFailure("auth/verify-email", error, startedAt, requestId);
+    return { ok: false, status, body: null };
+  }
+
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as AuthFailureBody;
+    return { ok: false, status: response.status, body };
   }
 
   const envelope = (await response.json()) as SuccessEnvelope<LoginResponseData>;

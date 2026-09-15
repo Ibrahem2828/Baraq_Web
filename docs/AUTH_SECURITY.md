@@ -126,10 +126,10 @@ auth, not session-cookie auth, for the actual backend calls).
 
 ## 8. Known gaps / explicitly out of scope for Phase 1
 
-- **No account deletion.** The backend has no `DELETE /users/me/` (or equivalent)
-  endpoint — `featureFlags.accountDeletion` is hard-coded `false` in
-  `src/config/feature-flags.ts` rather than env-toggleable, specifically so a
-  misconfigured env can't accidentally advertise a delete flow with nothing behind it.
+- **Account deletion is implemented.** The settings flow calls authenticated
+  `DELETE /users/me/` through the CSRF-protected BFF. A successful response clears
+  the HttpOnly access and refresh cookies immediately. The backend soft-deletes and
+  anonymizes the account and revokes its outstanding tokens.
 - **No subscription checkout.** No payment provider is wired up on the backend
   (`PAYMENTS_ENABLED` exists as a flag with zero implementation behind it) —
   `featureFlags.subscriptionsCheckout` is likewise hard-coded `false`.
@@ -261,3 +261,23 @@ prefixes only (never printing a full secret) and contains exclusively placeholde
 exposure was found. The rotation action item from §10 stands: it is an infrastructure
 action outside this repository's scope, and does not block Phase 3 *development* — it does
 block a production *deployment* of either the backend or this web app until confirmed done.
+
+## 12. Phase 3: response caching and body-size limit closed
+
+A blueprint compliance audit (against `04_WEB_APP.md` §9) flagged two §9 requirements this
+doc had never explicitly addressed, neither of which had any code behind them:
+
+1. **No explicit `Cache-Control: no-store`** on any `/api/bff/*` or `/api/auth/*` response —
+   relying only on Next.js's implicit dynamic-rendering behavior (triggered by `cookies()`
+   usage) is not a documented, generic guarantee, especially under `output: "standalone"`
+   (self-hosted Node, not Vercel's edge cache with its own defaults). Fixed: every response
+   from the BFF proxy (`src/app/api/bff/[...path]/route.ts`) and the four dedicated auth
+   routes (`login`, `logout`, `session`, `csrf`) now sets `Cache-Control: no-store,
+   must-revalidate` via a shared `NO_STORE_HEADERS` constant (`src/lib/http/no-store.ts`).
+2. **No request body size cap in the BFF proxy** — `request.arrayBuffer()` was called
+   unconditionally with nothing rejecting an oversized upload before/while it buffered in
+   memory. Fixed: `handle()` now rejects with `413 payload_too_large` both on a declared
+   `Content-Length` over the limit (cheap, rejects before reading the body) and on the
+   actual buffered size (catches a missing/lying `Content-Length`). The limit is
+   `BFF_MAX_BODY_BYTES` (`src/config/env.ts`, default 30MB — headroom above
+   `SOURCE_UPLOAD.maxSizeBytes`'s 25MB for multipart overhead), documented in `.env.example`.

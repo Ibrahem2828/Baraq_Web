@@ -5,7 +5,7 @@ import { useSearchParams, useRouter as useNativeRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter as useLocaleRouter } from "@/i18n/navigation";
 import { useLogin } from "@/lib/auth/client";
 import { loginSchema, type LoginInput } from "@/lib/validation/auth";
 import { Input } from "@/components/ui/Input";
@@ -43,6 +43,7 @@ function LoginForm() {
   // to). The plain Next.js router navigates to an already-resolved path
   // as-is, which is what an already-locale-prefixed `next` value needs.
   const router = useNativeRouter();
+  const localeRouter = useLocaleRouter();
   const searchParams = useSearchParams();
   const login = useLogin();
   const { toast } = useToast();
@@ -60,10 +61,16 @@ function LoginForm() {
         router.replace(isSafeRedirectPath(next) ? next : "/");
       },
       onError: (error) => {
+        if (error instanceof ApiError && error.fieldErrors?.error_code?.[0] === "email_not_verified") {
+          localeRouter.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
+          return;
+        }
         const message =
           error instanceof ApiError && error.code === "UNAUTHORIZED"
             ? t("auth.login.invalidCredentials")
-            : t("errors.UNKNOWN");
+            : error instanceof ApiError
+              ? t(`errors.${error.code}`)
+              : t("errors.UNKNOWN");
         toast({ title: message, variant: "error" });
       },
     });

@@ -3,8 +3,9 @@
 import { use, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useTicket, useReplyToTicket, useCloseTicket } from "@/features/support/hooks/useSupport";
+import { useCurrentUser } from "@/lib/auth/client";
 import { replyToTicketSchema, type ReplyToTicketInput } from "@/lib/validation/support";
 import type { SupportTicketStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -35,10 +36,12 @@ function humanize(value: string): string {
 export default function SupportTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const t = useTranslations();
+  const locale = useLocale();
   const { toast } = useToast();
   const ticket = useTicket(id);
   const reply = useReplyToTicket(id);
   const closeTicket = useCloseTicket();
+  const currentUser = useCurrentUser();
   const [confirmingClose, setConfirmingClose] = useState(false);
 
   const {
@@ -103,24 +106,30 @@ export default function SupportTicketDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="flex flex-col gap-3">
-        {(data.messages ?? []).map((message) => (
-          <Card
-            key={message.id}
-            className={cn(
-              "max-w-2xl",
-              message.is_staff
-                ? "border-[color:var(--color-accent-solid)]/30"
-                : "ms-auto bg-[color:var(--color-bg-soft)]",
-            )}
-          >
-            <p className="text-sm whitespace-pre-line text-[color:var(--color-ink)]">
-              {message.body}
-            </p>
-            <p className="mt-2 text-xs text-[color:var(--color-ink-faint)]">
-              {new Date(message.created_at).toLocaleString()}
-            </p>
-          </Card>
-        ))}
+        {(data.messages ?? []).map((message) => {
+          const isOwnMessage = message.sender === currentUser.data?.id;
+          return (
+            <Card
+              key={message.id}
+              className={cn(
+                "max-w-2xl",
+                isOwnMessage
+                  ? "ms-auto bg-[color:var(--color-bg-soft)]"
+                  : "border-[color:var(--color-accent-solid)]/30",
+              )}
+            >
+              <p className="text-xs font-medium text-[color:var(--color-ink-soft)]">
+                {message.sender_name}
+              </p>
+              <p className="text-sm whitespace-pre-line text-[color:var(--color-ink)]">
+                {message.body}
+              </p>
+              <p className="mt-2 text-xs text-[color:var(--color-ink-faint)]">
+                {new Date(message.created_at).toLocaleString(locale)}
+              </p>
+            </Card>
+          );
+        })}
       </div>
 
       {!isClosed ? (
