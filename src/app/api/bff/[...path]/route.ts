@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { backendFetch } from "@/lib/api/backend";
+import { backendFetch, logBackendFailure } from "@/lib/api/backend";
 import { serverEnv } from "@/config/env";
 import { NO_STORE_HEADERS } from "@/lib/http/no-store";
 import { endpoints } from "@/lib/api/endpoints";
@@ -53,6 +53,8 @@ async function forward(
 
   const requestId = request.headers.get("x-request-id");
   if (requestId) headers.set("X-Request-ID", requestId);
+  const acceptLanguage = request.headers.get("accept-language");
+  if (acceptLanguage) headers.set("Accept-Language", acceptLanguage);
 
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
 
@@ -115,13 +117,28 @@ async function handle(
     accessToken = (await refreshAccessToken()) ?? undefined;
   }
 
-  let upstream = await forward(request, targetPath, accessToken, body);
+  const startedAt = Date.now();
+  let upstream: Response;
+  try {
+    upstream = await forward(request, targetPath, accessToken, body);
 
-  if (upstream.status === 401 && accessToken) {
-    const renewed = await refreshAccessToken();
-    if (renewed) {
-      upstream = await forward(request, targetPath, renewed, body);
+    if (upstream.status === 401 && accessToken) {
+      const renewed = await refreshAccessToken();
+      if (renewed) {
+        upstream = await forward(request, targetPath, renewed, body);
+      }
     }
+  } catch (error) {
+    const { status, code } = logBackendFailure(
+      `bff/${(path ?? []).join("/")}`,
+      error,
+      startedAt,
+      request.headers.get("x-request-id"),
+    );
+    return jsonError(
+      { success: false, message: "Upstream service is temporarily unavailable", code },
+      status,
+    );
   }
 
   if (upstream.status === 401) {
@@ -134,9 +151,10 @@ async function handle(
   // response instead of a usable API error. Fail closed with a clear 502.
   if (upstream.status >= 300 && upstream.status < 400) {
     console.error("[bff] unexpected upstream redirect", {
-      targetPath,
+      operation: request.method,
+      upstreamPath: `/${(path ?? []).join("/")}/`,
       status: upstream.status,
-      location: upstream.headers.get("location"),
+      requestId: request.headers.get("x-request-id"),
     });
     return jsonError(
       { success: false, message: "Upstream service error", code: "upstream_redirect" },

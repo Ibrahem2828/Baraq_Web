@@ -37,7 +37,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = await verifyEmail(parsed.data.email, parsed.data.code);
+  const result = await verifyEmail(
+    parsed.data.email,
+    parsed.data.code,
+    request.headers.get("x-request-id"),
+  );
   if (!result.ok) {
     return NextResponse.json(
       result.body ?? { success: false, message: "Request failed", code: "server_error" },

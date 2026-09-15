@@ -37,7 +37,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = await login(parsed.data.email, parsed.data.password);
+  const result = await login(
+    parsed.data.email,
+    parsed.data.password,
+    request.headers.get("x-request-id"),
+  );
   if (!result.ok) {
     // Forward the backend's real error envelope (message/code/errors) as-is —
     // same principle as the generic BFF proxy — instead of collapsing every
