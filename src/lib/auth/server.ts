@@ -104,6 +104,24 @@ type AuthResult =
   | { ok: true; user: Record<string, unknown> }
   | { ok: false; status: number; body: AuthFailureBody };
 
+/**
+ * A 3xx from Django should never happen for these well-formed, slash-terminated
+ * calls, but relaying one raw to the browser (as a bare status forwarded via
+ * `NextResponse.json`) would leak an unusable redirect response instead of a
+ * normal API error — the same failure mode the generic BFF proxy already
+ * fails closed against in `app/api/bff/[...path]/route.ts`. Applies the
+ * identical guard here since `login`/`verifyEmail` bypass that proxy.
+ */
+function isRedirectStatus(status: number): boolean {
+  return status >= 300 && status < 400;
+}
+
+const UPSTREAM_REDIRECT_RESULT: AuthResult = {
+  ok: false,
+  status: 502,
+  body: { success: false, message: "Upstream service error", code: "upstream_redirect" },
+};
+
 export async function login(
   email: string,
   password: string,
@@ -126,6 +144,13 @@ export async function login(
   }
 
   if (!response.ok) {
+    if (isRedirectStatus(response.status)) {
+      console.error("[auth/login] unexpected upstream redirect", {
+        status: response.status,
+        requestId: requestId || undefined,
+      });
+      return UPSTREAM_REDIRECT_RESULT;
+    }
     const body = (await response.json().catch(() => null)) as AuthFailureBody;
     return { ok: false, status: response.status, body };
   }
@@ -158,6 +183,13 @@ export async function verifyEmail(
   }
 
   if (!response.ok) {
+    if (isRedirectStatus(response.status)) {
+      console.error("[auth/verify-email] unexpected upstream redirect", {
+        status: response.status,
+        requestId: requestId || undefined,
+      });
+      return UPSTREAM_REDIRECT_RESULT;
+    }
     const body = (await response.json().catch(() => null)) as AuthFailureBody;
     return { ok: false, status: response.status, body };
   }
