@@ -45,26 +45,70 @@ export interface BackendFetchInit extends RequestInit {
   timeoutMs?: number;
 }
 
+export class BackendResponseError extends Error {
+  constructor(public readonly upstreamStatus: number) {
+    super(`Unexpected backend response (status ${upstreamStatus})`);
+    this.name = "BackendResponseError";
+  }
+}
+
+function errorCodes(error: unknown): Set<string> {
+  const codes = new Set<string>();
+  const seen = new Set<object>();
+  const pending: unknown[] = [error];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    if (!current || typeof current !== "object" || seen.has(current)) continue;
+    seen.add(current);
+    const record = current as { code?: unknown; cause?: unknown; errors?: unknown };
+    if (typeof record.code === "string") codes.add(record.code);
+    if (record.cause) pending.push(record.cause);
+    if (Array.isArray(record.errors)) pending.push(...record.errors);
+  }
+  return codes;
+}
+
 export function classifyBackendError(error: unknown): { status: number; code: string } {
+  if (error instanceof BackendResponseError) {
+    if (error.upstreamStatus >= 300 && error.upstreamStatus < 400) {
+      return { status: 502, code: "upstream_redirect" };
+    }
+    if (error.upstreamStatus >= 500 && error.upstreamStatus <= 599) {
+      return { status: error.upstreamStatus, code: "upstream_response_error" };
+    }
+    return { status: 502, code: "upstream_malformed_response" };
+  }
   if (
     error instanceof DOMException &&
     (error.name === "TimeoutError" || error.name === "AbortError")
   ) {
     return { status: 504, code: "upstream_timeout" };
   }
-  const causeCode =
-    error instanceof Error ? (error.cause as { code?: string } | undefined)?.code : undefined;
+  const codes = errorCodes(error);
+  if (codes.has("ETIMEDOUT") || codes.has("UND_ERR_CONNECT_TIMEOUT")) {
+    return { status: 504, code: "upstream_timeout" };
+  }
   if (
     [
       "ERR_TLS_CERT_ALTNAME_INVALID",
       "DEPTH_ZERO_SELF_SIGNED_CERT",
       "UNABLE_TO_VERIFY_LEAF_SIGNATURE",
       "EPROTO",
-    ].includes(causeCode ?? "")
+    ].some((code) => codes.has(code))
   ) {
     return { status: 502, code: "upstream_tls_error" };
   }
-  if (["ECONNREFUSED", "ENOTFOUND", "EAI_AGAIN"].includes(causeCode ?? "")) {
+  if (
+    [
+      "ECONNREFUSED",
+      "ECONNRESET",
+      "ENETUNREACH",
+      "EHOSTUNREACH",
+      "ENOTFOUND",
+      "EAI_AGAIN",
+      "UND_ERR_SOCKET",
+    ].some((code) => codes.has(code))
+  ) {
     return { status: 502, code: "upstream_unreachable" };
   }
   return { status: 502, code: "upstream_error" };

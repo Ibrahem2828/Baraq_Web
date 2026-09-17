@@ -5,7 +5,9 @@
  * `lib/api/backend.ts`); the BFF proxy at `app/api/bff/[...path]/route.ts`
  * forwards whatever suffix is requested.
  *
- * Verified against `Baraaq_back/backend` (Django) — see docs/WEB_API_CONTRACT_MAP.md.
+ * Verified against the generated Django contracts in
+ * `Baraaq_back/backend/contracts`; contract generation and validation run in
+ * the backend release gate.
  */
 
 function withId(base: string, id: string | number): string {

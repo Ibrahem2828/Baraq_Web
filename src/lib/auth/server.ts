@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
-import { backendFetch, logBackendFailure } from "@/lib/api/backend";
+import { BackendResponseError, backendFetch, logBackendFailure } from "@/lib/api/backend";
 import { endpoints } from "@/lib/api/endpoints";
 import type { SuccessEnvelope } from "@/lib/api/envelope";
 import {
@@ -81,6 +81,12 @@ export async function refreshAccessToken(): Promise<string | null> {
       });
 
       if (!response.ok) {
+        if (response.status >= 300 && response.status < 400) {
+          throw new BackendResponseError(response.status);
+        }
+        if (response.status >= 500) {
+          throw new BackendResponseError(response.status);
+        }
         await clearAuthCookies();
         return null;
       }
@@ -88,8 +94,11 @@ export async function refreshAccessToken(): Promise<string | null> {
       const envelope = (await response.json()) as SuccessEnvelope<RefreshResponseData>;
       await setAuthCookies({ access: envelope.data.access, refresh: envelope.data.refresh });
       return envelope.data.access;
-    } catch {
-      return null;
+    } catch (error) {
+      // Transport, redirect, and upstream 5xx failures are operational
+      // outages, not evidence that the refresh token is invalid. Let the BFF
+      // classify them and preserve the cookies for a later retry.
+      throw error;
     }
   })();
 

@@ -112,12 +112,26 @@ async function handle(
     );
   }
 
+  const startedAt = Date.now();
+  const requestId = request.headers.get("x-request-id");
   let accessToken = await getAccessToken();
-  if (!accessToken) {
-    accessToken = (await refreshAccessToken()) ?? undefined;
+  try {
+    if (!accessToken) {
+      accessToken = (await refreshAccessToken()) ?? undefined;
+    }
+  } catch (error) {
+    const { status, code } = logBackendFailure(
+      `bff/${(path ?? []).join("/")}/refresh`,
+      error,
+      startedAt,
+      requestId,
+    );
+    return jsonError(
+      { success: false, message: "Upstream service is temporarily unavailable", code },
+      status,
+    );
   }
 
-  const startedAt = Date.now();
   let upstream: Response;
   try {
     upstream = await forward(request, targetPath, accessToken, body);
@@ -133,7 +147,7 @@ async function handle(
       `bff/${(path ?? []).join("/")}`,
       error,
       startedAt,
-      request.headers.get("x-request-id"),
+      requestId,
     );
     return jsonError(
       { success: false, message: "Upstream service is temporarily unavailable", code },

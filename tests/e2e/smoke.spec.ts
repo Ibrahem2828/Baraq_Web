@@ -53,15 +53,17 @@ test.describe("smoke", () => {
  * post-logout navigation) — this is the regression coverage for both.
  */
 test.describe("authenticated flows", () => {
+  const STUDENT_EMAIL = process.env.E2E_STUDENT_EMAIL;
+  const STUDENT_PASSWORD = process.env.E2E_STUDENT_PASSWORD;
   test.skip(
-    !process.env.E2E_BACKEND_AVAILABLE,
-    "Requires a reachable, seeded Django backend (BACKEND_API_URL) — set E2E_BACKEND_AVAILABLE=1 to enable.",
+    !process.env.E2E_BACKEND_AVAILABLE || !STUDENT_EMAIL || !STUDENT_PASSWORD,
+    "Requires a reachable backend and E2E_STUDENT_EMAIL/E2E_STUDENT_PASSWORD supplied through the test secret store.",
   );
 
-  const STUDENT_EMAIL = "student@baraq.app";
-  const STUDENT_PASSWORD = "Student@123456";
-
   async function login(page: import("@playwright/test").Page, next?: string) {
+    if (!STUDENT_EMAIL || !STUDENT_PASSWORD) {
+      throw new Error("E2E credentials are not configured");
+    }
     await page.goto(next ? `/ar/login?next=${encodeURIComponent(next)}` : "/ar/login");
     await page.getByLabel("البريد الإلكتروني").fill(STUDENT_EMAIL);
     await page.getByLabel("كلمة المرور").fill(STUDENT_PASSWORD);
