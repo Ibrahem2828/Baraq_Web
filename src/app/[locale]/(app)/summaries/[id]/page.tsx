@@ -3,6 +3,7 @@
 import { use } from "react";
 import { useTranslations } from "next-intl";
 import { useSummary } from "@/features/results/hooks/useResults";
+import { OpenSourceLink, OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
@@ -29,7 +30,16 @@ export default function SummaryDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div>
-      <PageHeader title={data.title} description={data.short_summary} />
+      <PageHeader
+        title={data.title}
+        description={data.short_summary}
+        actions={
+          <>
+            <OpenSourceLink sourceId={data.source} />
+            <OpenProjectLink projectId={data.project} />
+          </>
+        }
+      />
 
       <div className="flex flex-col gap-6">
         <Card>

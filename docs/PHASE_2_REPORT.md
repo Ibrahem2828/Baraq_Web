@@ -1,5 +1,9 @@
 # Phase 2 Report — Baraq Web
 
+> Historical snapshot. The account-deletion backend gap recorded below was closed
+> after this report; see `AUTH_SECURITY.md` and `FEATURE_PARITY_MATRIX.md` for the
+> current release behavior.
+
 Date: 2026-09-11. Scope: verify Phase 1's claims against a real backend, integrate the real
 Baraq assets, complete and verify the core ~50–60% of functionality (auth, profile,
 subjects, home, Khota, library/sources, capabilities), eliminate fake/demo behavior,

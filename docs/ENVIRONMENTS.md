@@ -34,7 +34,7 @@ does, copied from `.env.example`), it wins.
 | File | Tracked in git? | Contains |
 |---|---|---|
 | `.env.example` | Yes | Placeholder-only template — copy to `.env.local` for local dev |
-| `.env.production` | Yes | Real, non-secret production defaults (`BACKEND_API_URL=https://api.baraqapp.com`, `NEXT_PUBLIC_SITE_URL=https://baraqapp.com`, etc.) — safe to commit because every value in it is a public-facing hostname or a non-secret feature flag |
+| `.env.production` | Yes | Real, non-secret production defaults (`BACKEND_API_URL=https://api.baraqapp.com`, `NEXT_PUBLIC_SITE_URL=https://web.baraqapp.com`, etc.) — safe to commit because every value in it is a public-facing hostname or a non-secret feature flag |
 | `.env.staging` | Yes, if/when created | Same idea, scoped to staging — not created yet; no staging backend origin has been provided to this project yet |
 | `.env.local` | **No** (gitignored) | Real per-developer local overrides |
 | `.env.production.local` / `.env.staging.local` | **No** (gitignored) | Where a real secret (an API key, a signing secret) would go **if** one is ever needed for a specific environment — this project currently has none; every value the app needs is either non-secret or lives entirely server-side inside the Django backend, never inside this Next.js app |

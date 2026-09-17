@@ -186,8 +186,8 @@ architecture task.
 - Does not implement `cacheComponents`/Partial Prerendering (see §4).
 - Does not implement subscription checkout (no payment provider exists on the backend —
   see `docs/WEB_API_CONTRACT_MAP.md` §"Subscriptions").
-- Does not implement account deletion (no `DELETE /users/me/` endpoint exists on the
-  backend).
+- Implements account deletion through authenticated `DELETE /users/me/`; the BFF
+  clears its HttpOnly authentication cookies after a successful deletion.
 - Does not fully implement every feature page's business logic end-to-end — some pages
   (noted per-page in `FEATURE_PARITY_MATRIX.md`) are foundation-ready scaffolds with
   working data-fetching and the correct loading/empty/error states, pending a full pass

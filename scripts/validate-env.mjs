@@ -26,12 +26,29 @@ if (appEnv && !["development", "staging", "production"].includes(appEnv)) {
 
 const backendUrl = process.env.BACKEND_API_URL;
 if (backendUrl) {
+  let parsedBackendUrl;
+  try {
+    parsedBackendUrl = new URL(backendUrl);
+  } catch {
+    errors.push("BACKEND_API_URL must be an absolute URL");
+  }
   if (backendUrl.endsWith("/")) {
     errors.push("BACKEND_API_URL must not end with a trailing slash");
   }
   if (appEnv === "production") {
-    if (!backendUrl.startsWith("https://")) {
-      errors.push("BACKEND_API_URL must be HTTPS in production");
+    const isCanonicalPrivateBackend =
+      parsedBackendUrl?.protocol === "http:" &&
+      parsedBackendUrl.hostname === "backend" &&
+      parsedBackendUrl.port === "8000" &&
+      parsedBackendUrl.pathname === "/" &&
+      !parsedBackendUrl.username &&
+      !parsedBackendUrl.password &&
+      !parsedBackendUrl.search &&
+      !parsedBackendUrl.hash;
+    if (parsedBackendUrl?.protocol !== "https:" && !isCanonicalPrivateBackend) {
+      errors.push(
+        "BACKEND_API_URL must be HTTPS in production unless it is the canonical private http://backend:8000 Compose route",
+      );
     }
     if (/localhost|127\.0\.0\.1|\.sslip\.io/.test(backendUrl)) {
       errors.push("BACKEND_API_URL must not point at a local/sslip.io host in production");

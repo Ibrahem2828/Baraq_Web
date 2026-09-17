@@ -12,6 +12,12 @@ import type { StudentRecommendation, Summary, Transcription } from "@/types/doma
 export interface ResultFilters {
   subject?: number;
   source?: number;
+  /**
+   * The Project's public_id. Supported by `summaries`/`transcriptions`/`recommendations`
+   * list endpoints only once the backend Phase 0 project-scoping fix is deployed — on an
+   * older backend this filter is silently ignored (the list returns unfiltered, not an error).
+   */
+  project?: string;
   [key: string]: string | number | boolean | undefined;
 }
 

@@ -10,6 +10,8 @@ import {
   useArchiveQuiz,
   useStartQuizAttempt,
 } from "@/features/quizzes/hooks/useQuizzes";
+import { useAIJob } from "@/features/ai-jobs/hooks/useAIJob";
+import { OpenSourceLink, OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { isApiError } from "@/lib/api/errors";
 import type { QuizStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -26,6 +28,16 @@ const STATUS_BADGE_VARIANT: Record<QuizStatus, "neutral" | "success" | "warning"
   published: "success",
   archived: "warning",
 };
+
+/**
+ * `Quiz` has no direct `source` FK (unlike Summary/Transcription) — the only
+ * path back to an originating source is through the AI job that produced it.
+ * Best-effort: renders nothing if the job or its source can't be resolved.
+ */
+function QuizAiJobSourceLink({ aiRequestId }: { aiRequestId: string }) {
+  const job = useAIJob(aiRequestId);
+  return <OpenSourceLink sourceId={job.data?.source} />;
+}
 
 export default function QuizDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -72,13 +84,17 @@ export default function QuizDetailPage({ params }: { params: Promise<{ id: strin
         title={data.title}
         description={data.description ?? undefined}
         actions={
-          data.status !== "archived" ? (
-            // No dedicated "Archive" action label in `quizzes.*` yet (see final report).
-            <Button variant="outline" size="sm" onClick={() => setArchiveConfirmOpen(true)}>
-              <Archive className="size-4" aria-hidden="true" />
-              {locale === "ar" ? "أرشفة" : "Archive"}
-            </Button>
-          ) : undefined
+          <>
+            {data.ai_request_id ? <QuizAiJobSourceLink aiRequestId={data.ai_request_id} /> : null}
+            <OpenProjectLink projectId={data.project} />
+            {data.status !== "archived" ? (
+              // No dedicated "Archive" action label in `quizzes.*` yet (see final report).
+              <Button variant="outline" size="sm" onClick={() => setArchiveConfirmOpen(true)}>
+                <Archive className="size-4" aria-hidden="true" />
+                {locale === "ar" ? "أرشفة" : "Archive"}
+              </Button>
+            ) : null}
+          </>
         }
       />
 

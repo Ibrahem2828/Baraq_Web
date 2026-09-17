@@ -33,6 +33,8 @@ export interface WeekPlan {
 export interface StudyPlanFilters {
   status?: string;
   subject?: number;
+  /** The Project's public_id. */
+  project?: string;
   search?: string;
   [key: string]: string | number | boolean | undefined;
 }

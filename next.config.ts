@@ -43,6 +43,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  skipTrailingSlashRedirect: true,
   poweredByHeader: false,
   compress: true,
   images: {

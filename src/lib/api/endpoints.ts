@@ -26,6 +26,10 @@ export const endpoints = {
     login: "/auth/login/",
     refresh: "/auth/refresh/",
     verify: "/auth/verify/",
+    // Distinct from `verify` above (SimpleJWT's unrelated token-verify
+    // endpoint) -- this is the registration email-OTP check.
+    verifyEmail: "/auth/verify-email/",
+    resendOtp: "/auth/resend-otp/",
     logout: "/auth/logout/",
     changePassword: "/auth/change-password/",
     passwordReset: "/auth/password-reset/",

@@ -1,5 +1,9 @@
 # Phase 1 Report — Baraq Web
 
+> Historical snapshot. The account-deletion backend gap recorded below was closed
+> after this report; see `AUTH_SECURITY.md` and `FEATURE_PARITY_MATRIX.md` for the
+> current release behavior.
+
 Date: 2026-09-10. Scope: everything in the Phase 1 brief — audit, architecture, design
 system, i18n, auth, API layer, core components, app shell, route skeleton with working
 feature UIs, tests, docs. No backend instance was available to run against during this

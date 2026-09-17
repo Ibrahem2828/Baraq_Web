@@ -42,7 +42,7 @@ yarn-error.log*
 # platform's own env var store, never in a file on disk here) are
 # intentionally tracked. See docs/ENVIRONMENTS.md.
 .env*
-
+!.env.example
 !.env.production
 !.env.staging
 

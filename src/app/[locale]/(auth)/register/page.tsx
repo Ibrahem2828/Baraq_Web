@@ -30,15 +30,18 @@ export default function RegisterPage() {
   const onSubmit = handleSubmit((data) => {
     registerMutation.mutate(data, {
       onSuccess: () => {
-        toast({ title: t("auth.register.title"), variant: "success" });
-        router.replace("/login");
+        toast({ title: t("auth.register.otpSent"), variant: "success" });
+        router.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
       },
       onError: (error) => {
         if (error instanceof ApiError && error.fieldErrors?.email) {
           setError("email", { message: t("auth.register.emailTaken") });
           return;
         }
-        toast({ title: t("errors.UNKNOWN"), variant: "error" });
+        toast({
+          title: error instanceof ApiError ? t(`errors.${error.code}`) : t("errors.UNKNOWN"),
+          variant: "error",
+        });
       },
     });
   });

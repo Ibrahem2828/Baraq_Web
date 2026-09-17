@@ -5,6 +5,7 @@ import { CalendarDays, CalendarRange, ListChecks } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useTodayPlan } from "@/features/study-plans/hooks/useStudyPlans";
 import { useStudyPlans } from "@/features/study-plans/hooks/useStudyPlans";
+import { useActiveProject } from "@/features/projects/ActiveProjectContext";
 import type { CharacterDefinition } from "@/config/characters";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -27,8 +28,9 @@ import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
  */
 export function KhotaHub({ character }: { character: CharacterDefinition }) {
   const t = useTranslations();
+  const { projectId } = useActiveProject();
   const today = useTodayPlan();
-  const activePlans = useStudyPlans({ status: "active" });
+  const activePlans = useStudyPlans({ status: "active", project: projectId ?? undefined });
 
   return (
     <div>

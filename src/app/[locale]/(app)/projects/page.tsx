@@ -2,49 +2,23 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { useProjects, useCreateProject } from "@/features/projects/hooks/useProjects";
+import { useProjects } from "@/features/projects/hooks/useProjects";
+import { CreateProjectDialog } from "@/features/projects/components/CreateProjectDialog";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
-import { Modal } from "@/components/ui/Modal";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
 
-const createProjectSchema = z.object({
-  title: z.string().min(1),
-  goal: z.string().optional(),
-});
-type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
-
 export default function ProjectsPage() {
   const t = useTranslations();
   const projects = useProjects();
-  const createProject = useCreateProject();
   const [open, setOpen] = useState(false);
-
-  const form = useForm<CreateProjectFormValues>({ resolver: zodResolver(createProjectSchema) });
-
-  const onSubmit = form.handleSubmit((values) => {
-    createProject.mutate(
-      { title: values.title, goal: values.goal || null },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          form.reset();
-        },
-      },
-    );
-  });
 
   return (
     <div>
@@ -69,8 +43,14 @@ export default function ProjectsPage() {
         />
       ) : projects.data.items.length === 0 ? (
         <EmptyState
-          title={t("emptyStates.generic.title")}
-          description={t("emptyStates.generic.description")}
+          title={t("projects.emptyTitle")}
+          description={t("projects.emptyDescription")}
+          action={
+            <Button onClick={() => setOpen(true)}>
+              <Plus className="size-4" aria-hidden="true" />
+              {t("projects.newProject")}
+            </Button>
+          }
         />
       ) : (
         <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -102,33 +82,7 @@ export default function ProjectsPage() {
         </StaggerIn>
       )}
 
-      <Modal
-        open={open}
-        onOpenChange={(nextOpen) => {
-          setOpen(nextOpen);
-          if (!nextOpen) form.reset();
-        }}
-        title={t("projects.createTitle")}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={onSubmit} loading={createProject.isPending}>
-              {t("common.confirm")}
-            </Button>
-          </>
-        }
-      >
-        <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-          <Input
-            label={t("projects.titleField")}
-            error={form.formState.errors.title ? t("common.requiredField") : undefined}
-            {...form.register("title")}
-          />
-          <Textarea label={t("projects.goal")} {...form.register("goal")} />
-        </form>
-      </Modal>
+      <CreateProjectDialog open={open} onOpenChange={setOpen} />
     </div>
   );
 }

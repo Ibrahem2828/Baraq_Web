@@ -59,7 +59,24 @@
       "haveAccount": "لديك حساب بالفعل؟",
       "login": "تسجيل الدخول",
       "passwordMismatch": "كلمتا المرور غير متطابقتين",
-      "emailTaken": "هذا البريد الإلكتروني مستخدم بالفعل"
+      "emailTaken": "هذا البريد الإلكتروني مستخدم بالفعل",
+      "otpSent": "تم إرسال رمز تحقق إلى بريدك الإلكتروني"
+    },
+    "verifyEmail": {
+      "title": "تحقق من بريدك الإلكتروني",
+      "subtitle": "أرسلنا رمزًا مكوّنًا من 6 أرقام إلى {email}",
+      "codeField": "رمز التحقق",
+      "submit": "تحقق",
+      "noCode": "لم يصلك الرمز؟",
+      "resend": "إعادة الإرسال",
+      "resendCooldown": "إعادة الإرسال بعد {seconds} ثانية",
+      "resendSuccess": "تم إرسال رمز جديد إلى بريدك الإلكتروني",
+      "resendCooldownToast": "يرجى الانتظار قليلًا قبل طلب رمز جديد",
+      "invalidCode": "يجب أن يتكوّن الرمز من 6 أرقام",
+      "codeInvalid": "الرمز غير صحيح",
+      "codeExpired": "انتهت صلاحية الرمز — اطلب رمزًا جديدًا",
+      "tooManyAttempts": "محاولات كثيرة جدًا — اطلب رمزًا جديدًا",
+      "missingEmail": "لا يمكن فتح هذه الصفحة مباشرة — يرجى التسجيل أولًا"
     },
     "forgotPassword": {
       "title": "استعادة كلمة المرور",
@@ -175,15 +192,32 @@
       "sourcesCount": "{count} مصدر"
     }
   },
+  "sourceScope": {
+    "title": "اختر نطاق المصادر",
+    "selectedCount": "المصادر المختارة: {selected} من {total}",
+    "emptyTitle": "لا توجد مصادر في هذا المشروع بعد",
+    "emptyDescription": "ارفع مصدرًا من تبويب المصادر أولًا",
+    "groupPrompt": "اختر مصادر متعددة تُجمَّع تلقائيًا في مجلد",
+    "newCollection": "مجلد جديد",
+    "newCollectionNamePlaceholder": "اسم المجلد الجديد"
+  },
   "projects": {
     "title": "المشاريع",
     "subtitle": "نظّم مصادرك وخططك حسب المشروع",
     "newProject": "مشروع جديد",
+    "emptyTitle": "لا توجد مشاريع بعد",
+    "emptyDescription": "أنشئ مشروعك الأول لتبدأ برفع المصادر واستخدام الشخصيات",
+    "pickTitle": "اختر مشروعًا",
+    "pickDescription": "هذه الميزة تعمل ضمن مشروع محدد — اختر مشروعًا للمتابعة",
+    "pickInvalidDescription": "لم نتمكن من العثور على هذا المشروع — اختر مشروعًا آخر للمتابعة",
     "createTitle": "مشروع جديد",
     "titleField": "عنوان المشروع",
     "goal": "الهدف (اختياري)",
     "archive": "أرشفة",
     "restore": "استعادة",
+    "archiveConfirmTitle": "أرشفة المشروع؟",
+    "archiveConfirmDescription": "يمكنك استعادته لاحقًا من قائمة المشاريع",
+    "restoreConfirmTitle": "استعادة المشروع؟",
     "activity": "النشاط",
     "status": { "active": "نشط", "archived": "مؤرشف" },
     "activityEvents": {
@@ -192,6 +226,30 @@
       "project_deleted": "تم حذف المشروع",
       "project_archived": "تمت أرشفة المشروع",
       "project_restored": "تمت استعادة المشروع"
+    }
+  },
+  "workspace": {
+    "tabs": {
+      "sources": "المصادر",
+      "characters": "الشخصيات",
+      "artifacts": "النتائج",
+      "timeline": "النشاط"
+    },
+    "sources": {
+      "emptyTitle": "لا توجد مصادر في هذا المشروع بعد",
+      "emptyDescription": "ارفع أول مصدر دراسي لهذا المشروع",
+      "deleteTitle": "حذف المصدر؟"
+    },
+    "artifacts": {
+      "emptyTitle": "لا توجد نتائج بعد",
+      "emptyDescription": "استخدم إحدى الشخصيات لإنشاء أول نتيجة في هذا المشروع",
+      "types": {
+        "quiz": "اختبار",
+        "studyPlan": "خطة دراسية",
+        "summary": "ملخص",
+        "transcription": "نص صوتي",
+        "recommendation": "توصية"
+      }
     }
   },
   "aiJobs": {
@@ -212,6 +270,7 @@
     "title": "خطط الدراسة",
     "subtitle": "نظّم وقتك الدراسي وتابع مهامك",
     "newPlan": "خطة جديدة",
+    "goToProject": "اذهب إلى مشروع لإنشاء خطة",
     "generateWithKhota": "أنشئ مع خُطى",
     "createTitle": "خطة دراسية جديدة",
     "titleField": "عنوان الخطة",
@@ -259,10 +318,35 @@
     "noActivePlans": "لا توجد خطط نشطة بعد",
     "createFirstPlan": "أنشئ خطتك الأولى مع خُطى"
   },
+  "fahes": {
+    "hubSubtitle": "شخصيتك للاختبارات والتقييم",
+    "generate": "توليد اختبار",
+    "emptyTitle": "لا توجد اختبارات في هذا المشروع بعد",
+    "emptyDescription": "ولّد أول اختبار من مصادر هذا المشروع"
+  },
+  "rasheed": {
+    "hubSubtitle": "شخصيتك لتحليل الأداء والتوصيات",
+    "generate": "توليد توصية",
+    "emptyTitle": "لا توجد توصيات في هذا المشروع بعد",
+    "emptyDescription": "ولّد أول توصية من مصادر هذا المشروع"
+  },
+  "kholasa": {
+    "hubSubtitle": "شخصيتك للتلخيص الذكي",
+    "generate": "توليد ملخص",
+    "emptyTitle": "لا توجد ملخصات في هذا المشروع بعد",
+    "emptyDescription": "ولّد أول ملخص من مصادر هذا المشروع"
+  },
+  "sada": {
+    "hubSubtitle": "شخصيتك لتحويل الصوت إلى نص",
+    "generate": "تفريغ صوت",
+    "emptyTitle": "لا توجد نصوص صوتية في هذا المشروع بعد",
+    "emptyDescription": "اختر مصدر صوت واحدًا من هذا المشروع لتفريغه"
+  },
   "quizzes": {
     "title": "الاختبارات",
     "subtitle": "اختبر فهمك وتابع تقدمك",
     "newQuiz": "اختبار جديد",
+    "goToProject": "اذهب إلى مشروع لإنشاء اختبار",
     "start": "ابدأ الاختبار",
     "submit": "إرسال الإجابات",
     "timeLimit": "{minutes} دقيقة",
@@ -293,6 +377,10 @@
     "keyPoints": "النقاط الرئيسية",
     "importantTerms": "المصطلحات المهمة",
     "reviewQuestions": "أسئلة المراجعة"
+  },
+  "relatedArtifacts": {
+    "openSource": "افتح المصدر الأصلي",
+    "openProject": "المشروع"
   },
   "transcriptions": {
     "title": "النصوص الصوتية",
@@ -374,7 +462,9 @@
     "termsOfService": "شروط الاستخدام",
     "accountDeletion": {
       "title": "حذف الحساب",
-      "unavailable": "حذف الحساب غير متاح حاليًا حتى يكتمل عقد الخادم"
+      "description": "حذف حسابك وإخفاء بياناتك الشخصية نهائيًا",
+      "confirmation": "سيتم تعطيل حسابك نهائيًا وإلغاء الجلسات النشطة وإخفاء بياناتك الشخصية. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "حذف حسابي"
     },
     "logout": "تسجيل الخروج"
   },
