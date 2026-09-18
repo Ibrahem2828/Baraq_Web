@@ -75,6 +75,42 @@ describe("login native/autofill value synchronization", () => {
     });
   });
 
+  it("never writes the synchronized password to the console", async () => {
+    const spies = (["log", "info", "warn", "error", "debug"] as const).map((level) =>
+      vi.spyOn(console, level).mockImplementation(() => undefined),
+    );
+    const { container } = render(<LoginPage />);
+    const { form, email, password } = controls(container);
+    setDomValueWithoutInputEvent(email, "autofilled@example.com");
+    setDomValueWithoutInputEvent(password, "Autofilled Password 123!");
+
+    fireEvent.submit(form);
+    await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+
+    for (const spy of spies) {
+      expect(JSON.stringify(spy.mock.calls)).not.toContain("Autofilled Password 123!");
+      spy.mockRestore();
+    }
+  });
+
+  // The email local part stays ASCII on purpose: Zod's `.email()` and Django's
+  // EmailValidator both reject a non-ASCII local part, so the two layers agree.
+  // The password is where Arabic input is genuinely expected.
+  it("round-trips an Arabic password without mangling it", async () => {
+    const { container } = render(<LoginPage />);
+    const { form, email, password } = controls(container);
+    setDomValueWithoutInputEvent(email, "student@example.com");
+    setDomValueWithoutInputEvent(password, "كلمة المرور ١٢٣!");
+
+    fireEvent.submit(form);
+
+    await waitFor(() => expect(mutate).toHaveBeenCalledOnce());
+    expect(mutate.mock.calls[0]?.[0]).toEqual({
+      email: "student@example.com",
+      password: "كلمة المرور ١٢٣!",
+    });
+  });
+
   it("still blocks invalid values populated silently by autofill", async () => {
     const { container } = render(<LoginPage />);
     const { form, email, password } = controls(container);

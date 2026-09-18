@@ -43,10 +43,26 @@ export async function setAuthCookies(tokens: { access: string; refresh: string }
   store.set(REFRESH_COOKIE, tokens.refresh, refreshCookieOptions());
 }
 
+/**
+ * Expires every cookie the session is made of.
+ *
+ * `cookies().delete(name)` is deliberately not used: it emits a host-only,
+ * `Path=/` expiry. A cookie is keyed by (name, domain, path), so once
+ * `AUTH_COOKIE_DOMAIN` is configured that expiry creates a *different* cookie
+ * and leaves the real, domain-scoped refresh token live in the browser.
+ * Overwriting with the exact options each cookie was written with is the only
+ * form that reliably removes it.
+ *
+ * The CSRF token goes too — it is a per-session double-submit secret, and
+ * carrying one across a sign-out would let it be replayed against the next
+ * user of the same browser.
+ */
 export async function clearAuthCookies(): Promise<void> {
   const store = await cookies();
-  store.delete(ACCESS_COOKIE);
-  store.delete(REFRESH_COOKIE);
+  const expire = <T extends object>(options: T) => ({ ...options, maxAge: 0 });
+  store.set(ACCESS_COOKIE, "", expire(accessCookieOptions()));
+  store.set(REFRESH_COOKIE, "", expire(refreshCookieOptions()));
+  store.set(CSRF_COOKIE, "", expire(csrfCookieOptions()));
 }
 
 /**

@@ -173,6 +173,26 @@ describe("generic BFF transport contract", () => {
     expect(backendFetch).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ["no trailing slash", ["subjects"]],
+    // `skipTrailingSlashRedirect` means Next.js hands the route the trailing
+    // empty segment instead of 308-ing the browser. Both browser-facing forms
+    // must canonicalize to exactly one Django slash and never `//`.
+    ["trailing slash", ["subjects", ""]],
+  ] as const)("canonicalizes the %s browser form without a redirect", async (_label, segments) => {
+    backendFetch.mockResolvedValue(Response.json({ success: true, data: [] }));
+    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const request = new NextRequest("https://web.baraqapp.com/api/bff/subjects/");
+
+    const response = await GET(request, {
+      params: Promise.resolve({ path: [...segments] }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(backendFetch).toHaveBeenCalledOnce();
+    expect(backendFetch.mock.calls[0]?.[0]).toBe("/subjects/");
+  });
+
   it("turns an unexpected Django redirect into a JSON gateway error", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     backendFetch.mockResolvedValue(

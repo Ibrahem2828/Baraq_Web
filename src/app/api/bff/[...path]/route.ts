@@ -36,7 +36,11 @@ function buildTargetPath(segments: string[], search: string): string {
   if (segments.some((segment) => segment === ".." || segment.includes("\\"))) {
     throw new Error("Invalid path segment");
   }
-  const joined = segments.join("/");
+  // `skipTrailingSlashRedirect` (next.config.ts) means Next.js hands this
+  // route `/api/bff/subjects/` as `["subjects", ""]` rather than 308-ing the
+  // browser first. Dropping empty segments keeps both browser-facing forms
+  // collapsing to one canonical Django path instead of emitting `/subjects//`.
+  const joined = segments.filter(Boolean).join("/");
   const withSlash = joined.length > 0 ? `/${joined}/` : "/";
   return search ? `${withSlash}?${search}` : withSlash;
 }

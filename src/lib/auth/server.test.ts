@@ -20,7 +20,7 @@ vi.mock("@/lib/api/backend", async (importOriginal) => ({
   logBackendFailure: vi.fn(() => ({ status: 502, code: "upstream_error" })),
 }));
 
-import { refreshAccessToken } from "./server";
+import { clearAuthCookies, refreshAccessToken } from "./server";
 
 describe("Web refresh transport", () => {
   beforeEach(() => {
@@ -61,5 +61,38 @@ describe("Web refresh transport", () => {
 
     await expect(refreshAccessToken()).rejects.toMatchObject({ upstreamStatus: 503 });
     expect(mocks.deleteCookie).not.toHaveBeenCalled();
+  });
+});
+
+describe("clearAuthCookies", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getCookie.mockReturnValue(undefined);
+  });
+
+  it("expires every auth cookie with the same attributes they were written with", async () => {
+    await clearAuthCookies();
+
+    // A cookie is identified by (name, domain, path). Expiring it with a
+    // different domain/path writes a *different* cookie and silently leaves
+    // the real one in the browser — so an AUTH_COOKIE_DOMAIN deployment would
+    // keep a live refresh token after logout.
+    const names = mocks.setCookie.mock.calls.map((call) => call[0] as string);
+    expect(names).toEqual(
+      expect.arrayContaining(["baraq_access", "baraq_refresh", "baraq_csrf"]),
+    );
+    for (const [, value, options] of mocks.setCookie.mock.calls) {
+      expect(value).toBe("");
+      expect(options).toMatchObject({ path: "/", maxAge: 0, sameSite: "lax" });
+      expect(options).toHaveProperty("domain");
+    }
+  });
+
+  it("does not leave a reusable CSRF token behind after sign-out", async () => {
+    await clearAuthCookies();
+
+    const csrf = mocks.setCookie.mock.calls.find((call) => call[0] === "baraq_csrf");
+    expect(csrf?.[1]).toBe("");
+    expect(csrf?.[2]).toMatchObject({ httpOnly: false, maxAge: 0 });
   });
 });

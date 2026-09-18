@@ -16,7 +16,13 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
-    include: ["tests/unit/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
+    include: [
+      "tests/unit/**/*.test.{ts,tsx}",
+      // Wire tests boot a real HTTP origin and assert on the bytes that reach
+      // the socket; each one opts into the node environment itself.
+      "tests/wire/**/*.test.ts",
+      "src/**/*.test.{ts,tsx}",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
