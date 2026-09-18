@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -13,6 +14,7 @@ import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
 import { fieldErrorMessage } from "@/lib/validation/field-error";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 export default function RegisterPage() {
   const t = useTranslations();
@@ -24,10 +26,11 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) });
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     registerMutation.mutate(data, {
       onSuccess: () => {
         toast({ title: t("auth.register.otpSent"), variant: "success" });
@@ -45,6 +48,15 @@ export default function RegisterPage() {
       },
     });
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(
+      event.currentTarget,
+      ["full_name", "email", "phone_number", "password", "password_confirm"],
+      setValue,
+    );
+    return submitValidated(event);
+  }
 
   return (
     <FadeIn preset="slide-up" className="surface-card p-8">

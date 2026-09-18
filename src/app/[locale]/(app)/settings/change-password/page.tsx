@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 const changePasswordSchema = z
   .object({
@@ -35,10 +37,11 @@ export default function ChangePasswordPage() {
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<ChangePasswordInput>({ resolver: zodResolver(changePasswordSchema) });
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     changePassword.mutate(
       { current_password: data.current_password, new_password: data.new_password },
       {
@@ -56,6 +59,15 @@ export default function ChangePasswordPage() {
       },
     );
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(
+      event.currentTarget,
+      ["current_password", "new_password", "new_password_confirm"],
+      setValue,
+    );
+    return submitValidated(event);
+  }
 
   return (
     <FadeIn>

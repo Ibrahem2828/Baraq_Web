@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -16,6 +16,7 @@ import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
 import { LoadingState } from "@/components/feedback/LoadingState";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 const OTP_ERROR_MESSAGE_KEY: Record<string, string> = {
   otp_expired: "auth.verifyEmail.codeExpired",
@@ -48,6 +49,7 @@ function VerifyEmailForm() {
     register,
     handleSubmit,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<VerifyEmailOtpInput>({ resolver: zodResolver(verifyEmailOtpSchema) });
 
@@ -57,7 +59,7 @@ function VerifyEmailForm() {
     return () => clearInterval(interval);
   }, [cooldown]);
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     verifyEmail.mutate(
       { email, code: data.code },
       {
@@ -72,6 +74,11 @@ function VerifyEmailForm() {
       },
     );
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(event.currentTarget, ["code"], setValue);
+    return submitValidated(event);
+  }
 
   function handleResend() {
     resendOtp.mutate(email, {

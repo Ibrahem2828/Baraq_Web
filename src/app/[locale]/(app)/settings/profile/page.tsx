@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +15,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 const profileSchema = z.object({
   full_name: z.string().min(2),
@@ -32,6 +33,7 @@ export default function ProfileSettingsPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ProfileFormInput>({ resolver: zodResolver(profileSchema) });
 
@@ -41,12 +43,17 @@ export default function ProfileSettingsPage() {
     }
   }, [user.data, reset]);
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     updateUser.mutate(data, {
       onSuccess: () => toast({ title: t("common.save"), variant: "success" }),
       onError: () => toast({ title: t("errors.UNKNOWN"), variant: "error" }),
     });
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(event.currentTarget, ["full_name", "phone_number"], setValue);
+    return submitValidated(event);
+  }
 
   return (
     <FadeIn>

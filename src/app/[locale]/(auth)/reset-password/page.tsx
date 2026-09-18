@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { CheckCircle2 } from "lucide-react";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 // Same allowlist the mobile app enforces on the `baraq://reset-password` deep
 // link (src/navigation/deepLinks.ts) — defense in depth against a malformed
@@ -41,15 +42,21 @@ function ResetPasswordForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { uid, token },
   });
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     confirmReset.mutate(data);
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(event.currentTarget, ["new_password", "confirm_password"], setValue);
+    return submitValidated(event);
+  }
 
   if (!isValidLink) {
     return (

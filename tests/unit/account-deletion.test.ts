@@ -7,7 +7,14 @@ const { backendFetch, clearAuthCookies, logBackendFailure } = vi.hoisted(() => (
   logBackendFailure: vi.fn().mockReturnValue({ status: 502, code: "upstream_error" }),
 }));
 
-vi.mock("@/lib/api/backend", () => ({ backendFetch, logBackendFailure }));
+vi.mock("@/lib/api/backend", () => ({
+  backendFetch,
+  backendUrl: (path: string) => {
+    if (path.includes("https:") || path.includes("..")) throw new Error("Invalid backend path");
+    return `http://backend:8000/api/v1${path}`;
+  },
+  logBackendFailure,
+}));
 vi.mock("@/lib/auth/server", () => ({
   getAccessToken: vi.fn().mockResolvedValue("test-access-token"),
   refreshAccessToken: vi.fn(),
@@ -73,6 +80,97 @@ describe("generic BFF transport contract", () => {
     expect(init.headers.get("x-request-id")).toBe("request-123");
     expect(init.headers.get("accept-language")).toBe("ar");
     expect(response.headers.get("cache-control")).toContain("no-store");
+  });
+
+  it.each(["POST", "PUT", "PATCH"] as const)(
+    "preserves the exact JSON body and content type for %s",
+    async (method) => {
+      const payload = {
+        email: "visible.student@example.com",
+        full_name: "Visible Student",
+        password: "NotAProductionSecret123!",
+      };
+      backendFetch.mockResolvedValue(
+        Response.json({ success: true, data: { email: payload.email } }, { status: 201 }),
+      );
+      const handlers = await import("@/app/api/bff/[...path]/route");
+      const request = new NextRequest("https://web.baraqapp.com/api/bff/auth/register", {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": "test-csrf",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const response = await handlers[method](request, {
+        params: Promise.resolve({ path: ["auth", "register"] }),
+      });
+      const [targetPath, init] = backendFetch.mock.calls.at(-1) as [
+        string,
+        { method: string; headers: Headers; body: ArrayBuffer },
+      ];
+
+      expect(response.status).toBe(201);
+      expect(targetPath).toBe("/auth/register/");
+      expect(init.method).toBe(method);
+      expect(init.headers.get("content-type")).toBe("application/json");
+      expect(JSON.parse(new TextDecoder().decode(init.body))).toEqual(payload);
+    },
+  );
+
+  it("forwards multipart uploads byte-for-byte without rebuilding the incoming boundary", async () => {
+    backendFetch.mockResolvedValue(Response.json({ success: true }, { status: 201 }));
+    const { POST } = await import("@/app/api/bff/[...path]/route");
+    const boundary = "----browser-generated-boundary";
+    const multipartBody = [
+      `--${boundary}`,
+      'Content-Disposition: form-data; name="title"',
+      "",
+      "درس",
+      `--${boundary}`,
+      'Content-Disposition: form-data; name="file"; filename="lesson.txt"',
+      "Content-Type: text/plain",
+      "",
+      "source-content",
+      `--${boundary}--`,
+      "",
+    ].join("\r\n");
+    const request = new NextRequest("https://web.baraqapp.com/api/bff/student-sources", {
+      method: "POST",
+      headers: {
+        "X-CSRF-Token": "test-csrf",
+        "Content-Type": `multipart/form-data; boundary=${boundary}`,
+      },
+      body: multipartBody,
+    });
+
+    const response = await POST(request, {
+      params: Promise.resolve({ path: ["student-sources"] }),
+    });
+    const [, init] = backendFetch.mock.calls.at(-1) as [
+      string,
+      { headers: Headers; body: ArrayBuffer },
+    ];
+    const raw = new TextDecoder().decode(init.body);
+
+    expect(response.status).toBe(201);
+    expect(init.headers.get("content-type")).toBe(`multipart/form-data; boundary=${boundary}`);
+    expect(raw).toBe(multipartBody);
+    expect(raw).toContain("lesson.txt");
+    expect(raw).toContain("source-content");
+  });
+
+  it("rejects an externally-routable catch-all path before calling the backend", async () => {
+    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const request = new NextRequest("https://web.baraqapp.com/api/bff/https:/evil.example/path");
+
+    const response = await GET(request, {
+      params: Promise.resolve({ path: ["https:", "evil.example", "path"] }),
+    });
+
+    expect(response.status).toBe(400);
+    expect(backendFetch).not.toHaveBeenCalled();
   });
 
   it("turns an unexpected Django redirect into a JSON gateway error", async () => {

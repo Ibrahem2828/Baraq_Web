@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, type FormEvent } from "react";
 import { useSearchParams, useRouter as useNativeRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { isSafeRedirectPath } from "@/lib/utils/safe-redirect";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 // `useSearchParams()` (for the post-login `?next=` redirect target) opts a
 // page out of static rendering unless isolated behind a Suspense boundary —
@@ -51,10 +52,11 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     login.mutate(data, {
       onSuccess: () => {
         const next = searchParams.get("next");
@@ -75,6 +77,11 @@ function LoginForm() {
       },
     });
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(event.currentTarget, ["email", "password"], setValue);
+    return submitValidated(event);
+  }
 
   return (
     <FadeIn preset="slide-up" className="surface-card p-8">

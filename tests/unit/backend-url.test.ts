@@ -15,9 +15,6 @@ describe("backendUrl", () => {
     expect(backendUrl("///subjects///")).toBe("http://localhost:8000/api/v1/subjects/");
     expect(backendUrl("projects/42")).toBe("http://localhost:8000/api/v1/projects/42/");
     expect(backendUrl("/")).toBe("http://localhost:8000/api/v1/");
-    expect(backendUrl("//evil.example/path")).toBe(
-      "http://localhost:8000/api/v1/evil.example/path/",
-    );
   });
 
   it("preserves an existing encoded query without re-encoding it", () => {
@@ -28,6 +25,7 @@ describe("backendUrl", () => {
 
   it.each([
     "https://evil.example/path",
+    "//evil.example/path",
     "/../admin",
     "/%2e%2e/admin",
     "/safe%2fescape",

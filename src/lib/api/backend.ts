@@ -20,6 +20,7 @@ export function backendUrl(path: string): string {
   const segments = pathname.split("/").filter(Boolean);
 
   if (
+    (pathname.startsWith("//") && !pathname.startsWith("///")) ||
     /^[a-z][a-z\d+.-]*:/iu.test(pathname) ||
     segments.some((segment) => {
       try {

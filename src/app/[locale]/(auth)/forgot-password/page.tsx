@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { CheckCircle2 } from "lucide-react";
+import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 export default function ForgotPasswordPage() {
   const t = useTranslations();
@@ -20,12 +21,18 @@ export default function ForgotPasswordPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ForgotPasswordInput>({ resolver: zodResolver(forgotPasswordSchema) });
 
-  const onSubmit = handleSubmit((data) => {
+  const submitValidated = handleSubmit((data) => {
     requestReset.mutate(data, { onSuccess: () => setSubmitted(true) });
   });
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    syncNativeTextValues(event.currentTarget, ["email"], setValue);
+    return submitValidated(event);
+  }
 
   return (
     <FadeIn preset="slide-up" className="surface-card p-8">

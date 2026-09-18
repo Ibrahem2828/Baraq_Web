@@ -12,6 +12,7 @@ export const almarai = Almarai({
   weight: ["400", "700", "800"],
   variable: "--font-almarai",
   display: "swap",
+  preload: false,
 });
 
 export const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
@@ -19,6 +20,7 @@ export const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   weight: ["400", "500", "600", "700"],
   variable: "--font-ibm-plex-arabic",
   display: "swap",
+  preload: false,
 });
 
 export const poppins = Poppins({
@@ -26,6 +28,7 @@ export const poppins = Poppins({
   weight: ["500", "600", "700"],
   variable: "--font-poppins",
   display: "swap",
+  preload: false,
 });
 
 export const ibmPlexSans = IBM_Plex_Sans({
@@ -33,6 +36,7 @@ export const ibmPlexSans = IBM_Plex_Sans({
   weight: ["400", "500", "600"],
   variable: "--font-ibm-plex-sans",
   display: "swap",
+  preload: false,
 });
 
 export const fontVariables = `${almarai.variable} ${ibmPlexSansArabic.variable} ${poppins.variable} ${ibmPlexSans.variable}`;

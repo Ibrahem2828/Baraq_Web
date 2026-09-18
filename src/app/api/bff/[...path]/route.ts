@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { backendFetch, logBackendFailure } from "@/lib/api/backend";
+import { backendFetch, backendUrl, logBackendFailure } from "@/lib/api/backend";
 import { serverEnv } from "@/config/env";
 import { NO_STORE_HEADERS } from "@/lib/http/no-store";
 import { endpoints } from "@/lib/api/endpoints";
@@ -73,6 +73,10 @@ async function handle(
   let targetPath: string;
   try {
     targetPath = buildTargetPath(path ?? [], request.nextUrl.searchParams.toString());
+    // Validate the relative path before auth/refresh work. backendUrl always
+    // anchors it to the trusted configured service and rejects absolute,
+    // protocol-relative, traversal, encoded-slash and malformed inputs.
+    backendUrl(targetPath);
   } catch {
     return jsonError(
       { success: false, message: "Invalid request path", code: "invalid_path" },
