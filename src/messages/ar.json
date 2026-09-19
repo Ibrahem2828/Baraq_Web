@@ -98,11 +98,26 @@
     "passwordMismatch": "كلمتا المرور غير متطابقتين"
   },
   "characters": {
-    "khota": { "name": "خُطى", "role": "التخطيط الدراسي" },
-    "fahes": { "name": "فاحص", "role": "الاختبارات والتقييم" },
-    "rasheed": { "name": "رشيد", "role": "تحليل الأداء والتوصيات" },
-    "kholasa": { "name": "خُلاصة", "role": "التلخيص الذكي" },
-    "sada": { "name": "صدى", "role": "تحويل الصوت إلى نص" },
+    "khota": {
+      "name": "خُطى",
+      "role": "التخطيط الدراسي"
+    },
+    "fahes": {
+      "name": "فاحص",
+      "role": "الاختبارات والتقييم"
+    },
+    "rasheed": {
+      "name": "رشيد",
+      "role": "تحليل الأداء والتوصيات"
+    },
+    "kholasa": {
+      "name": "خُلاصة",
+      "role": "التلخيص الذكي"
+    },
+    "sada": {
+      "name": "صدى",
+      "role": "تحويل الصوت إلى نص"
+    },
     "hub": {
       "title": "شخصيات برّاق",
       "subtitle": "اختر رفيقك الذكي لهذه المهمة"
@@ -154,14 +169,30 @@
     "RATE_LIMIT": "عدد كبير من المحاولات، حاول لاحقًا",
     "SUBSCRIPTION_LIMIT": "لقد وصلت إلى الحد المسموح في خطتك الحالية",
     "SERVER": "حدث خطأ في الخادم. حاول لاحقًا",
-    "UNKNOWN": "حدث خطأ غير متوقع"
+    "UNKNOWN": "حدث خطأ غير متوقع",
+    "domain": {
+      "file_size_limit_exceeded": "حجم الملف أكبر من الحد المسموح في خطتك. اختر ملفًا أصغر أو رقِّ خطتك.",
+      "storage_limit_exceeded": "لم تعد لديك مساحة تخزين كافية في خطتك. احذف بعض المصادر أو رقِّ خطتك.",
+      "source_limit_reached": "وصلت إلى الحد الأقصى لعدد المصادر في خطتك.",
+      "collection_limit_reached": "وصلت إلى الحد الأقصى لعدد المجلدات في خطتك.",
+      "character_limit_reached": "استهلكت رصيد هذه الشخصية لهذا الشهر.",
+      "character_not_allowed": "هذه الشخصية غير متاحة في خطتك الحالية.",
+      "ai_request_limit_reached": "استهلكت الحد الشهري لطلبات الذكاء الاصطناعي.",
+      "subscription_limit_exceeded": "وصلت إلى أحد حدود خطتك الحالية.",
+      "subscription_feature_not_allowed": "هذه الميزة غير متاحة في خطتك الحالية.",
+      "rate_limited": "عدد المحاولات كبير. انتظر قليلًا ثم أعد المحاولة.",
+      "payload_too_large": "حجم الطلب أكبر مما يسمح به الخادم."
+    }
   },
   "library": {
     "title": "المكتبة",
     "subtitle": "مصادرك الدراسية ومجلداتك",
     "uploadAction": "رفع مصدر",
     "newCollection": "مجلد جديد",
-    "tabs": { "sources": "المصادر", "collections": "المجلدات" },
+    "tabs": {
+      "sources": "المصادر",
+      "collections": "المجلدات"
+    },
     "status": {
       "uploaded": "تم الرفع",
       "processing": "قيد المعالجة",
@@ -220,7 +251,10 @@
     "archiveConfirmDescription": "يمكنك استعادته لاحقًا من قائمة المشاريع",
     "restoreConfirmTitle": "استعادة المشروع؟",
     "activity": "النشاط",
-    "status": { "active": "نشط", "archived": "مؤرشف" },
+    "status": {
+      "active": "نشط",
+      "archived": "مؤرشف"
+    },
     "activityEvents": {
       "project_created": "تم إنشاء المشروع",
       "project_updated": "تم تحديث المشروع",
@@ -352,7 +386,11 @@
     "submit": "إرسال الإجابات",
     "timeLimit": "{minutes} دقيقة",
     "questionsCount": "{count} سؤال",
-    "status": { "draft": "مسودة", "published": "منشور", "archived": "مؤرشف" },
+    "status": {
+      "draft": "مسودة",
+      "published": "منشور",
+      "archived": "مؤرشف"
+    },
     "result": {
       "title": "نتيجة الاختبار",
       "score": "النتيجة",

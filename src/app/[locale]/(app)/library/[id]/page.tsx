@@ -14,6 +14,7 @@ import {
   type UseWithCharacterInput,
 } from "@/features/sources/api/sourcesApi";
 import { CHARACTER_LIST, type CharacterKey } from "@/config/characters";
+import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
 import type { SourceStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
@@ -37,6 +38,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
   const source = useSource(id);
   const capabilities = useSourceCapabilities(id);
   const processSource = useProcessSource();
+  const errorMessage = useApiErrorMessage();
   const [pendingCharacter, setPendingCharacter] = useState<CharacterKey | null>(null);
 
   const useWithCharacter = useMutation({
@@ -127,7 +129,7 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
           <div className="flex flex-col gap-3">
             {useWithCharacter.isError ? (
               <p role="alert" className="text-sm text-[color:var(--color-destructive)]">
-                {t("errors.UNKNOWN")}
+                {errorMessage(useWithCharacter.error)}
               </p>
             ) : null}
             <div className="flex flex-wrap gap-3">

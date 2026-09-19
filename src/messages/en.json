@@ -98,11 +98,26 @@
     "passwordMismatch": "Passwords do not match"
   },
   "characters": {
-    "khota": { "name": "Khota", "role": "Study planning" },
-    "fahes": { "name": "Fahes", "role": "Quizzes & assessment" },
-    "rasheed": { "name": "Rasheed", "role": "Performance analysis & recommendations" },
-    "kholasa": { "name": "Kholasa", "role": "Smart summarization" },
-    "sada": { "name": "Sada", "role": "Voice-to-text" },
+    "khota": {
+      "name": "Khota",
+      "role": "Study planning"
+    },
+    "fahes": {
+      "name": "Fahes",
+      "role": "Quizzes & assessment"
+    },
+    "rasheed": {
+      "name": "Rasheed",
+      "role": "Performance analysis & recommendations"
+    },
+    "kholasa": {
+      "name": "Kholasa",
+      "role": "Smart summarization"
+    },
+    "sada": {
+      "name": "Sada",
+      "role": "Voice-to-text"
+    },
     "hub": {
       "title": "Baraq characters",
       "subtitle": "Choose your smart companion for this task"
@@ -154,14 +169,30 @@
     "RATE_LIMIT": "Too many attempts. Please try again later",
     "SUBSCRIPTION_LIMIT": "You've reached the limit on your current plan",
     "SERVER": "A server error occurred. Please try again later",
-    "UNKNOWN": "An unexpected error occurred"
+    "UNKNOWN": "An unexpected error occurred",
+    "domain": {
+      "file_size_limit_exceeded": "This file is larger than your plan allows. Choose a smaller file or upgrade.",
+      "storage_limit_exceeded": "You have run out of storage on your plan. Delete some sources or upgrade.",
+      "source_limit_reached": "You have reached the maximum number of sources on your plan.",
+      "collection_limit_reached": "You have reached the maximum number of folders on your plan.",
+      "character_limit_reached": "You have used this character's quota for the month.",
+      "character_not_allowed": "This character is not included in your current plan.",
+      "ai_request_limit_reached": "You have used your monthly AI request quota.",
+      "subscription_limit_exceeded": "You have reached one of your plan's limits.",
+      "subscription_feature_not_allowed": "This feature is not included in your current plan.",
+      "rate_limited": "Too many attempts. Please wait a moment and try again.",
+      "payload_too_large": "The request is larger than the server accepts."
+    }
   },
   "library": {
     "title": "Library",
     "subtitle": "Your study sources and folders",
     "uploadAction": "Upload a source",
     "newCollection": "New folder",
-    "tabs": { "sources": "Sources", "collections": "Folders" },
+    "tabs": {
+      "sources": "Sources",
+      "collections": "Folders"
+    },
     "status": {
       "uploaded": "Uploaded",
       "processing": "Processing",
@@ -220,7 +251,10 @@
     "archiveConfirmDescription": "You can restore it later from the projects list",
     "restoreConfirmTitle": "Restore this project?",
     "activity": "Activity",
-    "status": { "active": "Active", "archived": "Archived" },
+    "status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
     "activityEvents": {
       "project_created": "Project created",
       "project_updated": "Project updated",
@@ -352,7 +386,11 @@
     "submit": "Submit answers",
     "timeLimit": "{minutes} minutes",
     "questionsCount": "{count} questions",
-    "status": { "draft": "Draft", "published": "Published", "archived": "Archived" },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
     "result": {
       "title": "Quiz result",
       "score": "Score",

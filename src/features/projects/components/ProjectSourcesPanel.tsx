@@ -10,6 +10,7 @@ import { Link } from "@/i18n/navigation";
 import { useSources, useUploadSource, useDeleteSource } from "@/features/sources/hooks/useSources";
 import { validateSourceFile, effectiveUploadLimitBytes } from "@/features/sources/validation";
 import { useMySubscription } from "@/features/subscriptions/hooks/useSubscriptions";
+import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
 import { SOURCE_UPLOAD } from "@/config/constants";
 import type { SourceStatus } from "@/types/domain";
 import { Card } from "@/components/ui/Card";
@@ -42,6 +43,7 @@ export function ProjectSourcesPanel({ projectId }: { projectId: string }) {
   const t = useTranslations();
   const sources = useSources({ project: projectId });
   const uploadSource = useUploadSource();
+  const errorMessage = useApiErrorMessage();
   // The limit this user actually has: min(plan, platform), computed
   // server-side. Showing the platform ceiling told a Free user they
   // could upload far more than their plan allows.
@@ -77,6 +79,10 @@ export function ProjectSourcesPanel({ projectId }: { projectId: string }) {
     formData.set("file", file);
 
     uploadSource.mutate(formData, {
+      // Surface the backend's reason. A plan/limit rejection is actionable
+      // ("upgrade", "delete something") and must not fail silently — the
+      // modal previously just stayed open with no explanation.
+      onError: (error) => setFileError(errorMessage(error)),
       onSuccess: () => {
         setUploadOpen(false);
         uploadForm.reset();
