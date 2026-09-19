@@ -174,7 +174,7 @@
       "description": "الوصف (اختياري)",
       "file": "الملف",
       "submit": "رفع",
-      "maxSize": "الحد الأقصى 25 ميجابايت",
+      "maxSize": "الحد الأقصى {megabytes} ميجابايت",
       "unsupportedType": "نوع الملف غير مدعوم",
       "fileTooLarge": "حجم الملف أكبر من الحد المسموح"
     },

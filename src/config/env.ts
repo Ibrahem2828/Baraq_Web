@@ -20,8 +20,20 @@ const serverEnvSchema = z.object({
     .url()
     .refine((value) => !value.endsWith("/"), "BACKEND_API_URL must not end with a trailing slash"),
   BACKEND_API_TIMEOUT_MS: z.coerce.number().int().positive().default(20_000),
-  /** Hard cap on request bodies the BFF proxy will forward upstream (bytes). Default gives headroom above `SOURCE_UPLOAD.maxSizeBytes` (25MB) for multipart overhead. */
-  BFF_MAX_BODY_BYTES: z.coerce.number().int().positive().default(30 * 1024 * 1024),
+  /**
+   * Hard cap on request bodies the BFF proxy forwards upstream (bytes).
+   *
+   * Must stay above the backend's own STUDENT_SOURCE_MAX_UPLOAD_MB (50MB)
+   * plus multipart overhead, or the BFF 413s a file the backend would have
+   * accepted — the user is told one limit and stopped at a lower, invisible
+   * one. Caddy's `request_body max_size` sits in front of this and must be
+   * at least as large again.
+   */
+  BFF_MAX_BODY_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(55 * 1024 * 1024),
   AUTH_COOKIE_SECURE: z
     .string()
     .optional()

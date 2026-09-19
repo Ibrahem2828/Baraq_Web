@@ -18,7 +18,16 @@ export const APP_DEFAULTS = {
  * genuinely support them.
  */
 export const SOURCE_UPLOAD = {
-  maxSizeBytes: 25 * 1024 * 1024,
+  /**
+   * Platform ceiling only — NOT what to show the user.
+   *
+   * The limit a given user actually gets is `min(plan, platform)`, which the
+   * backend computes and returns as `effective_limits.max_file_size_mb` on
+   * `/subscriptions/me/`. Showing this constant told a Free user (10MB) that
+   * 25MB was allowed. Use it solely as the fallback while that request is in
+   * flight, and keep it in step with STUDENT_SOURCE_MAX_UPLOAD_MB.
+   */
+  platformMaxSizeBytes: 50 * 1024 * 1024,
   acceptedExtensions: ["pdf", "txt", "docx", "pptx", "mp3", "m4a", "wav"],
   acceptedMimeTypes: [
     "application/pdf",

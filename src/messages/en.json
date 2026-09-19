@@ -174,7 +174,7 @@
       "description": "Description (optional)",
       "file": "File",
       "submit": "Upload",
-      "maxSize": "Maximum 25MB",
+      "maxSize": "Maximum {megabytes} MB",
       "unsupportedType": "Unsupported file type",
       "fileTooLarge": "File is larger than the allowed limit"
     },

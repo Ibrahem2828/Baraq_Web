@@ -502,9 +502,17 @@ export interface MySubscription {
   plan: SubscriptionPlan;
   subscription: UserSubscriptionRecord;
   usage: SubscriptionUsage;
+  /** The plan's own figures. NOT what to display — see `effective_limits`. */
   limits: Record<string, number>;
   features: Record<string, boolean>;
   remaining: Record<string, number>;
+  /**
+   * Plan figures intersected with the platform ceiling, computed server-side
+   * (`apps/subscriptions/services.effective_max_file_size_mb`). This is the
+   * only limit a client may show or enforce: a plan can advertise more than
+   * the platform accepts.
+   */
+  effective_limits: { max_file_size_mb: number };
 }
 
 export type NotificationCategory = "system" | "study" | "quiz" | "plan" | "ai" | "subscription";

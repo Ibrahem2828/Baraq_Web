@@ -13,7 +13,8 @@ import {
   useUploadSource,
   useCreateCollection,
 } from "@/features/sources/hooks/useSources";
-import { validateSourceFile } from "@/features/sources/validation";
+import { validateSourceFile, effectiveUploadLimitBytes } from "@/features/sources/validation";
+import { useMySubscription } from "@/features/subscriptions/hooks/useSubscriptions";
 import { SOURCE_UPLOAD } from "@/config/constants";
 import type { SourceStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -53,6 +54,13 @@ export default function LibraryPage() {
   const sources = useSources();
   const collections = useCollections();
   const uploadSource = useUploadSource();
+  // The limit this user actually has: min(plan, platform), computed
+  // server-side. Showing the platform ceiling told a Free user they
+  // could upload far more than their plan allows.
+  const subscription = useMySubscription();
+  const uploadLimitBytes = effectiveUploadLimitBytes(
+    subscription.data?.effective_limits?.max_file_size_mb,
+  );
   const createCollection = useCreateCollection();
 
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -68,7 +76,7 @@ export default function LibraryPage() {
       setFileError(t("common.requiredField"));
       return;
     }
-    const errorKey = validateSourceFile(file);
+    const errorKey = validateSourceFile(file, uploadLimitBytes);
     if (errorKey) {
       setFileError(t(errorKey));
       return;
@@ -260,7 +268,9 @@ export default function LibraryPage() {
               className="text-sm text-[color:var(--color-ink)] file:me-3 file:rounded-[var(--radius-full)] file:border-0 file:bg-[color:var(--color-bg-soft)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[color:var(--color-ink)]"
             />
             <p className="text-xs text-[color:var(--color-ink-faint)]">
-              {t("library.upload.maxSize")}
+              {t("library.upload.maxSize", {
+                megabytes: Math.floor(uploadLimitBytes / (1024 * 1024)),
+              })}
             </p>
             {fileError ? (
               <p role="alert" className="text-xs text-[color:var(--color-destructive)]">
