@@ -12,6 +12,8 @@
  * see `docs/DESIGN_SYSTEM.md`.
  */
 
+import { featureFlags } from "./feature-flags";
+
 export type CharacterKey = "khota" | "fahes" | "kholasa" | "rasheed" | "sada";
 
 export interface CharacterDefinition {
@@ -65,10 +67,9 @@ export const CHARACTERS: Record<CharacterKey, CharacterDefinition> = {
     role: "التلخيص الذكي",
     roleEn: "Smart summarization",
     colorToken: "--color-character-kholasa",
-    // Live on backend, but the mobile app still ships this as a "coming soon"
-    // experience (RELEASE_CHECKLIST.md). Mirror that rollout state here until
-    // product confirms the web app should launch ahead of mobile.
-    isLive: false,
+    // Rollout remains opt-in until the real-provider RC gate passes. Backend
+    // capability/entitlement checks remain authoritative after this UX gate.
+    isLive: featureFlags.kholasa,
     taskType: "kholasa_generate_summary",
   },
   rasheed: {
@@ -88,8 +89,7 @@ export const CHARACTERS: Record<CharacterKey, CharacterDefinition> = {
     role: "تحويل الصوت إلى نص",
     roleEn: "Voice-to-text",
     colorToken: "--color-character-sada",
-    // Same "coming soon" rollout state as Kholasa on mobile.
-    isLive: false,
+    isLive: featureFlags.sada,
     taskType: "sada_transcribe_audio",
   },
 };

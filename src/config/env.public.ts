@@ -15,11 +15,11 @@ const publicEnvSchema = z.object({
   NEXT_PUBLIC_FEATURE_KHOLASA: z
     .string()
     .optional()
-    .transform((value) => value !== "false"),
+    .transform((value) => value === "true"),
   NEXT_PUBLIC_FEATURE_SADA: z
     .string()
     .optional()
-    .transform((value) => value !== "false"),
+    .transform((value) => value === "true"),
   NEXT_PUBLIC_FEATURE_ACCOUNT_DELETION: z
     .string()
     .optional()
