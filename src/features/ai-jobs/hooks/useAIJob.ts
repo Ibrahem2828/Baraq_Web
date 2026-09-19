@@ -22,7 +22,20 @@ import {
 export function useAIJob(publicId: string) {
   return useQuery({
     queryKey: queryKeys.aiJobs.detail(publicId),
-    queryFn: () => getAIJob(publicId),
+    // `refresh` while the job is in flight, plain `get` once it is terminal.
+    //
+    // A plain GET only reads what Django already knows, and Django only
+    // learns anything when the AI service delivers its completion webhook --
+    // so polling GET showed one frozen state for the entire run. `refresh`
+    // pulls the AI service's current stage through the backend (which maps
+    // and authorizes it) and returns the updated job, which is what makes
+    // the stage on screen real rather than decorative.
+    // No client-side branch needed: the backend's refresh returns the job
+    // as-is for a terminal one or a job that was never dispatched, so it is
+    // safe and cheap in every state. If the AI service is unreachable it
+    // answers 503 -- fall back to the plain read so a transient AI outage
+    // does not blank the page the learner is watching.
+    queryFn: () => refreshAIJob(publicId).catch(() => getAIJob(publicId)),
     refetchInterval: (query) => {
       const job = query.state.data;
       if (!job || isTerminalAIJobStatus(job.status)) return false;

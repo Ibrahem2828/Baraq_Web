@@ -2,22 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSources, useCollections } from "@/features/sources/hooks/useSources";
-import { updateSource, createCollection } from "@/features/sources/api/sourcesApi";
-import { queryKeys } from "@/lib/query/keys";
+import { useSources } from "@/features/sources/hooks/useSources";
 import type { SourceType } from "@/types/domain";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { cn } from "@/lib/utils/cn";
 
-export type SourceScope = { source: number } | { collection: number };
+/**
+ * How an AI request names the material it should use.
+ *
+ * `sources` is an ephemeral selection recorded on the job itself. It replaced
+ * a workaround that bulk-reassigned the chosen sources into a collection --
+ * permanently reorganising the learner's library to describe one request.
+ */
+export type SourceScope = { source: number } | { collection: number } | { source_ids: number[] };
 
 /**
  * The single place a content-based AI action picks its knowledge scope.
@@ -52,52 +54,12 @@ export function SourceScopePicker({
   onConfirm: (scope: SourceScope) => void;
 }) {
   const t = useTranslations();
-  const queryClient = useQueryClient();
   const sources = useSources({ project: projectId, source_type: sourceType });
-  const collections = useCollections({ project: projectId });
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [groupChoice, setGroupChoice] = useState<string>("new");
-  const [newCollectionName, setNewCollectionName] = useState("");
 
   function reset() {
     setSelected(new Set());
-    setGroupChoice("new");
-    setNewCollectionName("");
   }
-
-  const groupIntoExisting = useMutation({
-    mutationFn: async (collectionId: number) => {
-      await Promise.all(
-        Array.from(selected).map((sourceId) => updateSource(sourceId, { collection: collectionId })),
-      );
-      return collectionId;
-    },
-    onSuccess: (collectionId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
-      onOpenChange(false);
-      reset();
-      onConfirm({ collection: collectionId });
-    },
-  });
-
-  const groupIntoNew = useMutation({
-    mutationFn: async (name: string) => {
-      const collection = await createCollection({ name, project: projectId });
-      await Promise.all(
-        Array.from(selected).map((sourceId) => updateSource(sourceId, { collection: collection.id })),
-      );
-      return collection.id;
-    },
-    onSuccess: (collectionId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sources.collections() });
-      onOpenChange(false);
-      reset();
-      onConfirm({ collection: collectionId });
-    },
-  });
-
-  const isGrouping = groupIntoExisting.isPending || groupIntoNew.isPending;
 
   function toggle(id: number) {
     if (singleSelectOnly) {
@@ -113,21 +75,14 @@ export function SourceScopePicker({
   }
 
   function handleConfirm() {
-    if (selected.size === 1) {
-      const [only] = selected;
-      onOpenChange(false);
-      reset();
-      onConfirm({ source: only });
-      return;
-    }
-    if (selected.size > 1) {
-      if (groupChoice === "new") {
-        if (!newCollectionName.trim()) return;
-        groupIntoNew.mutate(newCollectionName.trim());
-      } else {
-        groupIntoExisting.mutate(Number(groupChoice));
-      }
-    }
+    if (selected.size === 0) return;
+    const ids = Array.from(selected);
+    onOpenChange(false);
+    reset();
+    // One source still uses the singular form the backend has always
+    // accepted; several travel as an explicit selection that changes nothing
+    // in the library.
+    onConfirm(ids.length === 1 ? { source: ids[0] } : { source_ids: ids });
   }
 
   // A source outside these states is rejected by the backend for every
@@ -143,13 +98,8 @@ export function SourceScopePicker({
     [sources.data],
   );
   const total = selectableSources.length;
-  const collectionOptions = useMemo(
-    () => (collections.data?.items ?? []).map((c) => ({ value: String(c.id), label: c.name })),
-    [collections.data],
-  );
 
-  const confirmDisabled =
-    selected.size === 0 || (selected.size > 1 && groupChoice === "new" && !newCollectionName.trim());
+  const confirmDisabled = selected.size === 0;
 
   return (
     <Modal
@@ -164,7 +114,7 @@ export function SourceScopePicker({
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleConfirm} disabled={confirmDisabled} loading={isGrouping}>
+          <Button onClick={handleConfirm} disabled={confirmDisabled}>
             {confirmLabel}
           </Button>
         </>
@@ -221,29 +171,6 @@ export function SourceScopePicker({
             })}
           </ul>
         )}
-
-        {selected.size > 1 ? (
-          <div className="flex flex-col gap-3 border-t border-[color:var(--color-border)] pt-4">
-            <p className="text-sm font-medium text-[color:var(--color-ink)]">
-              {t("sourceScope.groupPrompt")}
-            </p>
-            <Select
-              value={groupChoice}
-              onChange={(event) => setGroupChoice(event.target.value)}
-              options={[
-                { value: "new", label: t("sourceScope.newCollection") },
-                ...collectionOptions,
-              ]}
-            />
-            {groupChoice === "new" ? (
-              <Input
-                placeholder={t("sourceScope.newCollectionNamePlaceholder")}
-                value={newCollectionName}
-                onChange={(event) => setNewCollectionName(event.target.value)}
-              />
-            ) : null}
-          </div>
-        ) : null}
       </div>
     </Modal>
   );

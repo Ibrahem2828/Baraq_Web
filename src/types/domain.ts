@@ -347,6 +347,23 @@ export type AIJobStatus =
   | "failed"
   | "canceled";
 
+/**
+ * The public progress vocabulary, mapped server-side from the AI service's
+ * private internal states. Deliberately not a percentage: the AI service
+ * reports progress_percent as a constant 0 because its own percentages were
+ * synthetic, so a number here would be invented twice over.
+ */
+export type AIJobProgressStage =
+  | "queued"
+  | "preparing"
+  | "retrieving"
+  | "generating"
+  | "validating"
+  | "finalizing"
+  | "completed"
+  | "failed"
+  | "canceled";
+
 export function isTerminalAIJobStatus(status: AIJobStatus): boolean {
   return status === "completed" || status === "failed" || status === "canceled";
 }
@@ -356,6 +373,8 @@ export interface AIJob {
   character: AIJobCharacter;
   task_type: AIJobTaskType;
   status: AIJobStatus;
+  /** What the job is actually doing right now, from the backend. */
+  progress_stage: AIJobProgressStage;
   source: number | null;
   collection: number | null;
   subject: number | null;

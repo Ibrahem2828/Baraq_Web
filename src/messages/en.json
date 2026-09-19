@@ -299,6 +299,42 @@
       "completed": "Completed",
       "failed": "Failed",
       "canceled": "Canceled"
+    },
+    "stage": {
+      "queued": "Waiting to start…",
+      "preparing": "Preparing…",
+      "retrieving": "Reading your sources…",
+      "generating": "Generating…",
+      "validating": "Checking the result…",
+      "finalizing": "Saving…",
+      "completed": "Done",
+      "failed": "Could not complete",
+      "canceled": "Cancelled",
+      "fahes": {
+        "retrieving": "Reading the source and pulling out concepts…",
+        "generating": "Writing the questions…",
+        "validating": "Reviewing the quiz…"
+      },
+      "kholasa": {
+        "retrieving": "Reading the content…",
+        "generating": "Pulling out the key ideas…",
+        "validating": "Reviewing the summary…"
+      },
+      "sada": {
+        "retrieving": "Preparing the recording…",
+        "generating": "Transcribing the audio…",
+        "finalizing": "Creating a reusable text source…"
+      },
+      "khota": {
+        "retrieving": "Analysing your study context…",
+        "generating": "Building the plan…",
+        "validating": "Checking the schedule…"
+      },
+      "rasheed": {
+        "retrieving": "Loading your results…",
+        "generating": "Analysing strengths and weaknesses…",
+        "validating": "Reviewing the recommendations…"
+      }
     }
   },
   "studyPlans": {

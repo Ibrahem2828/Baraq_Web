@@ -4,8 +4,18 @@ import type { AIJob, AIJobCharacter, AIJobTaskType } from "@/types/domain";
 
 export interface CreateAIJobInput {
   task_type: AIJobTaskType;
+  /** One source. Mutually exclusive with `collection` and `source_ids`. */
   source?: number;
+  /** One saved folder. Mutually exclusive with `source` and `source_ids`. */
   collection?: number;
+  /**
+   * An explicit multi-source selection, recorded on the job itself.
+   *
+   * Every id is authorized server-side. This replaced a workaround that
+   * bulk-reassigned the chosen sources into a collection, permanently
+   * reorganising the learner's library to describe one temporary request.
+   */
+  source_ids?: number[];
   subject?: number;
   project?: string;
   input?: Record<string, unknown>;
