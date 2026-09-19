@@ -2,8 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
-import { isTerminalAIJobStatus } from "@/types/domain";
-import { getAIJobPollingDelay } from "@/config/constants";
+import { getAIJobPollingInterval } from "@/config/constants";
 import {
   getAIJob,
   createAIJob,
@@ -37,9 +36,7 @@ export function useAIJob(publicId: string) {
     // does not blank the page the learner is watching.
     queryFn: () => refreshAIJob(publicId).catch(() => getAIJob(publicId)),
     refetchInterval: (query) => {
-      const job = query.state.data;
-      if (!job || isTerminalAIJobStatus(job.status)) return false;
-      return getAIJobPollingDelay(new Date(job.created_at));
+      return getAIJobPollingInterval(query.state.data);
     },
   });
 }

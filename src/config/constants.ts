@@ -54,3 +54,13 @@ export function getAIJobPollingDelay(createdAt: Date): number {
   const tier = AI_JOB_POLLING.scheduleMs.find((entry) => ageMs < entry.maxAgeMs);
   return tier?.delayMs ?? AI_JOB_POLLING.fallbackDelayMs;
 }
+
+export function getAIJobPollingInterval(job: {
+  status: string;
+  created_at: string;
+} | undefined): number | false {
+  if (!job || job.status === "completed" || job.status === "failed" || job.status === "canceled") {
+    return false;
+  }
+  return getAIJobPollingDelay(new Date(job.created_at));
+}
