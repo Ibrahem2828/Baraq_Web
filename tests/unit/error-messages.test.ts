@@ -30,6 +30,24 @@ const BACKEND_SUBSCRIPTION_CODES = [
   "subscription_feature_not_allowed",
 ];
 
+/**
+ * Every code `resolve_invitation` / `request_to_join` can raise in
+ * apps/organizations/services.py.
+ *
+ * Each one is a state the learner can act on -- ask for a new code, ask to
+ * be re-invited, or stop because they are already a member -- so none of
+ * them may reach them as "something went wrong".
+ */
+const BACKEND_JOIN_CODES = [
+  "invitation_invalid",
+  "invitation_revoked",
+  "invitation_expired",
+  "invitation_exhausted",
+  "organization_unavailable",
+  "class_unavailable",
+  "membership_already_active",
+];
+
 const BACKEND_AI_JOB_CODES = [
   "pdf_ocr_required",
   "unsupported_source_format",
@@ -63,6 +81,10 @@ describe("domain error message mapping", () => {
   });
 
   it.each(BACKEND_AI_JOB_CODES)("maps AI job failure %s to a dedicated message", (code) => {
+    expect(domainErrorMessageKey(code)).toBe(`errors.domain.${code}`);
+  });
+
+  it.each(BACKEND_JOIN_CODES)("maps join failure %s to a dedicated message", (code) => {
     expect(domainErrorMessageKey(code)).toBe(`errors.domain.${code}`);
   });
 

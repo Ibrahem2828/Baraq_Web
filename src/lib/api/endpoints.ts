@@ -130,6 +130,13 @@ export const endpoints = {
     markRead: (id: string | number) => `/notifications/${id}/mark-read/`,
     markAllRead: "/notifications/mark-all-read/",
   },
+  organizations: {
+    // The learner-facing half of the organization surface. Everything else
+    // under /admin/organizations/ is staff-only and never reached from here.
+    joinPreview: "/join/preview/",
+    joinConfirm: "/join/confirm/",
+    myMemberships: "/my/memberships/",
+  },
   support: {
     tickets: "/support/tickets/",
     ticket: (id: string | number) => withId("/support/tickets/", id),

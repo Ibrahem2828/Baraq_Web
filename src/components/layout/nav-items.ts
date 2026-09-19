@@ -12,6 +12,7 @@ import {
   Bell,
   CreditCard,
   LifeBuoy,
+  School,
   Settings,
 } from "lucide-react";
 
@@ -38,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/transcriptions", labelKey: "nav.transcriptions", icon: Mic },
   { href: "/notifications", labelKey: "nav.notifications", icon: Bell },
   { href: "/subscription", labelKey: "nav.subscription", icon: CreditCard },
+  { href: "/join", labelKey: "nav.join", icon: School },
   { href: "/support", labelKey: "nav.support", icon: LifeBuoy },
   { href: "/settings", labelKey: "nav.settings", icon: Settings, primary: true },
 ];

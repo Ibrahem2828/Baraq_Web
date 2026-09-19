@@ -33,7 +33,8 @@
     "support": "Support",
     "settings": "Settings",
     "profile": "Profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "join": "Join a school"
   },
   "auth": {
     "login": {
@@ -215,7 +216,14 @@
       "provider_unavailable": "The AI service is temporarily unavailable. Please retry later.",
       "no_provider_available": "No AI provider is currently available for this request.",
       "result_validation_failed": "The generated result was rejected because it was incomplete or invalid.",
-      "worker_interrupted": "The job stopped safely after a worker interruption. Please retry."
+      "worker_interrupted": "The job stopped safely after a worker interruption. Please retry.",
+      "invitation_invalid": "That code is not valid. Check it with your teacher.",
+      "invitation_revoked": "That invitation was cancelled. Ask your teacher for a new code.",
+      "invitation_expired": "That invitation has expired. Ask your teacher for a new code.",
+      "invitation_exhausted": "That invitation has been used the maximum number of times.",
+      "organization_unavailable": "That school is not accepting new members right now.",
+      "class_unavailable": "That class is not accepting new members right now.",
+      "membership_already_active": "You have already joined this school."
     }
   },
   "library": {
@@ -598,5 +606,27 @@
     "termsOfService": "Terms of Service",
     "about": "About Baraq",
     "rights": "All rights reserved"
+  },
+  "join": {
+    "title": "Join a school",
+    "subtitle": "Enter the code your teacher gave you, or open the invitation link.",
+    "codeLabel": "Invitation code",
+    "codePlaceholder": "e.g. 7HKM2PDF",
+    "check": "Check code",
+    "checking": "Checking...",
+    "confirm": "Request to join",
+    "confirming": "Sending...",
+    "previewTitle": "You are about to join",
+    "school": "School",
+    "institute": "Institute",
+    "classLabel": "Class",
+    "pendingTitle": "Request sent",
+    "pendingBody": "Your teacher will review it. You will see it here once it is approved.",
+    "myMemberships": "My schools",
+    "noMemberships": "You have not joined a school yet.",
+    "joinedOn": "Joined",
+    "statusActive": "Active",
+    "statusPending": "Pending",
+    "again": "Use a different code"
   }
 }

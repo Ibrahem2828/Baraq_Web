@@ -65,6 +65,16 @@ export const DOMAIN_ERROR_MESSAGE_KEYS: Record<string, string> = {
   result_validation_failed: "errors.domain.result_validation_failed",
   output_validation_failed: "errors.domain.result_validation_failed",
   worker_interrupted_execution_uncertain: "errors.domain.worker_interrupted",
+  // Joining a school. Every one of these is a state the learner can act on
+  // -- ask for a new code, ask to be re-invited -- so none of them may
+  // degrade to "something went wrong".
+  invitation_invalid: "errors.domain.invitation_invalid",
+  invitation_revoked: "errors.domain.invitation_revoked",
+  invitation_expired: "errors.domain.invitation_expired",
+  invitation_exhausted: "errors.domain.invitation_exhausted",
+  organization_unavailable: "errors.domain.organization_unavailable",
+  class_unavailable: "errors.domain.class_unavailable",
+  membership_already_active: "errors.domain.membership_already_active",
 };
 
 export function domainErrorMessageKey(code: string | null | undefined): string | undefined {
