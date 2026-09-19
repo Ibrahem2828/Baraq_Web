@@ -119,8 +119,24 @@ export function deleteSource(id: number | string) {
   return apiClient.delete<void>(endpoints.sources.detail(id));
 }
 
+/**
+ * `POST /student-sources/{id}/process/` answers **202** with an envelope, not
+ * a bare source — see `SourceProcessingQueuedResponseSerializer`
+ * (`apps/sources/serializers.py`) and `SourceProcessingQueuedResponse` in
+ * `contracts/openapi.json`. `source` is the source as it stands *before* the
+ * queued work runs, so callers must re-fetch (or rely on query invalidation)
+ * to observe the processed result.
+ *
+ * This was previously typed as a bare `StudentSource`, which type-checked
+ * cleanly while every field read `undefined` at runtime.
+ */
+export interface SourceProcessingQueuedResponse {
+  message: string;
+  source: StudentSource;
+}
+
 export function processSource(id: number | string) {
-  return apiClient.post<StudentSource>(endpoints.sources.process(id));
+  return apiClient.post<SourceProcessingQueuedResponse>(endpoints.sources.process(id));
 }
 
 export function getSourceCapabilities(id: number | string) {

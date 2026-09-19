@@ -71,8 +71,12 @@ export function useProcessSource() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: processSource,
-    onSuccess: (source) => {
-      queryClient.setQueryData(queryKeys.sources.detail(source.id), source);
+    // The 202 body carries the source as it stood *before* the queued work
+    // runs, so it must not be seeded into the detail cache — that would
+    // overwrite fresher data with a stale snapshot. Invalidating
+    // `sources.all` is sufficient: it is a key prefix of `sources.detail`
+    // and `sources.capabilities`, so both refetch from the server.
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
     },
   });
