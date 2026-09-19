@@ -40,6 +40,11 @@ const BACKEND_AI_JOB_CODES = [
   "provider_timeout",
   "provider_rate_limited",
   "result_validation_failed",
+  "insufficient_source_context",
+  "missing_authoritative_data",
+  "khota_constraint_violation",
+  "empty_transcription",
+  "transcription_failed",
 ];
 
 function lookup(messages: unknown, dottedKey: string): unknown {
