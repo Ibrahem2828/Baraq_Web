@@ -179,12 +179,13 @@
       "fileTooLarge": "File is larger than the allowed limit"
     },
     "detail": {
-      "process": "Process source",
+      "retryProcessing": "Retry processing",
       "useWithCharacter": "Use with a character",
       "extractedText": "Extracted text",
       "noExtractedText": "No extracted text yet",
-      "processingRequiredTitle": "Source is still processing",
-      "processingRequiredDescription": "This source can't be used with a character until processing finishes."
+      "extractedByAi": "Text is extracted from this file when you run a character; it is not stored here in advance.",
+      "processingFailedTitle": "This source could not be processed",
+      "processingFailedDescription": "The file did not finish processing, so it cannot be used with a character. Retry, or upload the file again."
     },
     "collection": {
       "createTitle": "New folder",

@@ -60,7 +60,18 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
   }
 
   const data = source.data;
-  const isProcessingRequired = data.status !== "ready";
+  // `status === "ready"` is NOT the readiness signal. `uploaded` is the
+  // terminal success state for every non-text source — Django's
+  // process_source() leaves PDFs/DOCX/PPTX there on purpose, because
+  // extraction belongs to the AI service — so gating on `ready` blocked those
+  // formats forever behind a "process" button that only ever re-wrote
+  // `uploaded`. The authoritative signal is the capabilities contract, which
+  // the backend now evaluates from source state, type and subscription
+  // together (apps/sources/capabilities.py).
+  const hasFailed = data.status === "failed";
+  // Only a failed source has anything to gain from re-running processing; for
+  // `uploaded`/`ready` it is a no-op that just re-stamps sha256/processed_at.
+  const canRetryProcessing = hasFailed;
 
   return (
     <div>
@@ -77,15 +88,20 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
           {t("library.detail.extractedText")}
         </h2>
         <p className="text-sm whitespace-pre-line text-[color:var(--color-ink-soft)]">
-          {data.extracted_text_preview || t("library.detail.noExtractedText")}
+          {data.extracted_text_preview ||
+            t(
+              data.source_type === "text"
+                ? "library.detail.noExtractedText"
+                : "library.detail.extractedByAi",
+            )}
         </p>
-        {data.status !== "ready" ? (
+        {canRetryProcessing ? (
           <Button
             variant="outline"
             onClick={() => processSource.mutate(data.id)}
             loading={processSource.isPending}
           >
-            {t("library.detail.process")}
+            {t("library.detail.retryProcessing")}
           </Button>
         ) : null}
       </Card>
@@ -94,10 +110,10 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
         <h2 className="text-sm font-bold text-[color:var(--color-ink)]">
           {t("library.detail.useWithCharacter")}
         </h2>
-        {isProcessingRequired ? (
+        {hasFailed ? (
           <EmptyState
-            title={t("library.detail.processingRequiredTitle")}
-            description={t("library.detail.processingRequiredDescription")}
+            title={t("library.detail.processingFailedTitle")}
+            description={t("library.detail.processingFailedDescription")}
           />
         ) : capabilities.isPending ? (
           <LoadingState label={t("common.loading")} />

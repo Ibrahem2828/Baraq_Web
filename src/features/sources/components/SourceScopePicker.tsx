@@ -130,7 +130,19 @@ export function SourceScopePicker({
     }
   }
 
-  const total = sources.data?.items.length ?? 0;
+  // A source outside these states is rejected by the backend for every
+  // character (apps/sources/models.py AI_USABLE_STATUSES), so offering it
+  // here would only produce a 400 after the user commits to a selection.
+  // `uploaded` IS selectable: it is the terminal success state for every
+  // non-text source. Purely a UX filter — the backend stays authoritative.
+  const selectableSources = useMemo(
+    () =>
+      (sources.data?.items ?? []).filter(
+        (source) => source.status === "uploaded" || source.status === "ready",
+      ),
+    [sources.data],
+  );
+  const total = selectableSources.length;
   const collectionOptions = useMemo(
     () => (collections.data?.items ?? []).map((c) => ({ value: String(c.id), label: c.name })),
     [collections.data],
@@ -181,7 +193,7 @@ export function SourceScopePicker({
           />
         ) : (
           <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-            {sources.data.items.map((source) => {
+            {selectableSources.map((source) => {
               const checked = selected.has(source.id);
               return (
                 <li key={source.id}>

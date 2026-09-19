@@ -179,12 +179,13 @@
       "fileTooLarge": "حجم الملف أكبر من الحد المسموح"
     },
     "detail": {
-      "process": "معالجة المصدر",
+      "retryProcessing": "إعادة محاولة المعالجة",
       "useWithCharacter": "استخدم مع شخصية",
       "extractedText": "النص المستخرج",
       "noExtractedText": "لا يوجد نص مستخرج بعد",
-      "processingRequiredTitle": "المصدر قيد المعالجة",
-      "processingRequiredDescription": "لا يمكن استخدام هذا المصدر مع الشخصيات حتى تكتمل معالجته."
+      "extractedByAi": "يستخرج النص من هذا الملف عند تشغيل إحدى الشخصيات، ولا يُحفظ هنا مسبقًا.",
+      "processingFailedTitle": "تعذّرت معالجة هذا المصدر",
+      "processingFailedDescription": "لم تكتمل معالجة الملف، لذلك لا يمكن استخدامه مع الشخصيات. أعد المحاولة أو ارفع الملف مرة أخرى."
     },
     "collection": {
       "createTitle": "مجلد جديد",
