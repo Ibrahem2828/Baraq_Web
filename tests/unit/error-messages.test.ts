@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import arMessages from "@/messages/ar.json";
 import enMessages from "@/messages/en.json";
-import { DOMAIN_ERROR_MESSAGE_KEYS, errorMessageKey } from "@/lib/api/error-messages";
+import {
+  DOMAIN_ERROR_MESSAGE_KEYS,
+  domainErrorMessageKey,
+  errorMessageKey,
+} from "@/lib/api/error-messages";
 import { ApiError, fromErrorEnvelope } from "@/lib/api/errors";
 
 /**
@@ -26,6 +30,18 @@ const BACKEND_SUBSCRIPTION_CODES = [
   "subscription_feature_not_allowed",
 ];
 
+const BACKEND_AI_JOB_CODES = [
+  "pdf_ocr_required",
+  "unsupported_source_format",
+  "source_version_changed",
+  "source_ingestion_failed",
+  "embedding_failed",
+  "retrieval_failed",
+  "provider_timeout",
+  "provider_rate_limited",
+  "result_validation_failed",
+];
+
 function lookup(messages: unknown, dottedKey: string): unknown {
   return dottedKey
     .split(".")
@@ -39,6 +55,10 @@ function lookup(messages: unknown, dottedKey: string): unknown {
 describe("domain error message mapping", () => {
   it.each(BACKEND_SUBSCRIPTION_CODES)("maps %s to a dedicated message", (code) => {
     expect(DOMAIN_ERROR_MESSAGE_KEYS[code]).toBeDefined();
+  });
+
+  it.each(BACKEND_AI_JOB_CODES)("maps AI job failure %s to a dedicated message", (code) => {
+    expect(domainErrorMessageKey(code)).toBe(`errors.domain.${code}`);
   });
 
   it.each(Object.entries(DOMAIN_ERROR_MESSAGE_KEYS))(

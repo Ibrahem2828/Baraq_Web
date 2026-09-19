@@ -181,7 +181,22 @@
       "subscription_limit_exceeded": "You have reached one of your plan's limits.",
       "subscription_feature_not_allowed": "This feature is not included in your current plan.",
       "rate_limited": "Too many attempts. Please wait a moment and try again.",
-      "payload_too_large": "The request is larger than the server accepts."
+      "payload_too_large": "The request is larger than the server accepts.",
+      "pdf_ocr_required": "This PDF contains no extractable text. Upload a text-based PDF or run OCR first.",
+      "unsupported_source_format": "This file format is not supported for this AI request.",
+      "source_not_found": "The selected source is no longer available.",
+      "source_forbidden": "You do not have access to the selected source.",
+      "source_download_failed": "The source could not be downloaded. Please try again.",
+      "source_checksum_mismatch": "The source failed an integrity check. Upload it again before retrying.",
+      "source_version_changed": "The source changed after this job started. Create a new request using the current version.",
+      "source_ingestion_failed": "The source could not be prepared for AI use. Please retry.",
+      "embedding_failed": "The source could not be indexed. Please retry later.",
+      "retrieval_failed": "Relevant content could not be retrieved from the selected source.",
+      "provider_timeout": "The AI provider took too long to respond. Please retry.",
+      "provider_rate_limited": "The AI service is busy right now. Wait a moment and retry.",
+      "provider_unavailable": "The AI service is temporarily unavailable. Please retry later.",
+      "result_validation_failed": "The generated result was rejected because it was incomplete or invalid.",
+      "worker_interrupted": "The job stopped safely after a worker interruption. Please retry."
     }
   },
   "library": {

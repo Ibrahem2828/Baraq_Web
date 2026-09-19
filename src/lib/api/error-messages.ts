@@ -27,13 +27,35 @@ export const DOMAIN_ERROR_MESSAGE_KEYS: Record<string, string> = {
   // Transport / throttling.
   rate_limited: "errors.domain.rate_limited",
   payload_too_large: "errors.domain.payload_too_large",
+  // AI source, retrieval, provider, and output failures.
+  pdf_ocr_required: "errors.domain.pdf_ocr_required",
+  unsupported_source_format: "errors.domain.unsupported_source_format",
+  source_not_found: "errors.domain.source_not_found",
+  source_forbidden: "errors.domain.source_forbidden",
+  source_download_failed: "errors.domain.source_download_failed",
+  source_checksum_mismatch: "errors.domain.source_checksum_mismatch",
+  source_version_changed: "errors.domain.source_version_changed",
+  source_ingestion_failed: "errors.domain.source_ingestion_failed",
+  embedding_failed: "errors.domain.embedding_failed",
+  retrieval_failed: "errors.domain.retrieval_failed",
+  provider_timeout: "errors.domain.provider_timeout",
+  provider_rate_limited: "errors.domain.provider_rate_limited",
+  provider_unavailable: "errors.domain.provider_unavailable",
+  validation_failed: "errors.domain.result_validation_failed",
+  result_validation_failed: "errors.domain.result_validation_failed",
+  output_validation_failed: "errors.domain.result_validation_failed",
+  worker_interrupted_execution_uncertain: "errors.domain.worker_interrupted",
 };
+
+export function domainErrorMessageKey(code: string | null | undefined): string | undefined {
+  return code ? DOMAIN_ERROR_MESSAGE_KEYS[code] : undefined;
+}
 
 /**
  * The i18n key for an error, most specific first:
  * backend domain code → normalized class → UNKNOWN.
  */
 export function errorMessageKey(error: ApiError): string {
-  const domainKey = error.backendCode ? DOMAIN_ERROR_MESSAGE_KEYS[error.backendCode] : undefined;
+  const domainKey = domainErrorMessageKey(error.backendCode);
   return domainKey ?? `errors.${error.code}`;
 }

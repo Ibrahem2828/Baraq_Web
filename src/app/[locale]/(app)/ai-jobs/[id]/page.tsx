@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
+import { domainErrorMessageKey } from "@/lib/api/error-messages";
 
 const RESULT_ROUTE: Record<string, string> = {
   quiz: "/quizzes",
@@ -52,6 +53,10 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
     : t.has(genericKey)
       ? t(genericKey)
       : data.progress_stage;
+  const failureKey = domainErrorMessageKey(data.error_code);
+  const failureMessage = failureKey && t.has(failureKey)
+    ? t(failureKey)
+    : data.error_message ?? t("errors.SERVER");
 
   return (
     <div>
@@ -96,7 +101,7 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
 
         {data.status === "failed" ? (
           <p className="text-sm text-[color:var(--color-destructive)]">
-            {data.error_message ?? t("errors.SERVER")}
+            {failureMessage}
           </p>
         ) : null}
 
