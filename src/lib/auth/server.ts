@@ -225,14 +225,45 @@ export async function verifyEmail(
 }
 
 export async function logout(): Promise<void> {
-  const refresh = await getRefreshToken();
+  let refresh = await getRefreshToken();
+  let access = await getAccessToken();
   if (refresh) {
     try {
-      await backendFetch(endpoints.auth.logout, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh }),
-      });
+      if (!access) {
+        access = (await refreshAccessToken()) ?? undefined;
+        refresh = await getRefreshToken();
+      }
+
+      if (access && refresh) {
+        let response = await backendFetch(endpoints.auth.logout, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access}`,
+          },
+          body: JSON.stringify({ refresh }),
+        });
+
+        // Logout requires an access token at the Django boundary so that one
+        // session cannot revoke another session's refresh token. If the access
+        // token expired while the browser was idle, refresh once and retry with
+        // the rotated pair; otherwise the browser would look signed out while
+        // the original refresh token remained usable until its full expiry.
+        if (response.status === 401) {
+          access = (await refreshAccessToken()) ?? undefined;
+          refresh = await getRefreshToken();
+          if (access && refresh) {
+            response = await backendFetch(endpoints.auth.logout, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${access}`,
+              },
+              body: JSON.stringify({ refresh }),
+            });
+          }
+        }
+      }
     } catch {
       // Best-effort: always clear local cookies even if backend revocation fails.
     }

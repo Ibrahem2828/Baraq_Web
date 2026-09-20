@@ -20,7 +20,7 @@ vi.mock("@/lib/api/backend", async (importOriginal) => ({
   logBackendFailure: vi.fn(() => ({ status: 502, code: "upstream_error" })),
 }));
 
-import { clearAuthCookies, refreshAccessToken } from "./server";
+import { clearAuthCookies, logout, refreshAccessToken } from "./server";
 
 describe("Web refresh transport", () => {
   beforeEach(() => {
@@ -94,5 +94,106 @@ describe("clearAuthCookies", () => {
     const csrf = mocks.setCookie.mock.calls.find((call) => call[0] === "baraq_csrf");
     expect(csrf?.[1]).toBe("");
     expect(csrf?.[2]).toMatchObject({ httpOnly: false, maxAge: 0 });
+  });
+});
+
+describe("logout transport", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getCookie.mockImplementation((name: string) => {
+      if (name === "baraq_access") return { value: "opaque-access" };
+      if (name === "baraq_refresh") return { value: "opaque-refresh" };
+      return undefined;
+    });
+  });
+
+  it("authorizes backend refresh-token revocation with the HttpOnly access token", async () => {
+    mocks.backendFetch.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await logout();
+
+    expect(mocks.backendFetch).toHaveBeenCalledWith(
+      "/auth/logout/",
+      expect.objectContaining({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer opaque-access",
+        },
+        body: JSON.stringify({ refresh: "opaque-refresh" }),
+      }),
+    );
+  });
+
+  it("refreshes an expired access token before retrying revocation", async () => {
+    let currentRefresh = "opaque-refresh";
+    mocks.getCookie.mockImplementation((name: string) => {
+      if (name === "baraq_access") return { value: "opaque-access" };
+      if (name === "baraq_refresh") return { value: currentRefresh };
+      return undefined;
+    });
+    mocks.setCookie.mockImplementation((name: string, value: string) => {
+      if (name === "baraq_refresh") currentRefresh = value;
+    });
+    mocks.backendFetch
+      .mockResolvedValueOnce(new Response(null, { status: 401 }))
+      .mockResolvedValueOnce(
+        Response.json({ data: { access: "renewed-access", refresh: "renewed-refresh" } }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    await logout();
+
+    expect(mocks.backendFetch).toHaveBeenNthCalledWith(
+      2,
+      "/auth/refresh/",
+      expect.objectContaining({ body: JSON.stringify({ refresh: "opaque-refresh" }) }),
+    );
+    expect(mocks.backendFetch).toHaveBeenNthCalledWith(
+      3,
+      "/auth/logout/",
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer renewed-access",
+        },
+        body: JSON.stringify({ refresh: "renewed-refresh" }),
+      }),
+    );
+  });
+
+  it("refreshes before revocation when the access cookie has already expired", async () => {
+    let currentRefresh = "opaque-refresh";
+    mocks.getCookie.mockImplementation((name: string) => {
+      if (name === "baraq_refresh") return { value: currentRefresh };
+      return undefined;
+    });
+    mocks.setCookie.mockImplementation((name: string, value: string) => {
+      if (name === "baraq_refresh") currentRefresh = value;
+    });
+    mocks.backendFetch
+      .mockResolvedValueOnce(
+        Response.json({ data: { access: "renewed-access", refresh: "renewed-refresh" } }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    await logout();
+
+    expect(mocks.backendFetch).toHaveBeenNthCalledWith(
+      1,
+      "/auth/refresh/",
+      expect.objectContaining({ body: JSON.stringify({ refresh: "opaque-refresh" }) }),
+    );
+    expect(mocks.backendFetch).toHaveBeenNthCalledWith(
+      2,
+      "/auth/logout/",
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer renewed-access",
+        },
+        body: JSON.stringify({ refresh: "renewed-refresh" }),
+      }),
+    );
   });
 });
