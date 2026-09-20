@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "audit": "npm audit --omit=dev",
     "validate:env": "node scripts/validate-env.mjs",
+  "check:headers": "node scripts/check-security-headers.mjs",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {

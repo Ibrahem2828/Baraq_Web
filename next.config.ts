@@ -3,7 +3,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-const isProduction = process.env.APP_ENV === "production";
+// Gated on NODE_ENV, not APP_ENV. Next resolves `headers()` during
+// `next build` and bakes the result into routes-manifest.json; it is never
+// re-evaluated at runtime. The production image's builder stage does not set
+// APP_ENV, so gating on it silently shipped `'unsafe-eval'` in the production
+// CSP and dropped HSTS entirely, no matter what compose set at runtime.
+// `next build` always sets NODE_ENV=production, and NODE_ENV is also the flag
+// React itself keys its eval()-based dev overlay off, so it is the signal
+// this condition actually means.
+const isProduction = process.env.NODE_ENV === "production";
 
 // Security headers, ported from the pattern already validated in
 // Baraq_Dashboard_Professional's next.config.ts, upgraded slightly (CSP
@@ -23,8 +31,11 @@ const securityHeaders = [
       // user-controlled interpolation. Revisit with a nonce-based CSP if the
       // build pipeline adds nonce support for inline scripts.
       // 'unsafe-eval' is dev-only: React dev mode uses eval() to reconstruct
-      // stack traces for its debugging overlay (never in production builds —
-      // verified this doesn't leak into the prod CSP below).
+      // stack traces for its debugging overlay. This previously DID leak into
+      // production -- routes-manifest.json from a real build carried
+      // 'unsafe-eval' -- because the gate above read a variable the build
+      // stage never set. Verify it the only way that proves anything: build,
+      // then read the CSP out of .next/routes-manifest.json.
       `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
