@@ -23,11 +23,35 @@ export interface JoinRequestSummary {
   decided_at: string | null;
 }
 
-export interface Membership {
-  organization: { name: string; organization_type: string };
-  classroom: { name: string } | null;
-  status: string;
-  joined_at: string | null;
+/**
+ * What `/my/memberships/` actually returns: three lists, not one.
+ *
+ * A learner's place in the platform has three parts and they are not
+ * interchangeable -- the school they belong to, the classes inside it, and
+ * anything still waiting on a teacher. Flattening them would lose exactly
+ * the distinction the page exists to show.
+ */
+export interface MyMemberships {
+  organizations: Array<{
+    organization: { public_id: string; name: string; organization_type: string };
+    member_type: string;
+    status: string;
+    joined_at: string | null;
+  }>;
+  classes: Array<{
+    classroom: { public_id: string; name: string };
+    organization: { public_id: string; name: string };
+    status: string;
+    joined_at: string | null;
+  }>;
+  join_requests: Array<{
+    public_id: string;
+    organization: { public_id: string; name: string };
+    classroom: { public_id: string; name: string } | null;
+    status: JoinRequestSummary["status"];
+    created_at: string;
+    decided_at: string | null;
+  }>;
 }
 
 /** A link carries a token; a whiteboard carries a code. Either resolves. */
@@ -45,5 +69,5 @@ export function confirmInvitation(credential: JoinCredential) {
 }
 
 export function listMyMemberships() {
-  return apiClient.get<Membership[]>(endpoints.organizations.myMemberships);
+  return apiClient.get<MyMemberships>(endpoints.organizations.myMemberships);
 }
