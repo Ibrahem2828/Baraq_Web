@@ -15,7 +15,7 @@ export function Sidebar() {
       <Link href="/" className="mb-8 px-2">
         <Logo />
       </Link>
-      <nav className="flex flex-1 flex-col gap-1" aria-label="Primary">
+      <nav className="flex flex-1 flex-col gap-1" aria-label={t("common.a11y.sidebarNav")}>
         {NAV_ITEMS.map((item) => {
           const isActive =
             pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));

@@ -12,7 +12,7 @@ export function MobileNav() {
 
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t("common.a11y.mobileNav")}
       className="fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-[color:var(--color-border)] bg-[color:var(--color-surface)] pb-[env(safe-area-inset-bottom)] lg:hidden"
     >
       {PRIMARY_NAV_ITEMS.map((item) => {

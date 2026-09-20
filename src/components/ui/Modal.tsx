@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import type { ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -28,6 +30,7 @@ export function Modal({
   footer,
   className,
 }: ModalProps) {
+  const t = useTranslations();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -56,7 +59,7 @@ export function Modal({
           {footer ? <div className="mt-6 flex items-center justify-end gap-3">{footer}</div> : null}
           <Dialog.Close
             className="inset-inline-end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
-            aria-label="Close"
+            aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />
           </Dialog.Close>

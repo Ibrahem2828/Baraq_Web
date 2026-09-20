@@ -16,7 +16,16 @@
     "seeAll": "See all",
     "comingSoon": "Coming soon",
     "offline": "No internet connection. We'll retry automatically.",
-    "requiredField": "This field is required"
+    "requiredField": "This field is required",
+    "a11y": {
+      "switchLanguage": "Switch language",
+      "notifications": "Notifications",
+      "dismiss": "Dismiss",
+      "remove": "Remove",
+      "mainNav": "Main",
+      "mobileNav": "Main, compact",
+      "sidebarNav": "Sections"
+    }
   },
   "nav": {
     "home": "Home",

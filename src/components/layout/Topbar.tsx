@@ -103,7 +103,7 @@ export function Topbar() {
         <div className="mb-6">
           <Logo />
         </div>
-        <nav className="flex flex-col gap-1" aria-label="Primary">
+        <nav className="flex flex-col gap-1" aria-label={t("common.a11y.mainNav")}>
           {NAV_ITEMS.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));

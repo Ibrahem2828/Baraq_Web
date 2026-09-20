@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import type { ReactNode } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -26,6 +28,7 @@ export function Drawer({
   children,
   className,
 }: DrawerProps) {
+  const t = useTranslations();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -50,7 +53,7 @@ export function Drawer({
           )}
           <Dialog.Close
             className="inset-inline-end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
-            aria-label="Close"
+            aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />
           </Dialog.Close>

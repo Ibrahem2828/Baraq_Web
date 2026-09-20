@@ -1,15 +1,23 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
-import { X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean;
-  onRemove?: () => void;
 }
 
-/** A selectable/removable filter pill — e.g. subject filters, tag lists. */
+/**
+ * A selectable filter pill — subject filters, tag lists.
+ *
+ * It had a remove affordance: a `<span role="button" tabIndex={-1}>` nested
+ * inside the chip's own `<button>`. That is interactive content inside
+ * interactive content, which is invalid, and the negative tabindex meant a
+ * keyboard user could never reach it — the control existed only for a
+ * mouse. Nothing in the app ever passed `onRemove`, so it is gone rather
+ * than repaired; a removable chip needs the remove control as a sibling of
+ * the chip, not a child of it.
+ */
 export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
-  ({ className, selected = false, onRemove, children, ...props }, ref) => {
+  ({ className, selected = false, children, ...props }, ref) => {
     return (
       <button
         ref={ref}
@@ -25,20 +33,6 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         {...props}
       >
         {children}
-        {onRemove ? (
-          <span
-            role="button"
-            tabIndex={-1}
-            onClick={(event) => {
-              event.stopPropagation();
-              onRemove();
-            }}
-            aria-label="Remove"
-            className="rounded-full p-0.5 hover:bg-black/5"
-          >
-            <X className="size-3" aria-hidden="true" />
-          </span>
-        ) : null}
       </button>
     );
   },

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CheckCircle2, AlertTriangle, XCircle, Info, X } from "lucide-react";
@@ -42,6 +44,7 @@ const VARIANT_CLASSES: Record<ToastVariant, string> = {
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations();
   const [items, setItems] = useState<ToastItem[]>([]);
 
   const dismiss = useCallback((id: string) => {
@@ -67,7 +70,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         className="inset-inline-end-4 pointer-events-none fixed bottom-4 z-50 flex w-full max-w-sm flex-col gap-2"
         role="region"
-        aria-label="Notifications"
+        aria-label={t("common.a11y.notifications")}
       >
         <AnimatePresence>
           {items.map((item) => {
@@ -101,7 +104,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   type="button"
                   onClick={() => dismiss(item.id)}
                   className="shrink-0 rounded-full p-1 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
-                  aria-label="Dismiss"
+                  aria-label={t("common.a11y.dismiss")}
                 >
                   <X className="size-4" aria-hidden="true" />
                 </button>

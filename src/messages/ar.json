@@ -16,7 +16,16 @@
     "seeAll": "عرض الكل",
     "comingSoon": "قريبًا",
     "offline": "لا يوجد اتصال بالإنترنت. سيتم إعادة المحاولة تلقائيًا.",
-    "requiredField": "هذا الحقل مطلوب"
+    "requiredField": "هذا الحقل مطلوب",
+    "a11y": {
+      "switchLanguage": "تغيير اللغة",
+      "notifications": "الإشعارات",
+      "dismiss": "إغلاق التنبيه",
+      "remove": "إزالة",
+      "mainNav": "التنقل الرئيسي",
+      "mobileNav": "التنقل الرئيسي المختصر",
+      "sidebarNav": "الأقسام"
+    }
   },
   "nav": {
     "home": "الرئيسية",
