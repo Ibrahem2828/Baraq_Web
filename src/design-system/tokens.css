@@ -76,6 +76,11 @@
 
   /* Layout */
   --container-max: 1180px;
+  /* One fluid page gutter. A fixed 24px spends 13% of a 360px phone on
+     empty margin; this starts at 16px there and grows to 32px by about
+     1280px, then holds -- the edge distance a reader needs stops growing
+     with the viewport. */
+  --gutter: clamp(1rem, 0.35rem + 2.2vw, 2rem);
 }
 
 /* Dark — system preference, unless explicitly overridden */

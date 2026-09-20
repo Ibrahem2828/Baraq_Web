@@ -35,7 +35,7 @@ export function Progress({
         <RadixProgress.Indicator
           className={cn(
             "h-full rounded-[var(--radius-full)] bg-[color:var(--color-accent-solid)] transition-transform duration-[var(--duration-normal)] ease-[var(--ease-brand)]",
-            indeterminate && "w-1/3 animate-[progress-indeterminate_1.3s_ease-in-out_infinite]",
+            indeterminate && "w-1/3 animate-progress-indeterminate",
           )}
           style={indeterminate ? undefined : { transform: `translateX(-${100 - percent}%)` }}
         />

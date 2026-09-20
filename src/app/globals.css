@@ -145,7 +145,12 @@
   animation-name: slide-in-from-left;
 }
 
-@keyframes progress-indeterminate {
+/* An indeterminate bar should travel the way the page reads. translateX
+   does not flip with direction, so in Arabic this swept backwards --
+   subtle, but it is the one element on screen claiming "something is
+   moving forward". The drawer animations above already solve this with
+   :dir(); this follows the same convention. */
+@keyframes progress-indeterminate-ltr {
   from {
     transform: translateX(-100%);
   }
@@ -154,11 +159,27 @@
   }
 }
 
+@keyframes progress-indeterminate-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-300%);
+  }
+}
+
+:dir(ltr) .animate-progress-indeterminate {
+  animation: progress-indeterminate-ltr 1.3s ease-in-out infinite;
+}
+:dir(rtl) .animate-progress-indeterminate {
+  animation: progress-indeterminate-rtl 1.3s ease-in-out infinite;
+}
+
 @layer utilities {
   .container-page {
     max-width: var(--container-max);
     margin-inline: auto;
-    padding-inline: 24px;
+    padding-inline: var(--gutter);
   }
 
   .surface-card {
