@@ -76,10 +76,10 @@ export default function SettingsPage() {
   // components/layout/ThemeToggle.tsx's Topbar usage) — hardcoded pending a
   // `settings.themeOptions.*` message addition.
   const themeLabels: Record<ThemePreference, string> = {
-    system: "System",
-    light: "Light",
-    dark: "Dark",
-    fire: "Fire",
+    system: t("settings.themeNames.system"),
+    light: t("settings.themeNames.light"),
+    dark: t("settings.themeNames.dark"),
+    fire: t("settings.themeNames.fire"),
   };
 
   return (

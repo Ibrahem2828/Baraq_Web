@@ -583,7 +583,13 @@
       "confirmation": "This permanently disables your account, revokes active sessions, and anonymizes personal details. This action cannot be undone.",
       "confirm": "Delete my account"
     },
-    "logout": "Log out"
+    "logout": "Log out",
+    "themeNames": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark",
+      "fire": "Fire"
+    }
   },
   "onboarding": {
     "profileSetup": {

@@ -44,10 +44,10 @@ export function Topbar() {
         <LocaleSwitcher />
         <ThemeToggle
           labels={{
-            system: "System",
-            light: "Light",
-            dark: "Dark",
-            fire: "Fire",
+            system: t("settings.themeNames.system"),
+            light: t("settings.themeNames.light"),
+            dark: t("settings.themeNames.dark"),
+            fire: t("settings.themeNames.fire"),
           }}
         />
         <Link href="/notifications" className="relative">
