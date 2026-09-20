@@ -42,7 +42,12 @@ if (existsSync(publicSrc)) {
   cpSync(publicSrc, publicDest, { recursive: true });
 }
 
-const port = process.env.PORT ?? "3000";
+const portFlag = process.argv.indexOf("--port");
+const port = portFlag >= 0 ? process.argv[portFlag + 1] : (process.env.PORT ?? "3000");
+if (!port || !/^\d+$/.test(port)) {
+  console.error("A numeric --port value is required when one is supplied.");
+  process.exit(1);
+}
 const child = spawn(process.execPath, [serverEntry], {
   cwd: standaloneDir,
   stdio: "inherit",

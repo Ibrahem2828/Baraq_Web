@@ -68,6 +68,14 @@ test.describe("authenticated flows", () => {
     await page.getByLabel("البريد الإلكتروني").fill(STUDENT_EMAIL);
     await page.getByLabel("كلمة المرور").fill(STUDENT_PASSWORD);
     await page.getByRole("button", { name: "دخول" }).click();
+    // The auth route writes HttpOnly cookies before the browser reaches its
+    // destination. Do not navigate a test to the next protected page until
+    // that redirect completes, otherwise a fast `page.goto()` races the
+    // Set-Cookie response and exercises an unauthenticated proxy by mistake.
+    await page.waitForURL(
+      (url) => url.pathname.startsWith("/ar") && url.pathname !== "/ar/login",
+      { timeout: 10_000 },
+    );
   }
 
   test("successful login lands on Home with real user data", async ({ page }) => {
@@ -91,19 +99,99 @@ test.describe("authenticated flows", () => {
 
   test("open-redirect attempts never leave the app's origin", async ({ page }) => {
     await login(page, "//evil.example.com");
-    await expect(page).toHaveURL("http://localhost:3000/ar");
+    await expect(page).toHaveURL(new URL("/ar", process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000").toString());
   });
 
   test("Khota hub, Today, and Week render real data", async ({ page }) => {
     await login(page);
     await page.goto("/ar/characters/khota");
+
+    // AI character flows are deliberately project-scoped. Start through the
+    // same chooser a learner sees instead of bypassing it with an invalid
+    // project-less deep link, then carry that authoritative query parameter
+    // to Khota's subroutes.
+    const projectLink = page.getByRole("link", { name: /مشروع مراجعة الرياضيات/ });
+    const projectHref = await projectLink.getAttribute("href");
+    expect(projectHref).toMatch(/^\/ar\/characters\/khota\?project=/);
+    await projectLink.click();
     await expect(page.getByText("رفيقك في التخطيط الدراسي")).toBeVisible();
 
-    await page.goto("/ar/characters/khota/today");
+    const projectQuery = new URL(projectHref!, page.url()).search;
+    await page.goto(`/ar/characters/khota/today${projectQuery}`);
     await expect(page.getByRole("heading", { name: "مهام اليوم" })).toBeVisible();
 
-    await page.goto("/ar/characters/khota/week");
+    await page.goto(`/ar/characters/khota/week${projectQuery}`);
     await expect(page.getByRole("heading", { name: "خطة الأسبوع" })).toBeVisible();
+  });
+
+  test("core learner routes stay available in one authenticated Arabic session", async ({ page }) => {
+    await login(page);
+
+    // These are the primary routes exposed in the learner navigation. Visiting
+    // them through a real BFF session catches broken route guards, hydration
+    // failures, and client-only errors that component tests cannot observe.
+    const routes = [
+      "/ar/library",
+      "/ar/projects",
+      "/ar/characters",
+      "/ar/study-plans",
+      "/ar/quizzes",
+      "/ar/recommendations",
+      "/ar/summaries",
+      "/ar/transcriptions",
+      "/ar/notifications",
+      "/ar/subscription",
+      "/ar/support",
+      "/ar/settings",
+    ];
+    const runtimeErrors: string[] = [];
+    page.on("pageerror", (error) => runtimeErrors.push(error.message));
+
+    for (const route of routes) {
+      const response = await page.goto(route);
+      expect(response?.status(), route).toBeLessThan(500);
+      await expect(page).not.toHaveURL(/\/ar\/login/);
+      await expect(page.locator("main"), route).toBeVisible();
+      await expect(page.getByText("حدث خطأ غير متوقع", { exact: false }), route).toHaveCount(0);
+    }
+
+    expect(runtimeErrors).toEqual([]);
+  });
+
+  test("core learner views remain RTL-safe at compact phone and tablet widths", async ({ browser }) => {
+    const context = await browser.newContext({
+      locale: "ar-SA",
+      viewport: { width: 390, height: 844 },
+      isMobile: true,
+    });
+    const page = await context.newPage();
+
+    try {
+      await login(page);
+
+      for (const { name, viewport } of [
+        { name: "phone", viewport: { width: 390, height: 844 } },
+        { name: "tablet", viewport: { width: 768, height: 1024 } },
+      ]) {
+        await page.setViewportSize(viewport);
+
+        for (const route of ["/ar/library", "/ar/characters", "/ar/settings"]) {
+          await page.goto(route);
+          await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+          await expect(page.locator("main"), `${name}: ${route}`).toBeVisible();
+
+          const dimensions = await page.evaluate(() => ({
+            clientWidth: document.documentElement.clientWidth,
+            scrollWidth: document.documentElement.scrollWidth,
+          }));
+          expect(dimensions.scrollWidth, `${name}: ${route}`).toBeLessThanOrEqual(
+            dimensions.clientWidth + 1,
+          );
+        }
+      }
+    } finally {
+      await context.close();
+    }
   });
 
   test("theme preference persists across reload", async ({ page }) => {

@@ -1,13 +1,21 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+const parsedBaseURL = new URL(baseURL);
+const webServerPort = parsedBaseURL.port || (parsedBaseURL.protocol === "https:" ? "443" : "80");
+
 export default defineConfig({
   testDir: "./tests/e2e",
-  fullyParallel: true,
+  // Authenticated journeys intentionally share one E2E learner account. Run
+  // them serially so the suite verifies the real login throttle rather than
+  // manufacturing a same-IP credential burst that production blocks.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     trace: "on-first-retry",
   },
   projects: [
@@ -26,8 +34,8 @@ export default defineConfig({
     ...(process.env.CI ? [] : [{ name: "msedge", use: { channel: "msedge" as const } }]),
   ],
   webServer: {
-    command: "npm run build && npm run start",
-    url: "http://localhost:3000",
+    command: `npm run build && npm run start -- --port ${webServerPort}`,
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },
