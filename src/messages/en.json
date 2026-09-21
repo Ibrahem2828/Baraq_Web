@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Baraq",
+    "appName": "برّاق",
     "loading": "Loading...",
     "retry": "Retry",
     "cancel": "Cancel",
@@ -48,7 +48,7 @@
   "auth": {
     "login": {
       "title": "Sign in",
-      "subtitle": "Welcome back to Baraq",
+      "subtitle": "Welcome back to برّاق",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
@@ -59,7 +59,7 @@
     },
     "register": {
       "title": "Create account",
-      "subtitle": "Start your learning journey with Baraq",
+      "subtitle": "Start your learning journey with برّاق",
       "fullName": "Full name",
       "email": "Email",
       "phoneNumber": "Phone number (optional)",
@@ -129,7 +129,7 @@
       "role": "Voice-to-text"
     },
     "hub": {
-      "title": "Baraq characters",
+      "title": "برّاق characters",
       "subtitle": "Choose your smart companion for this task"
     }
   },
@@ -583,7 +583,7 @@
     },
     "theme": "Theme",
     "language": "Language",
-    "about": "About Baraq",
+    "about": "About برّاق",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "accountDeletion": {
@@ -619,7 +619,7 @@
   "footer": {
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
-    "about": "About Baraq",
+    "about": "About برّاق",
     "rights": "All rights reserved"
   },
   "join": {
