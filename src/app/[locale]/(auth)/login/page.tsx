@@ -60,7 +60,25 @@ function LoginForm() {
     login.mutate(data, {
       onSuccess: () => {
         const next = searchParams.get("next");
-        router.replace(isSafeRedirectPath(next) ? next : "/");
+        if (isSafeRedirectPath(next)) {
+          // `next` is already locale-prefixed by src/proxy.ts (it's built
+          // from `request.nextUrl.pathname`) — the plain router navigates to
+          // it as-is. See the comment above on why the locale-aware router
+          // would double-prefix it.
+          router.replace(next);
+        } else {
+          // No `next` (a direct visit to /login, not a redirect-back): fall
+          // back to this locale's own home, not the app's configured
+          // default. `router.replace("/")` here used to send *every*
+          // fallback login — English included — through next-intl's
+          // middleware, which resolves a locale-free "/" to the app's
+          // default locale rather than the one the user was actually using.
+          // The locale-aware router already prepends whatever locale is
+          // active on this page (same mechanism the `/verify-email`
+          // redirect below and the `Link`s further down already rely on),
+          // so `/en/login` falls back to `/en` and `/ar/login` to `/ar`.
+          localeRouter.replace("/");
+        }
       },
       onError: (error) => {
         if (error instanceof ApiError && error.fieldErrors?.error_code?.[0] === "email_not_verified") {

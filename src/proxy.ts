@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "@/i18n/routing";
 import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/auth/cookie-names";
+import { resolveAuthRedirectTarget } from "@/lib/auth/resolve-auth-redirect";
 
 /**
  * Next.js 16 renamed `middleware.ts` to `proxy.ts` (Node.js runtime only —
@@ -12,22 +13,19 @@ import { ACCESS_COOKIE, REFRESH_COOKIE } from "@/lib/auth/cookie-names";
  *     `/en/...` and sets the locale cookie.
  *  2. Route protection: a cheap, optimistic cookie-presence check (no token
  *     verification, no backend call) that redirects unauthenticated users
- *     away from protected routes and authenticated users away from the auth
- *     pages. This is NOT the real security boundary — actual authorization
- *     happens per-request in `app/api/bff/[...path]/route.ts` (which holds
- *     the only code path that can call the backend) and in each Server
- *     Component that fetches user-specific data. A proxy check can be
- *     bypassed by a Server Action or a direct fetch to a Route Handler, so
- *     nothing downstream may assume the proxy already verified the session.
+ *     away from protected routes. This is NOT the real security boundary —
+ *     actual authorization happens per-request in
+ *     `app/api/bff/[...path]/route.ts` (which holds the only code path that
+ *     can call the backend) and in each Server Component that fetches
+ *     user-specific data. A proxy check can be bypassed by a Server Action
+ *     or a direct fetch to a Route Handler, so nothing downstream may assume
+ *     the proxy already verified the session.
+ *
+ * The route-protection decision itself lives in
+ * `@/lib/auth/resolve-auth-redirect` (extracted so it can be unit tested
+ * without needing next-intl's middleware to run) — see that module for why
+ * public auth paths are never redirected away from, in either direction.
  */
-
-const PUBLIC_SEGMENTS = new Set([
-  "login",
-  "register",
-  "verify-email",
-  "forgot-password",
-  "reset-password",
-]);
 
 const handleI18nRouting = createMiddleware(routing);
 
@@ -49,23 +47,13 @@ export default function proxy(request: NextRequest) {
     return response;
   }
 
-  const isPublicPath = firstSegment !== undefined && PUBLIC_SEGMENTS.has(firstSegment);
   const hasSession = Boolean(
     request.cookies.get(ACCESS_COOKIE)?.value || request.cookies.get(REFRESH_COOKIE)?.value,
   );
 
-  if (!hasSession && !isPublicPath) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${locale}/login`;
-    url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
-  }
-
-  if (hasSession && isPublicPath) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/${locale}`;
-    url.search = "";
-    return NextResponse.redirect(url);
+  const target = resolveAuthRedirectTarget(pathname, locale, firstSegment, hasSession);
+  if (target) {
+    return NextResponse.redirect(new URL(target, request.nextUrl));
   }
 
   return response;
