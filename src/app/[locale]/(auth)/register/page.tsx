@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
+import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
 import { fieldErrorMessage } from "@/lib/validation/field-error";
 import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
@@ -21,6 +22,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const registerMutation = useRegister();
   const { toast } = useToast();
+  const resolveApiError = useApiErrorMessage();
 
   const {
     register,
@@ -32,17 +34,19 @@ export default function RegisterPage() {
 
   const submitValidated = handleSubmit((data) => {
     registerMutation.mutate(data, {
-      onSuccess: () => {
+      onSuccess: (pending) => {
         toast({ title: t("auth.register.otpSent"), variant: "success" });
-        router.replace(`/verify-email?email=${encodeURIComponent(data.email)}`);
+        router.replace(
+          `/verify-email?email=${encodeURIComponent(pending.email)}&expires_in=${pending.expires_in}&resend_after=${pending.resend_after_seconds}`,
+        );
       },
       onError: (error) => {
-        if (error instanceof ApiError && error.fieldErrors?.email) {
+        if (error instanceof ApiError && error.backendCode === "email_already_registered") {
           setError("email", { message: t("auth.register.emailTaken") });
           return;
         }
         toast({
-          title: error instanceof ApiError ? t(`errors.${error.code}`) : t("errors.UNKNOWN"),
+          title: resolveApiError(error),
           variant: "error",
         });
       },

@@ -232,7 +232,16 @@
       "invitation_exhausted": "That invitation has been used the maximum number of times.",
       "organization_unavailable": "That school is not accepting new members right now.",
       "class_unavailable": "That class is not accepting new members right now.",
-      "membership_already_active": "You have already joined this school."
+      "membership_already_active": "You have already joined this school.",
+      "email_already_registered": "An account already exists for this email. Sign in instead.",
+      "pending_registration_missing": "This registration request is no longer available. Please register again.",
+      "otp_invalid": "The verification code is incorrect.",
+      "otp_expired": "This verification code has expired. Request a new code.",
+      "otp_too_many_attempts": "Too many incorrect attempts. Request a new verification code.",
+      "otp_resend_cooldown": "Please wait before requesting another verification code.",
+      "otp_resend_limit_exceeded": "Too many verification codes were requested. Please try again later.",
+      "email_delivery_unavailable": "We could not send a verification email right now. Please try again shortly.",
+      "registration_conflict": "Your account could not be created safely. Please try again."
     }
   },
   "library": {

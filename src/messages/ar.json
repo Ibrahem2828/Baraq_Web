@@ -232,7 +232,16 @@
       "invitation_exhausted": "استُخدمت هذه الدعوة العدد الأقصى من المرات.",
       "organization_unavailable": "هذه المدرسة لا تقبل أعضاء جدداً حالياً.",
       "class_unavailable": "هذا الصف لا يقبل أعضاء جدداً حالياً.",
-      "membership_already_active": "أنت منضم إلى هذه المدرسة بالفعل."
+      "membership_already_active": "أنت منضم إلى هذه المدرسة بالفعل.",
+      "email_already_registered": "يوجد حساب بالفعل لهذا البريد الإلكتروني. سجّل الدخول بدلًا من ذلك.",
+      "pending_registration_missing": "لم تعد طلبية التسجيل هذه متاحة. ابدأ التسجيل من جديد.",
+      "otp_invalid": "رمز التحقق غير صحيح.",
+      "otp_expired": "انتهت صلاحية رمز التحقق. اطلب رمزًا جديدًا.",
+      "otp_too_many_attempts": "عدد المحاولات غير الصحيحة كبير. اطلب رمز تحقق جديدًا.",
+      "otp_resend_cooldown": "يرجى الانتظار قبل طلب رمز تحقق آخر.",
+      "otp_resend_limit_exceeded": "تم طلب رموز تحقق كثيرة. حاول مرة أخرى لاحقًا.",
+      "email_delivery_unavailable": "تعذّر إرسال رسالة التحقق الآن. حاول مرة أخرى بعد قليل.",
+      "registration_conflict": "تعذّر إنشاء حسابك بأمان. حاول مرة أخرى."
     }
   },
   "library": {

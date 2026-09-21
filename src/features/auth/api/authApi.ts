@@ -1,7 +1,19 @@
 import { apiClient } from "@/lib/api/client";
 import { endpoints } from "@/lib/api/endpoints";
-import type { User } from "@/types/domain";
 import type { RegisterInput, ForgotPasswordInput, ResetPasswordInput } from "@/lib/validation/auth";
+
+export interface RegistrationPendingResponse {
+  verification_required: true;
+  email: string;
+  expires_in: number;
+  resend_after_seconds: number;
+}
+
+export interface ResendOtpResponse {
+  message: string;
+  expires_in: number;
+  resend_after_seconds: number;
+}
 
 /**
  * Register, password-reset, and password-reset-confirm are all public
@@ -12,7 +24,7 @@ import type { RegisterInput, ForgotPasswordInput, ResetPasswordInput } from "@/l
  */
 export function register(input: RegisterInput) {
   const { password_confirm, ...rest } = input;
-  return apiClient.post<User>(endpoints.auth.register, { ...rest, password_confirm });
+  return apiClient.post<RegistrationPendingResponse>(endpoints.auth.register, { ...rest, password_confirm });
 }
 
 export function requestPasswordReset(input: ForgotPasswordInput) {
@@ -42,5 +54,5 @@ export function deleteAccount() {
  * BFF proxy like `register` above.
  */
 export function resendOtp(email: string) {
-  return apiClient.post<{ message: string }>(endpoints.auth.resendOtp, { email });
+  return apiClient.post<ResendOtpResponse>(endpoints.auth.resendOtp, { email });
 }

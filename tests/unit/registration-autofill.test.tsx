@@ -60,4 +60,36 @@ describe("registration browser autofill contract", () => {
     expect(mutate.mock.calls[0]?.[0]).toEqual(values);
     expect(screen.queryByText("common.requiredField")).not.toBeInTheDocument();
   });
+
+  it("continues only to verification using the backend's pending-registration response", async () => {
+    mutate.mockImplementation((_input, callbacks) => {
+      callbacks.onSuccess({
+        verification_required: true,
+        email: "normalized.student@example.com",
+        expires_in: 600,
+        resend_after_seconds: 60,
+      });
+    });
+    const { container } = render(<RegisterPage />);
+    const values = {
+      full_name: "Pending Student",
+      email: "Normalized.Student@Example.COM",
+      phone_number: "",
+      password: "Autofill-Password-123!",
+      password_confirm: "Autofill-Password-123!",
+    };
+
+    for (const [name, value] of Object.entries(values)) {
+      setDomValueWithoutInputEvent(
+        container.querySelector<HTMLInputElement>(`input[name="${name}"]`)!,
+        value,
+      );
+    }
+    fireEvent.submit(container.querySelector("form")!);
+
+    await waitFor(() => expect(replace).toHaveBeenCalledOnce());
+    expect(replace).toHaveBeenCalledWith(
+      "/verify-email?email=normalized.student%40example.com&expires_in=600&resend_after=60",
+    );
+  });
 });

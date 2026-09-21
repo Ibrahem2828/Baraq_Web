@@ -27,6 +27,16 @@ export const DOMAIN_ERROR_MESSAGE_KEYS: Record<string, string> = {
   // Transport / throttling.
   rate_limited: "errors.domain.rate_limited",
   payload_too_large: "errors.domain.payload_too_large",
+  // Registration and email OTP lifecycle.
+  email_already_registered: "errors.domain.email_already_registered",
+  pending_registration_missing: "errors.domain.pending_registration_missing",
+  otp_invalid: "errors.domain.otp_invalid",
+  otp_expired: "errors.domain.otp_expired",
+  otp_too_many_attempts: "errors.domain.otp_too_many_attempts",
+  otp_resend_cooldown: "errors.domain.otp_resend_cooldown",
+  otp_resend_limit_exceeded: "errors.domain.otp_resend_limit_exceeded",
+  email_delivery_unavailable: "errors.domain.email_delivery_unavailable",
+  registration_conflict: "errors.domain.registration_conflict",
   // AI source, retrieval, provider, and output failures.
   pdf_ocr_required: "errors.domain.pdf_ocr_required",
   unsupported_source_format: "errors.domain.unsupported_source_format",
