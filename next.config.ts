@@ -37,8 +37,11 @@ const securityHeaders = [
       // stage never set. Verify it the only way that proves anything: build,
       // then read the CSP out of .next/routes-manifest.json.
       `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
+      // The application deliberately uses system-font fallbacks (see
+      // design-system/fonts.ts), so no third-party font origin belongs in the
+      // production CSP or in the build dependency graph.
+      "style-src 'self' 'unsafe-inline'",
+      "font-src 'self'",
       "img-src 'self' data: blob: https:",
       "connect-src 'self'",
       "frame-ancestors 'none'",

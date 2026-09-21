@@ -189,11 +189,18 @@
 
 /* Typography — Arabic-first, English override per html[lang] */
 :root {
-  --font-display: var(--font-almarai), Tahoma, sans-serif;
-  --font-body: var(--font-ibm-plex-arabic), Tahoma, sans-serif;
+  /* The candidate image must build without downloading fonts. These
+     Arabic-first system stacks preserve a readable fallback until licensed
+     local brand font files are deliberately bundled. */
+  --font-almarai: Tahoma, Arial, sans-serif;
+  --font-ibm-plex-arabic: Tahoma, Arial, sans-serif;
+  --font-poppins: "Segoe UI", Arial, sans-serif;
+  --font-ibm-plex-sans: "Segoe UI", Arial, sans-serif;
+  --font-display: var(--font-almarai);
+  --font-body: var(--font-ibm-plex-arabic);
 }
 
 html[lang="en"] {
-  --font-display: var(--font-poppins), "Segoe UI", sans-serif;
-  --font-body: var(--font-ibm-plex-sans), "Segoe UI", sans-serif;
+  --font-display: var(--font-poppins);
+  --font-body: var(--font-ibm-plex-sans);
 }

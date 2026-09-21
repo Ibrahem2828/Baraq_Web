@@ -20,7 +20,7 @@ import { resolve } from "node:path";
 const MANIFEST = resolve("./.next/routes-manifest.json");
 
 /** Directives that must never reach a production bundle. */
-const FORBIDDEN_CSP = ["'unsafe-eval'"];
+const FORBIDDEN_CSP = ["'unsafe-eval'", "fonts.googleapis.com", "fonts.gstatic.com"];
 /** Headers a production build must carry. */
 const REQUIRED = ["Content-Security-Policy", "Strict-Transport-Security"];
 
