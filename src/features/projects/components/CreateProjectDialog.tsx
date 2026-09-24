@@ -37,7 +37,7 @@ export function CreateProjectDialog({
 
   const onSubmit = form.handleSubmit((values) => {
     createProject.mutate(
-      { title: values.title, goal: values.goal || null },
+      { title: values.title, goal: values.goal || "" },
       {
         onSuccess: (project) => {
           onOpenChange(false);
