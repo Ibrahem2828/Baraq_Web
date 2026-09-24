@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import { useTranslations } from "next-intl";
+import { Clock3, RefreshCw, Sparkles } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import { useAIJob, useCancelAIJob } from "@/features/ai-jobs/hooks/useAIJob";
 import { isTerminalAIJobStatus } from "@/types/domain";
@@ -42,6 +43,7 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
 
   const data = job.data;
   const isTerminal = isTerminalAIJobStatus(data.status);
+  const isWorking = !isTerminal;
   const resultRoute = data.result_type ? RESULT_ROUTE[data.result_type] : undefined;
   // Prefer wording specific to what this character is actually doing
   // ("reading your source" reads very differently for Sada than for Fahes),
@@ -56,12 +58,26 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
   const failureKey = domainErrorMessageKey(data.error_code);
   const failureMessage = failureKey && t.has(failureKey)
     ? t(failureKey)
-    : data.error_message ?? t("errors.SERVER");
+      : data.error_message ?? t("errors.SERVER");
+
+  const updatedAt = new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(data.updated_at));
 
   return (
     <div>
-      <PageHeader title={t("nav.characters")} description={data.task_type} />
-      <Card className="flex flex-col gap-5">
+      <PageHeader
+        title={t("aiJobs.progressTitle")}
+        description={t("aiJobs.progressDescription")}
+      />
+      <Card className="relative overflow-hidden">
+        {isWorking ? (
+          <div className="absolute inset-x-0 top-0 h-1 bg-[color:var(--color-accent-solid)]/15">
+            <div className="h-full w-1/3 animate-progress-indeterminate rounded-full bg-[color:var(--color-accent-solid)]" />
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-6 p-1">
         <div className="flex items-center justify-between">
           <Badge
             variant={
@@ -88,6 +104,20 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
           ) : null}
         </div>
 
+        <div className="flex items-start gap-4">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[color:var(--color-accent-solid)]/12 text-[color:var(--color-accent)]">
+            {isWorking ? <Sparkles className="size-6 animate-pulse" aria-hidden="true" /> : <Clock3 className="size-6" aria-hidden="true" />}
+          </div>
+          <div className="min-w-0 space-y-1">
+            <h2 className="font-bold text-[color:var(--color-ink)]">
+              {isWorking ? t("aiJobs.workingTitle") : t("aiJobs.resultTitle")}
+            </h2>
+            <p className="text-sm text-[color:var(--color-ink-soft)]">
+              {isWorking ? t("aiJobs.workingDescription") : stageLabel}
+            </p>
+          </div>
+        </div>
+
         {/*
          * Stage, not a percentage. The AI service reports progress_percent
          * as a constant 0 -- its own percentages were synthetic -- so any
@@ -96,8 +126,26 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
          */}
         <div className="flex flex-col gap-2">
           <Progress value={isTerminal ? 100 : 0} indeterminate={!isTerminal} />
-          <p className="text-xs text-[color:var(--color-ink-soft)]">{stageLabel}</p>
+          <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--color-ink-soft)]">
+            <p>{stageLabel}</p>
+            {isWorking ? <span>{t("aiJobs.updatedAt", { time: updatedAt })}</span> : null}
+          </div>
         </div>
+
+        {isWorking ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] bg-[color:var(--color-bg-soft)] px-4 py-3">
+            <p className="text-xs text-[color:var(--color-ink-soft)]">{t("aiJobs.autoRefresh")}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => job.refetch()}
+              loading={job.isFetching}
+            >
+              <RefreshCw className="size-4" aria-hidden="true" />
+              {t("aiJobs.refresh")}
+            </Button>
+          </div>
+        ) : null}
 
         {data.status === "failed" ? (
           <p className="text-sm text-[color:var(--color-destructive)]">
@@ -110,6 +158,7 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
             {t("common.seeAll")}
           </Button>
         ) : null}
+        </div>
       </Card>
     </div>
   );

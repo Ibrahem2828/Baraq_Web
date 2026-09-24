@@ -215,6 +215,26 @@
   }
 }
 
+@keyframes baraq-loader-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes baraq-loader-orbit-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.baraq-loader-orbit {
+  animation: baraq-loader-orbit 1.5s linear infinite;
+}
+
+.baraq-loader-orbit-reverse {
+  animation: baraq-loader-orbit-reverse 900ms cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
 :dir(ltr) .animate-progress-indeterminate {
   animation: progress-indeterminate-ltr 1.3s ease-in-out infinite;
 }

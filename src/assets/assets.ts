@@ -16,6 +16,7 @@ import logoBaraqWordmark from "./logos/logo_baraq_wordmark.png";
 import logoBaraqDark from "./logos/logo_baraq_dark.png";
 import logoBaraqLight from "./logos/logo_baraq_light.png";
 import logoBaraqMono from "./logos/logo_baraq_mono.png";
+import logoBaraqArabicTransparent from "./logos/لوغو بدون خلفية عربي.png";
 
 import bgSplashLight from "./images/backgrounds/bg_splash_light.png";
 import bgHomeSoftGems from "./images/backgrounds/bg_home_soft_gems.png";
@@ -97,6 +98,7 @@ export const assets = {
     dark: logoBaraqDark,
     light: logoBaraqLight,
     mono: logoBaraqMono,
+    arabicTransparent: logoBaraqArabicTransparent,
   },
   appIcons: {
     icon1024: appIcon1024,

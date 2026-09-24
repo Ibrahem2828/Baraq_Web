@@ -348,6 +348,14 @@
     }
   },
   "aiJobs": {
+    "progressTitle": "AI request",
+    "progressDescription": "We follow each processing step for you",
+    "workingTitle": "برّاق is working on your request",
+    "workingDescription": "You can stay here; your result will appear automatically when it is ready.",
+    "resultTitle": "Request status",
+    "autoRefresh": "Status updates automatically; you do not need to reload this page.",
+    "refresh": "Refresh now",
+    "updatedAt": "Updated {time}",
     "status": {
       "created": "Getting started",
       "queued": "Queued",
@@ -363,9 +371,13 @@
     "stage": {
       "queued": "Waiting to start…",
       "preparing": "Preparing…",
+      "planning": "Organising the processing steps…",
       "retrieving": "Reading your sources…",
       "generating": "Generating…",
       "validating": "Checking the result…",
+      "repairing": "Improving the result…",
+      "output_ready": "Your result is ready for review…",
+      "materializing": "Saving your result…",
       "finalizing": "Saving…",
       "completed": "Done",
       "failed": "Could not complete",

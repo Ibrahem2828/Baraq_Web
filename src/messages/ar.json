@@ -348,6 +348,14 @@
     }
   },
   "aiJobs": {
+    "progressTitle": "طلب الذكاء الاصطناعي",
+    "progressDescription": "نتابع المعالجة خطوة بخطوة",
+    "workingTitle": "برّاق يعمل على طلبك",
+    "workingDescription": "يمكنك البقاء هنا؛ ستظهر النتيجة تلقائيًا فور جهوزها.",
+    "resultTitle": "حالة الطلب",
+    "autoRefresh": "يتم تحديث الحالة تلقائيًا دون الحاجة لإعادة تحميل الصفحة.",
+    "refresh": "تحديث الآن",
+    "updatedAt": "آخر تحديث {time}",
     "status": {
       "created": "بدء الطلب",
       "queued": "في الانتظار",
@@ -363,9 +371,13 @@
     "stage": {
       "queued": "في الانتظار…",
       "preparing": "جارٍ التحضير…",
+      "planning": "جارٍ تنظيم خطوات المعالجة…",
       "retrieving": "جارٍ قراءة مصادرك…",
       "generating": "جارٍ الإنشاء…",
       "validating": "جارٍ التحقق من النتيجة…",
+      "repairing": "جارٍ تحسين النتيجة…",
+      "output_ready": "النتيجة جاهزة للمراجعة…",
+      "materializing": "جارٍ حفظ النتيجة…",
       "finalizing": "جارٍ الحفظ…",
       "completed": "اكتمل",
       "failed": "تعذّر إكمال الطلب",
