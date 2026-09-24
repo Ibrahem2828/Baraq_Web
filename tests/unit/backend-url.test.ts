@@ -1,10 +1,24 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import {
   BackendResponseError,
   backendFetch,
   backendUrl,
   classifyBackendError,
 } from "@/lib/api/backend";
+
+// serverEnv parses BACKEND_API_URL once, at import. tests/setup.ts only fills
+// it in when unset, so CI's real origin (or a developer's .env.local) would
+// leak into the exact-URL assertions below. Pin it before the module loads.
+const pinnedEnv = vi.hoisted(() => {
+  const previous = process.env.BACKEND_API_URL;
+  process.env.BACKEND_API_URL = "http://localhost:8000";
+  return { previous };
+});
+
+afterAll(() => {
+  if (pinnedEnv.previous === undefined) delete process.env.BACKEND_API_URL;
+  else process.env.BACKEND_API_URL = pinnedEnv.previous;
+});
 
 describe("backendUrl", () => {
   afterEach(() => {
