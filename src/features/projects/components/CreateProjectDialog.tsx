@@ -9,11 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Modal } from "@/components/ui/Modal";
+import {
+  ProjectSubjectSelect,
+  subjectIdFromValue,
+} from "@/features/projects/components/ProjectSubjectSelect";
 import type { Project } from "@/types/domain";
 
 const createProjectSchema = z.object({
   title: z.string().min(1),
   goal: z.string().optional(),
+  subject: z.string().optional(),
 });
 type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
 
@@ -37,7 +42,7 @@ export function CreateProjectDialog({
 
   const onSubmit = form.handleSubmit((values) => {
     createProject.mutate(
-      { title: values.title, goal: values.goal || "" },
+      { title: values.title, goal: values.goal || "", subject: subjectIdFromValue(values.subject) },
       {
         onSuccess: (project) => {
           onOpenChange(false);
@@ -73,6 +78,7 @@ export function CreateProjectDialog({
           error={form.formState.errors.title ? t("common.requiredField") : undefined}
           {...form.register("title")}
         />
+        <ProjectSubjectSelect defaultValue="" {...form.register("subject")} />
         <Textarea label={t("projects.goal")} {...form.register("goal")} />
       </form>
     </Modal>

@@ -2,12 +2,19 @@
 
 import { use, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query/keys";
 import {
   useProject,
   useArchiveProject,
   useRestoreProject,
   useProjectActivity,
+  useUpdateProject,
 } from "@/features/projects/hooks/useProjects";
+import {
+  ProjectSubjectSelect,
+  subjectIdFromValue,
+} from "@/features/projects/components/ProjectSubjectSelect";
 import { ProjectSourcesPanel } from "@/features/projects/components/ProjectSourcesPanel";
 import { ProjectCharactersPanel } from "@/features/projects/components/ProjectCharactersPanel";
 import { ProjectArtifactsPanel } from "@/features/projects/components/ProjectArtifactsPanel";
@@ -29,6 +36,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const archiveProject = useArchiveProject();
   const restoreProject = useRestoreProject();
   const activity = useProjectActivity(id);
+  const updateProject = useUpdateProject(id);
+  const queryClient = useQueryClient();
 
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [restoreConfirmOpen, setRestoreConfirmOpen] = useState(false);
@@ -110,6 +119,20 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </>
         }
       />
+
+      <div className="mb-6 sm:max-w-sm">
+        <ProjectSubjectSelect
+          value={data.subject ? String(data.subject) : ""}
+          disabled={!isActive || updateProject.isPending}
+          onChange={(event) =>
+            updateProject.mutate(
+              { subject: subjectIdFromValue(event.target.value) },
+              // Source capabilities depend on the project's subject.
+              { onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.sources.all }) },
+            )
+          }
+        />
+      </div>
 
       <Tabs
         items={[
