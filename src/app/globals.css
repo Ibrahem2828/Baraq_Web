@@ -96,6 +96,15 @@
   }
 }
 
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes scale-in {
   from {
     opacity: 0;
@@ -132,17 +141,55 @@
   }
 }
 
-:dir(ltr) .animate-drawer-start {
+@keyframes slide-out-to-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-out-to-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/*
+ * These are plain classes matched directly by the `[data-state]` attribute
+ * Radix sets on Dialog.Content, not Tailwind variant utilities: Tailwind has
+ * no registered `animate-drawer-start`/`animate-drawer-end` theme token, so
+ * a `data-[state=open]:animate-drawer-start` class candidate never compiles
+ * to any CSS (silently — no build error) and the drawer never animated in.
+ */
+:dir(ltr) .animate-drawer-start[data-state="open"] {
   animation-name: slide-in-from-left;
 }
-:dir(rtl) .animate-drawer-start {
+:dir(rtl) .animate-drawer-start[data-state="open"] {
   animation-name: slide-in-from-right;
 }
-:dir(ltr) .animate-drawer-end {
+:dir(ltr) .animate-drawer-end[data-state="open"] {
   animation-name: slide-in-from-right;
 }
-:dir(rtl) .animate-drawer-end {
+:dir(rtl) .animate-drawer-end[data-state="open"] {
   animation-name: slide-in-from-left;
+}
+
+:dir(ltr) .animate-drawer-start[data-state="closed"] {
+  animation-name: slide-out-to-left;
+}
+:dir(rtl) .animate-drawer-start[data-state="closed"] {
+  animation-name: slide-out-to-right;
+}
+:dir(ltr) .animate-drawer-end[data-state="closed"] {
+  animation-name: slide-out-to-right;
+}
+:dir(rtl) .animate-drawer-end[data-state="closed"] {
+  animation-name: slide-out-to-left;
 }
 
 /* An indeterminate bar should travel the way the page reads. translateX

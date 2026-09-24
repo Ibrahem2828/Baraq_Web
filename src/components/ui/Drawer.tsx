@@ -32,13 +32,13 @@ export function Drawer({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm" />
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-[fade-in_var(--duration-fast)_var(--ease-brand)] data-[state=closed]:animate-[fade-out_var(--duration-fast)_var(--ease-brand)]" />
         <Dialog.Content
           className={cn(
-            "inset-block-0 fixed z-50 flex h-full w-[min(85vw,20rem)] flex-col overflow-y-auto border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[var(--shadow-md)] focus:outline-none",
+            "inset-y-0 fixed z-50 flex h-full w-[min(85vw,20rem)] flex-col overflow-y-auto border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[var(--shadow-md)] focus:outline-none",
             side === "start"
-              ? "inset-inline-start-0 data-[state=open]:animate-drawer-start border-e [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]"
-              : "inset-inline-end-0 data-[state=open]:animate-drawer-end border-s [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]",
+              ? "inset-inline-start-0 animate-drawer-start border-e [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]"
+              : "inset-inline-end-0 animate-drawer-end border-s [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]",
             className,
           )}
         >
