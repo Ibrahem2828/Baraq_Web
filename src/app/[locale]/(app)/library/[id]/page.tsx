@@ -135,13 +135,10 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
             <div className="flex flex-wrap gap-3">
               {CHARACTER_LIST.map((character) => {
                 const capability = capabilities.data[character.key];
-                // COMING_SOON: product rollout gate (independent of this
-                // source/backend — Kholasa/Sada aren't launched yet, see
-                // config/characters.ts). BLOCKED/UNAVAILABLE both read from
-                // the backend's own `available`/`message` — the API doesn't
-                // distinguish a separate "blocked" reason code, so the real
-                // Arabic message (e.g. a plan limit) is shown verbatim rather
-                // than inventing a fake distinct category.
+                // A character's availability comes from the backend's
+                // capability/entitlement contract. The Arabic message explains
+                // a real source or plan restriction without exposing a
+                // browser-only toggle as a fake product limitation.
                 if (!character.isLive) {
                   return (
                     <div

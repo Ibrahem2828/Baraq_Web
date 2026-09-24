@@ -12,8 +12,6 @@
  * see `docs/DESIGN_SYSTEM.md`.
  */
 
-import { featureFlags } from "./feature-flags";
-
 export type CharacterKey = "khota" | "fahes" | "kholasa" | "rasheed" | "sada";
 
 export interface CharacterDefinition {
@@ -67,9 +65,9 @@ export const CHARACTERS: Record<CharacterKey, CharacterDefinition> = {
     role: "التلخيص الذكي",
     roleEn: "Smart summarization",
     colorToken: "--color-character-kholasa",
-    // Rollout remains opt-in until the real-provider RC gate passes. Backend
-    // capability/entitlement checks remain authoritative after this UX gate.
-    isLive: featureFlags.kholasa,
+    // The backend's capability and subscription checks are authoritative.
+    // A browser-only rollout flag hid an otherwise working, authorized flow.
+    isLive: true,
     taskType: "kholasa_generate_summary",
   },
   rasheed: {
@@ -89,7 +87,9 @@ export const CHARACTERS: Record<CharacterKey, CharacterDefinition> = {
     role: "تحويل الصوت إلى نص",
     roleEn: "Voice-to-text",
     colorToken: "--color-character-sada",
-    isLive: featureFlags.sada,
+    // Sada retains its backend-only audio/source constraints; this only
+    // removes the obsolete UI "coming soon" gate.
+    isLive: true,
     taskType: "sada_transcribe_audio",
   },
 };

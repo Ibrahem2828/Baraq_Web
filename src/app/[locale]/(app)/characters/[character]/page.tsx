@@ -16,11 +16,9 @@ function isCharacterKey(value: string): value is CharacterKey {
 }
 
 /**
- * Every character key has a real hub component ready — Kholasa/Sada's are
- * only rendered once `CHARACTERS[key].isLive` flips to `true` (mirrors the
- * mobile app's current rollout state, see `src/config/characters.ts`); until
- * then they fall through to the generic "coming soon" identity view, same as
- * today.
+ * Every supported character has a real hub. Availability and entitlement are
+ * determined by the backend capabilities contract, never by a browser-only
+ * rollout flag.
  */
 export default async function CharacterDetailPage({
   params,

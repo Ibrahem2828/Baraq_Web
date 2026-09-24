@@ -279,8 +279,8 @@ doc had never explicitly addressed, neither of which had any code behind them:
    memory. Fixed: `handle()` now rejects with `413 payload_too_large` both on a declared
    `Content-Length` over the limit (cheap, rejects before reading the body) and on the
    actual buffered size (catches a missing/lying `Content-Length`). The limit is
-   `BFF_MAX_BODY_BYTES` (`src/config/env.ts`, default 30MB — headroom above
-   `SOURCE_UPLOAD.maxSizeBytes`'s 25MB for multipart overhead), documented in `.env.example`.
+   `BFF_MAX_BODY_BYTES` (`src/config/env.ts`, default 55MB — headroom above
+   the 50MB source ceiling for multipart overhead), documented in `.env.example`.
 
 ## 13. Native autofill and form-state integrity
 

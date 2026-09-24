@@ -19,12 +19,10 @@ describe("canonical character configuration", () => {
     expect(CHARACTER_LIST).toHaveLength(5);
   });
 
-  it("marks kholasa and sada as not-live, matching the mobile app's current rollout", () => {
-    expect(CHARACTERS.kholasa.isLive).toBe(false);
-    expect(CHARACTERS.sada.isLive).toBe(false);
-    expect(CHARACTERS.khota.isLive).toBe(true);
-    expect(CHARACTERS.fahes.isLive).toBe(true);
-    expect(CHARACTERS.rasheed.isLive).toBe(true);
+  it("marks all implemented characters as live while backend capabilities enforce entitlement", () => {
+    for (const character of CHARACTER_LIST) {
+      expect(character.isLive).toBe(true);
+    }
   });
 
   it("getCharacter returns the matching definition", () => {
