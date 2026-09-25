@@ -74,6 +74,10 @@ export const DOMAIN_ERROR_MESSAGE_KEYS: Record<string, string> = {
   validation_failed: "errors.domain.result_validation_failed",
   result_validation_failed: "errors.domain.result_validation_failed",
   output_validation_failed: "errors.domain.result_validation_failed",
+  unsupported_claim: "errors.domain.unsupported_claim",
+  unverifiable_claim: "errors.domain.unverifiable_claim",
+  invalid_source_reference: "errors.domain.invalid_source_reference",
+  unsupported_topic_reference: "errors.domain.unsupported_topic_reference",
   worker_interrupted_execution_uncertain: "errors.domain.worker_interrupted",
   // Joining a school. Every one of these is a state the learner can act on
   // -- ask for a new code, ask to be re-invited -- so none of them may
