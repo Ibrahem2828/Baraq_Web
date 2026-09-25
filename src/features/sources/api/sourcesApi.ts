@@ -1,4 +1,5 @@
 import { apiClient, requestPaginated } from "@/lib/api/client";
+import { uploadWithProgress, type UploadOptions } from "@/lib/api/upload";
 import { endpoints } from "@/lib/api/endpoints";
 import type {
   AIJob,
@@ -107,8 +108,8 @@ export function getSource(id: number | string) {
   return apiClient.get<StudentSource>(endpoints.sources.detail(id));
 }
 
-export function uploadSource(formData: FormData) {
-  return apiClient.post<StudentSource>(endpoints.sources.list, formData);
+export function uploadSource(formData: FormData, options?: UploadOptions) {
+  return uploadWithProgress<StudentSource>(endpoints.sources.list, formData, options);
 }
 
 export function updateSource(id: number | string, patch: UpdateSourceInput) {

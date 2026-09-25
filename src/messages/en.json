@@ -267,7 +267,14 @@
       "submit": "Upload",
       "maxSize": "Maximum {megabytes} MB",
       "unsupportedType": "Unsupported file type",
-      "fileTooLarge": "File is larger than the allowed limit"
+      "fileTooLarge": "File is larger than the allowed limit",
+      "project": "Project",
+      "chooseProject": "Choose a project",
+      "projectRequired": "Choose the project this source belongs to",
+      "noProjects": "Create a project first on the Projects page; the characters work on a project's sources.",
+      "uploading": "Uploading… {sent} of {total} MB",
+      "processing": "Upload complete, saving…",
+      "cancelUpload": "Cancel upload"
     },
     "detail": {
       "retryProcessing": "Retry processing",

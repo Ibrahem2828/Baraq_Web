@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { backendFetch, backendUrl, logBackendFailure } from "@/lib/api/backend";
 import { serverEnv } from "@/config/env";
 import { NO_STORE_HEADERS } from "@/lib/http/no-store";
+import { BodyTooLargeError, readBodyViaDisk } from "@/lib/http/spool-body";
 import { endpoints } from "@/lib/api/endpoints";
 import {
   getAccessToken,
@@ -28,6 +29,13 @@ import {
 
 const MUTATING_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 
+/**
+ * An upload is received in full before it is forwarded, so the forward itself
+ * is fast; Django still has to store and fingerprint up to 50MB. The default
+ * JSON timeout (BACKEND_API_TIMEOUT_MS, 20s) is kept for everything else.
+ */
+const UPLOAD_UPSTREAM_TIMEOUT_MS = 120_000;
+
 function jsonError(body: Record<string, unknown>, status: number): NextResponse {
   return NextResponse.json(body, { status, headers: NO_STORE_HEADERS });
 }
@@ -50,6 +58,7 @@ async function forward(
   targetPath: string,
   accessToken: string | undefined,
   body: ArrayBuffer | undefined,
+  timeoutMs?: number,
 ): Promise<Response> {
   const headers = new Headers();
   const incomingContentType = request.headers.get("content-type");
@@ -66,6 +75,7 @@ async function forward(
     method: request.method,
     headers,
     body: body && body.byteLength > 0 ? body : undefined,
+    timeoutMs,
   });
 }
 
@@ -99,9 +109,9 @@ async function handle(
     }
   }
 
-  // Reject oversized bodies before buffering them in memory. Checked twice: the
-  // declared Content-Length (cheap, catches almost every real client) and the
-  // actual buffered size (catches a missing/lying Content-Length header).
+  // Reject oversized bodies before reading them. Checked twice: the declared
+  // Content-Length (cheap, catches almost every real client) and the bytes
+  // actually received (catches a missing/lying Content-Length header).
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (declaredLength > serverEnv.BFF_MAX_BODY_BYTES) {
     return jsonError(
@@ -110,8 +120,22 @@ async function handle(
     );
   }
 
-  const body =
-    request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
+  const isUpload = (request.headers.get("content-type") ?? "").startsWith("multipart/form-data");
+  let body: ArrayBuffer | undefined;
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    try {
+      body = isUpload
+        ? await readBodyViaDisk(request.body, serverEnv.BFF_MAX_BODY_BYTES)
+        : await request.arrayBuffer();
+    } catch (error) {
+      if (!(error instanceof BodyTooLargeError)) throw error;
+      return jsonError(
+        { success: false, message: "Request body too large", code: "payload_too_large" },
+        413,
+      );
+    }
+  }
+  const upstreamTimeoutMs = isUpload ? UPLOAD_UPSTREAM_TIMEOUT_MS : undefined;
 
   if (body && body.byteLength > serverEnv.BFF_MAX_BODY_BYTES) {
     return jsonError(
@@ -142,12 +166,12 @@ async function handle(
 
   let upstream: Response;
   try {
-    upstream = await forward(request, targetPath, accessToken, body);
+    upstream = await forward(request, targetPath, accessToken, body, upstreamTimeoutMs);
 
     if (upstream.status === 401 && accessToken) {
       const renewed = await refreshAccessToken();
       if (renewed) {
-        upstream = await forward(request, targetPath, renewed, body);
+        upstream = await forward(request, targetPath, renewed, body, upstreamTimeoutMs);
       }
     }
   } catch (error) {

@@ -1,5 +1,7 @@
 "use client";
 
+import { useCallback, useRef, useState } from "react";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query/keys";
 import {
@@ -36,14 +38,30 @@ export function useSource(id: number | string) {
   });
 }
 
+/**
+ * Upload with live progress (0..1, null when idle) and a cancel() that aborts
+ * the request in flight.
+ */
 export function useUploadSource() {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: uploadSource,
+  const [progress, setProgress] = useState<number | null>(null);
+  const controller = useRef<AbortController | null>(null);
+  const mutation = useMutation({
+    mutationFn: (formData: FormData) => {
+      controller.current = new AbortController();
+      setProgress(0);
+      return uploadSource(formData, { onProgress: setProgress, signal: controller.current.signal });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sources.all });
     },
+    onSettled: () => {
+      controller.current = null;
+      setProgress(null);
+    },
   });
+  const cancel = useCallback(() => controller.current?.abort(), []);
+  return { ...mutation, progress, cancel };
 }
 
 export function useUpdateSource(id: number | string) {

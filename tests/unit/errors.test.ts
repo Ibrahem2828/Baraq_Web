@@ -70,6 +70,13 @@ describe("fromNetworkError", () => {
     expect(error.code).toBe("TIMEOUT");
   });
 
+  it("maps AbortSignal.timeout()'s TimeoutError to TIMEOUT, not NETWORK", () => {
+    // It used to fall through to NETWORK: a slow request told the student
+    // "Couldn't reach the server".
+    const error = fromNetworkError(new DOMException("signal timed out", "TimeoutError"));
+    expect(error.code).toBe("TIMEOUT");
+  });
+
   it("maps any other error to NETWORK", () => {
     const error = fromNetworkError(new Error("fetch failed"));
     expect(error.code).toBe("NETWORK");

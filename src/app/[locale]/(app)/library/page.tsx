@@ -10,13 +10,10 @@ import { Link } from "@/i18n/navigation";
 import {
   useSources,
   useCollections,
-  useUploadSource,
   useCreateCollection,
 } from "@/features/sources/hooks/useSources";
-import { validateSourceFile, effectiveUploadLimitBytes } from "@/features/sources/validation";
-import { useMySubscription } from "@/features/subscriptions/hooks/useSubscriptions";
+import { UploadSourceDialog } from "@/features/sources/components/UploadSourceDialog";
 import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
-import { SOURCE_UPLOAD } from "@/config/constants";
 import type { SourceStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
@@ -38,12 +35,6 @@ const STATUS_VARIANT: Record<SourceStatus, "neutral" | "info" | "success" | "des
   failed: "destructive",
 };
 
-const uploadSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().optional(),
-});
-type UploadFormValues = z.infer<typeof uploadSchema>;
-
 const collectionSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
@@ -54,54 +45,12 @@ export default function LibraryPage() {
   const t = useTranslations();
   const sources = useSources();
   const collections = useCollections();
-  const uploadSource = useUploadSource();
-  const errorMessage = useApiErrorMessage();
-  // The limit this user actually has: min(plan, platform), computed
-  // server-side. Showing the platform ceiling told a Free user they
-  // could upload far more than their plan allows.
-  const subscription = useMySubscription();
-  const uploadLimitBytes = effectiveUploadLimitBytes(
-    subscription.data?.effective_limits?.max_file_size_mb,
-  );
   const createCollection = useCreateCollection();
+  const errorMessage = useApiErrorMessage();
 
   const [uploadOpen, setUploadOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
-
-  const uploadForm = useForm<UploadFormValues>({ resolver: zodResolver(uploadSchema) });
   const collectionForm = useForm<CollectionFormValues>({ resolver: zodResolver(collectionSchema) });
-
-  const onUpload = uploadForm.handleSubmit((values) => {
-    if (!file) {
-      setFileError(t("common.requiredField"));
-      return;
-    }
-    const errorKey = validateSourceFile(file, uploadLimitBytes);
-    if (errorKey) {
-      setFileError(t(errorKey));
-      return;
-    }
-    setFileError(null);
-
-    const formData = new FormData();
-    formData.set("title", values.title);
-    if (values.description) formData.set("description", values.description);
-    formData.set("file", file);
-
-    uploadSource.mutate(formData, {
-      // Surface the backend's reason. A plan/limit rejection is actionable
-      // ("upgrade", "delete something") and must not fail silently — the
-      // modal previously just stayed open with no explanation.
-      onError: (error) => setFileError(errorMessage(error)),
-      onSuccess: () => {
-        setUploadOpen(false);
-        uploadForm.reset();
-        setFile(null);
-      },
-    });
-  });
 
   const onCreateCollection = collectionForm.handleSubmit((values) => {
     createCollection.mutate(
@@ -228,64 +177,7 @@ export default function LibraryPage() {
         ]}
       />
 
-      <Modal
-        open={uploadOpen}
-        onOpenChange={(open) => {
-          setUploadOpen(open);
-          if (!open) {
-            uploadForm.reset();
-            setFile(null);
-            setFileError(null);
-          }
-        }}
-        title={t("library.upload.title")}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setUploadOpen(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button onClick={onUpload} loading={uploadSource.isPending}>
-              {t("library.upload.submit")}
-            </Button>
-          </>
-        }
-      >
-        <form onSubmit={onUpload} noValidate className="flex flex-col gap-4">
-          <Input
-            label={t("library.upload.titleField")}
-            error={uploadForm.formState.errors.title ? t("common.requiredField") : undefined}
-            {...uploadForm.register("title")}
-          />
-          <Textarea
-            label={t("library.upload.description")}
-            {...uploadForm.register("description")}
-          />
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-[color:var(--color-ink)]">
-              {t("library.upload.file")}
-            </label>
-            <input
-              type="file"
-              accept={SOURCE_UPLOAD.acceptedExtensions.map((ext) => `.${ext}`).join(",")}
-              onChange={(event) => {
-                setFile(event.target.files?.[0] ?? null);
-                setFileError(null);
-              }}
-              className="text-sm text-[color:var(--color-ink)] file:me-3 file:rounded-[var(--radius-full)] file:border-0 file:bg-[color:var(--color-bg-soft)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[color:var(--color-ink)]"
-            />
-            <p className="text-xs text-[color:var(--color-ink-faint)]">
-              {t("library.upload.maxSize", {
-                megabytes: Math.floor(uploadLimitBytes / (1024 * 1024)),
-              })}
-            </p>
-            {fileError ? (
-              <p role="alert" className="text-xs text-[color:var(--color-destructive)]">
-                {fileError}
-              </p>
-            ) : null}
-          </div>
-        </form>
-      </Modal>
+      <UploadSourceDialog open={uploadOpen} onOpenChange={setUploadOpen} />
 
       <Modal
         open={collectionOpen}
@@ -315,6 +207,11 @@ export default function LibraryPage() {
             label={t("library.upload.description")}
             {...collectionForm.register("description")}
           />
+          {createCollection.isError ? (
+            <p role="alert" className="text-xs text-[color:var(--color-destructive)]">
+              {errorMessage(createCollection.error)}
+            </p>
+          ) : null}
         </form>
       </Modal>
     </div>

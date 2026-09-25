@@ -17,7 +17,7 @@ import { ApiError, fromErrorEnvelope, fromNetworkError } from "./errors";
 
 let csrfTokenPromise: Promise<string> | null = null;
 
-async function ensureCsrfToken(): Promise<string> {
+export async function ensureCsrfToken(): Promise<string> {
   const existing = readClientCookie(CSRF_COOKIE);
   if (existing) return existing;
 

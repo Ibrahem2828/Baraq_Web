@@ -267,7 +267,14 @@
       "submit": "رفع",
       "maxSize": "الحد الأقصى {megabytes} ميجابايت",
       "unsupportedType": "نوع الملف غير مدعوم",
-      "fileTooLarge": "حجم الملف أكبر من الحد المسموح"
+      "fileTooLarge": "حجم الملف أكبر من الحد المسموح",
+      "project": "المشروع",
+      "chooseProject": "اختر المشروع",
+      "projectRequired": "اختر المشروع الذي سيُضاف إليه المصدر",
+      "noProjects": "أنشئ مشروعًا أولًا من صفحة المشاريع؛ الشخصيات تعمل على مصادر المشروع.",
+      "uploading": "جارٍ الرفع… {sent} من {total} ميجابايت",
+      "processing": "اكتمل الرفع، جارٍ الحفظ…",
+      "cancelUpload": "إلغاء الرفع"
     },
     "detail": {
       "retryProcessing": "إعادة محاولة المعالجة",

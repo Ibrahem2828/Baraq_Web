@@ -121,7 +121,10 @@ export function fromErrorEnvelope(
 }
 
 export function fromNetworkError(error: unknown): ApiError {
-  if (error instanceof DOMException && error.name === "AbortError") {
+  // AbortSignal.timeout() rejects with a "TimeoutError", not an "AbortError";
+  // it used to fall through to NETWORK, so a slow request was reported to the
+  // student as "Couldn't reach the server".
+  if (error instanceof DOMException && (error.name === "AbortError" || error.name === "TimeoutError")) {
     return new ApiError({ code: "TIMEOUT", message: "Request timed out" });
   }
   return new ApiError({
