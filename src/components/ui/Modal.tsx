@@ -58,7 +58,7 @@ export function Modal({
           <div className="mt-4 flex-1">{children}</div>
           {footer ? <div className="mt-6 flex items-center justify-end gap-3">{footer}</div> : null}
           <Dialog.Close
-            className="inset-inline-end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
+            className="end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
             aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />

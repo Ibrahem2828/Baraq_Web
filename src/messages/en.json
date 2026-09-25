@@ -19,6 +19,8 @@
     "requiredField": "This field is required",
     "a11y": {
       "switchLanguage": "Switch language",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "notifications": "Notifications",
       "dismiss": "Dismiss",
       "remove": "Remove",
@@ -105,7 +107,9 @@
       "invalidLink": "This reset link is invalid or has expired"
     },
     "passwordTooShort": "Password must be at least 10 characters",
-    "passwordMismatch": "Passwords do not match"
+    "passwordMismatch": "Passwords do not match",
+    "invalidEmail": "Enter a valid email address",
+    "invalidPhone": "Enter a valid phone number"
   },
   "characters": {
     "khota": {

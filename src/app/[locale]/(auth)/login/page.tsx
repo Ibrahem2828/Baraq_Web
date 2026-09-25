@@ -4,6 +4,7 @@ import { Suspense, type FormEvent } from "react";
 import { useSearchParams, useRouter as useNativeRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { validationMessage } from "@/lib/validation/field-error";
 import { useTranslations } from "next-intl";
 import { Link, useRouter as useLocaleRouter } from "@/i18n/navigation";
 import { useLogin } from "@/lib/auth/client";
@@ -111,13 +112,13 @@ function LoginForm() {
           label={t("auth.login.email")}
           type="email"
           autoComplete="email"
-          error={errors.email ? t("common.requiredField") : undefined}
+          error={validationMessage(errors.email, t)}
           {...register("email")}
         />
         <PasswordInput
           label={t("auth.login.password")}
           autoComplete="current-password"
-          error={errors.password ? t("common.requiredField") : undefined}
+          error={validationMessage(errors.password, t)}
           {...register("password")}
         />
         <div className="flex justify-end">

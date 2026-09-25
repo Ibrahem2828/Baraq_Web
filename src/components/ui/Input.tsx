@@ -12,6 +12,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, description, error, id, startSlot, endSlot, ...props }, ref) => {
+    // Addresses and numbers are left-to-right in every language: in the
+    // Arabic UI "abc@" was rendered as "@abc". Aligned to the reading edge.
+    const ltrValue = props.type === "email" || props.type === "tel" || props.type === "url";
     const generatedId = useId();
     const inputId = id ?? generatedId;
     const descriptionId = description ? `${inputId}-description` : undefined;
@@ -26,26 +29,28 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         ) : null}
         <div className="relative flex items-center">
           {startSlot ? (
-            <span className="inset-inline-start-3 pointer-events-none absolute flex items-center text-[color:var(--color-ink-faint)]">
+            <span className="start-3 pointer-events-none absolute flex items-center text-[color:var(--color-ink-faint)]">
               {startSlot}
             </span>
           ) : null}
           <input
             ref={ref}
             id={inputId}
+            dir={props.dir ?? (ltrValue ? "ltr" : undefined)}
             aria-invalid={Boolean(error) || undefined}
             aria-describedby={cn(descriptionId, errorId) || undefined}
             className={cn(
               "h-11 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm text-[color:var(--color-ink)] transition-colors duration-[var(--duration-fast)] placeholder:text-[color:var(--color-ink-faint)] focus-visible:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               startSlot && "ps-10",
               endSlot && "pe-10",
+              ltrValue && "rtl:text-right",
               error && "border-[color:var(--color-destructive)]",
               className,
             )}
             {...props}
           />
           {endSlot ? (
-            <span className="inset-inline-end-3 absolute flex items-center text-[color:var(--color-ink-faint)]">
+            <span className="end-3 absolute flex items-center text-[color:var(--color-ink-faint)]">
               {endSlot}
             </span>
           ) : null}

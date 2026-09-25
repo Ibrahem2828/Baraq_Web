@@ -4,6 +4,7 @@ import { Suspense, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { validationMessage } from "@/lib/validation/field-error";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/auth";
@@ -101,13 +102,13 @@ function ResetPasswordForm() {
         <PasswordInput
           label={t("auth.resetPassword.newPassword")}
           autoComplete="new-password"
-          error={errors.new_password ? t("auth.passwordTooShort") : undefined}
+          error={validationMessage(errors.new_password, t, "auth.passwordTooShort")}
           {...register("new_password")}
         />
         <PasswordInput
           label={t("auth.resetPassword.confirmPassword")}
           autoComplete="new-password"
-          error={errors.confirm_password ? t("auth.passwordMismatch") : undefined}
+          error={validationMessage(errors.confirm_password, t, "auth.passwordMismatch")}
           {...register("confirm_password")}
         />
         <Button type="submit" size="lg" loading={confirmReset.isPending} className="mt-2">

@@ -42,3 +42,45 @@ describe("loginSchema", () => {
     expect(loginSchema.safeParse({ email: "a@b.com", password: "" }).success).toBe(false);
   });
 });
+
+describe("validation messages are specific i18n keys", () => {
+  const messageOf = (result: ReturnType<typeof loginSchema.safeParse>, field: string) =>
+    result.success ? undefined : result.error.issues.find((issue) => issue.path[0] === field)?.message;
+
+  it("tells an empty email apart from a malformed one", () => {
+    expect(messageOf(loginSchema.safeParse({ email: "", password: "x" }), "email")).toBe(
+      "common.requiredField",
+    );
+    expect(messageOf(loginSchema.safeParse({ email: "not-an-email", password: "x" }), "email")).toBe(
+      "auth.invalidEmail",
+    );
+  });
+
+  it("requires the password confirmation even when the password itself is invalid", () => {
+    const result = registerSchema.safeParse({
+      full_name: "Sara Ahmad",
+      email: "sara@example.com",
+      phone_number: "",
+      password: "short",
+      password_confirm: "",
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const confirm = result.error.issues.find((issue) => issue.path[0] === "password_confirm");
+      expect(confirm?.message).toBe("common.requiredField");
+    }
+  });
+
+  it("rejects an obviously wrong phone number but keeps it optional", () => {
+    const base = {
+      full_name: "Sara Ahmad",
+      email: "sara@example.com",
+      password: "correct-horse-battery",
+      password_confirm: "correct-horse-battery",
+    };
+    expect(registerSchema.safeParse({ ...base, phone_number: "" }).success).toBe(true);
+    expect(registerSchema.safeParse({ ...base, phone_number: "+963 944 123 456" }).success).toBe(true);
+    const bad = registerSchema.safeParse({ ...base, phone_number: "12" });
+    expect(bad.success).toBe(false);
+  });
+});

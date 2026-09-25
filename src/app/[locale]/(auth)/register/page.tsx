@@ -14,7 +14,7 @@ import { useToast } from "@/components/feedback/Toast";
 import { FadeIn } from "@/components/motion/FadeIn";
 import { ApiError } from "@/lib/api/errors";
 import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
-import { fieldErrorMessage } from "@/lib/validation/field-error";
+import { validationMessage } from "@/lib/validation/field-error";
 import { syncNativeTextValues } from "@/lib/forms/sync-native-values";
 
 export default function RegisterPage() {
@@ -75,32 +75,33 @@ export default function RegisterPage() {
         <Input
           label={t("auth.register.fullName")}
           autoComplete="name"
-          error={errors.full_name ? t("common.requiredField") : undefined}
+          error={validationMessage(errors.full_name, t)}
           {...register("full_name")}
         />
         <Input
           label={t("auth.register.email")}
           type="email"
           autoComplete="email"
-          error={fieldErrorMessage(errors.email, () => t("common.requiredField"))}
+          error={validationMessage(errors.email, t)}
           {...register("email")}
         />
         <Input
           label={t("auth.register.phoneNumber")}
           type="tel"
           autoComplete="tel"
+          error={validationMessage(errors.phone_number, t)}
           {...register("phone_number")}
         />
         <PasswordInput
           label={t("auth.register.password")}
           autoComplete="new-password"
-          error={errors.password ? t("auth.passwordTooShort") : undefined}
+          error={validationMessage(errors.password, t, "auth.passwordTooShort")}
           {...register("password")}
         />
         <PasswordInput
           label={t("auth.register.passwordConfirm")}
           autoComplete="new-password"
-          error={errors.password_confirm ? t("auth.passwordMismatch") : undefined}
+          error={validationMessage(errors.password_confirm, t, "auth.passwordMismatch")}
           {...register("password_confirm")}
         />
         <Button type="submit" size="lg" loading={registerMutation.isPending} className="mt-2">

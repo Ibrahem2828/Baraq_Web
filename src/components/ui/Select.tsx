@@ -58,7 +58,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
           <ChevronDown
-            className="inset-inline-end-3 pointer-events-none absolute top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-ink-faint)]"
+            className="end-3 pointer-events-none absolute top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-ink-faint)]"
             aria-hidden="true"
           />
         </div>

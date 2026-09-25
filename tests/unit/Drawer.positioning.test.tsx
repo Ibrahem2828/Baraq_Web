@@ -14,6 +14,9 @@ import { Drawer } from "@/components/ui/Drawer";
 // `inset-block-0` and `data-[state=open]:animate-drawer-start` are not
 // Tailwind utilities: they compile to no CSS at all, silently, which left the
 // panel positioned ~1200px below the viewport with no slide-in animation.
+// `inset-inline-start-0` is not one either (Tailwind v4 spells it `start-0`):
+// the panel only sat at the start edge by its static position, and an
+// end-side drawer opened on the wrong side.
 describe("Drawer positioning contract", () => {
   it.each(["start", "end"] as const)("pins the %s panel to the viewport with real utilities", (side) => {
     render(
@@ -23,8 +26,9 @@ describe("Drawer positioning contract", () => {
     );
     const classes = screen.getByRole("dialog").className.split(/\s+/);
 
-    expect(classes).toEqual(expect.arrayContaining(["fixed", "inset-y-0", `inset-inline-${side}-0`, `animate-drawer-${side}`]));
+    expect(classes).toEqual(expect.arrayContaining(["fixed", "inset-y-0", `${side}-0`, `animate-drawer-${side}`]));
     expect(classes).not.toContain("inset-block-0");
+    expect(classes.some((name) => name.startsWith("inset-inline-"))).toBe(false);
     expect(classes.some((name) => name.startsWith("data-[state=open]:animate-drawer"))).toBe(false);
   });
 

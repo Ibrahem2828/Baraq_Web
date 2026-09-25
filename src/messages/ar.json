@@ -19,6 +19,8 @@
     "requiredField": "هذا الحقل مطلوب",
     "a11y": {
       "switchLanguage": "تغيير اللغة",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
       "notifications": "الإشعارات",
       "dismiss": "إغلاق التنبيه",
       "remove": "إزالة",
@@ -105,7 +107,9 @@
       "invalidLink": "رابط إعادة التعيين غير صالح أو منتهي الصلاحية"
     },
     "passwordTooShort": "يجب ألا تقل كلمة المرور عن 10 أحرف",
-    "passwordMismatch": "كلمتا المرور غير متطابقتين"
+    "passwordMismatch": "كلمتا المرور غير متطابقتين",
+    "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
+    "invalidPhone": "رقم الهاتف غير صالح"
   },
   "characters": {
     "khota": {

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { validationMessage } from "@/lib/validation/field-error";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validation/auth";
@@ -56,7 +57,7 @@ export default function ForgotPasswordPage() {
             label={t("auth.forgotPassword.email")}
             type="email"
             autoComplete="email"
-            error={errors.email ? t("common.requiredField") : undefined}
+            error={validationMessage(errors.email, t)}
             {...register("email")}
           />
           <Button type="submit" size="lg" loading={requestReset.isPending} className="mt-2">

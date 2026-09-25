@@ -15,3 +15,20 @@ export function fieldErrorMessage(
   if (error.type === "manual" && error.message) return error.message;
   return translateFallback();
 }
+
+const MESSAGE_KEY = /^[a-z][A-Za-z]*(\.[A-Za-z][A-Za-z0-9]*)+$/;
+
+/**
+ * Like `fieldErrorMessage`, but a schema message that is an i18n key
+ * ("auth.invalidEmail") is translated, so each rule gets its own text.
+ * Server-driven (`manual`) messages are shown verbatim.
+ */
+export function validationMessage(
+  error: FieldError | undefined,
+  translate: (key: string) => string,
+  fallbackKey = "common.requiredField",
+): string | undefined {
+  if (!error) return undefined;
+  if (error.type === "manual" && error.message) return error.message;
+  return translate(error.message && MESSAGE_KEY.test(error.message) ? error.message : fallbackKey);
+}

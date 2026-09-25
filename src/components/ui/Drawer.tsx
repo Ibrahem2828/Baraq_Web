@@ -37,8 +37,8 @@ export function Drawer({
           className={cn(
             "inset-y-0 fixed z-50 flex h-full w-[min(85vw,20rem)] flex-col overflow-y-auto border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[var(--shadow-md)] focus:outline-none",
             side === "start"
-              ? "inset-inline-start-0 animate-drawer-start border-e [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]"
-              : "inset-inline-end-0 animate-drawer-end border-s [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]",
+              ? "start-0 animate-drawer-start border-e [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]"
+              : "end-0 animate-drawer-end border-s [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]",
             className,
           )}
         >
@@ -52,7 +52,7 @@ export function Drawer({
             </Dialog.Title>
           )}
           <Dialog.Close
-            className="inset-inline-end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
+            className="end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
             aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />
