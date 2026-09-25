@@ -13,7 +13,7 @@ export function ProjectCharactersPanel({ projectId }: { projectId: string }) {
   return (
     <StaggerIn className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
       {CHARACTER_LIST.map((character) => (
-        <StaggerItem key={character.key}>
+        <StaggerItem key={character.key} className="h-full">
           <CharacterCard
             character={character}
             role={t(`characters.${character.key}.role`)}

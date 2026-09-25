@@ -36,6 +36,13 @@ import onboardingSmartPlanKhota from "./images/onboarding/onboarding_smart_plan_
 // untouched and are not imported anywhere; every on-screen usage of a
 // character should show correctly on Light/Dark/Fire without a baked white
 // rectangle behind it.
+// Normalised avatars: every figure cropped to its outline and placed at the
+// same height on the same 512px canvas, so the five read as one set.
+import khotaAvatar from "./characters/khota/character_khota_avatar.webp";
+import fahesAvatar from "./characters/fahes/character_fahes_avatar.webp";
+import rasheedAvatar from "./characters/rasheed/character_rasheed_avatar.webp";
+import kholasaAvatar from "./characters/kholasa/character_kholasa_avatar.webp";
+import sadaAvatar from "./characters/sada/character_sada_avatar.webp";
 import khotaFull from "./characters/khota/processed/character_khota_full.png";
 import khotaHappy from "./characters/khota/processed/character_khota_happy.png";
 import khotaPointing from "./characters/khota/processed/character_khota_pointing.png";
@@ -120,6 +127,7 @@ export const assets = {
   },
   characters: {
     khota: {
+      avatar: khotaAvatar,
       full: khotaFull,
       happy: khotaHappy,
       pointing: khotaPointing,
@@ -128,6 +136,7 @@ export const assets = {
       thumbnail: khotaThumbnail,
     },
     fahes: {
+      avatar: fahesAvatar,
       full: fahesFull,
       happy: fahesHappy,
       quiz: fahesQuiz,
@@ -136,6 +145,7 @@ export const assets = {
       thumbnail: fahesThumbnail,
     },
     rasheed: {
+      avatar: rasheedAvatar,
       full: rasheedFull,
       advice: rasheedAdvice,
       happy: rasheedHappy,
@@ -144,6 +154,7 @@ export const assets = {
       thumbnail: rasheedThumbnail,
     },
     kholasa: {
+      avatar: kholasaAvatar,
       full: kholasaFull,
       empty: kholasaEmpty,
       happy: kholasaHappy,
@@ -152,6 +163,7 @@ export const assets = {
       thumbnail: kholasaThumbnail,
     },
     sada: {
+      avatar: sadaAvatar,
       full: sadaFull,
       happy: sadaHappy,
       help: sadaHelp,

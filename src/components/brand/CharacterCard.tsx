@@ -30,7 +30,7 @@ export function CharacterCard({
       whileHover={reduced || !character.isLive ? undefined : { y: -4 }}
       whileTap={reduced || !character.isLive ? undefined : { scale: 0.985 }}
       className={cn(
-        "surface-card flex flex-col items-center gap-3 p-6 text-center transition-shadow duration-[var(--duration-normal)] disabled:cursor-not-allowed disabled:opacity-70",
+        "surface-card flex h-full w-full flex-col items-center gap-3 p-6 text-center transition-shadow duration-[var(--duration-normal)] disabled:cursor-not-allowed disabled:opacity-70",
         character.isLive && "hover:shadow-[var(--shadow-md)]",
         className,
       )}

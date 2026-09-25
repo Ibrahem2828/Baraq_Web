@@ -54,13 +54,15 @@ export function CharacterAvatar({
       }}
     >
       <Image
-        src={assets.characters[character.key].full}
+        src={assets.characters[character.key].avatar}
         alt=""
         width={px}
         height={px}
-        // object-contain: the artwork is never cropped, only fitted. The
-        // padding keeps the figure off the frame edge at every size.
-        className="size-full object-contain p-[12%]"
+        // The avatar files are normalised (same canvas, figure height and
+        // baseline -- see the assets map), so one fit works for all five.
+        // The full artwork had different margins per character, which is why
+        // the five used to look like different sizes in identical frames.
+        className="size-full object-contain p-[6%]"
       />
     </span>
   );
