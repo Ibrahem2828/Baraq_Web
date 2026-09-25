@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { BackendResponseError, backendFetch, logBackendFailure } from "@/lib/api/backend";
 import { endpoints } from "@/lib/api/endpoints";
 import type { SuccessEnvelope } from "@/lib/api/envelope";
@@ -66,63 +66,142 @@ export async function clearAuthCookies(): Promise<void> {
 }
 
 /**
- * In-process single-flight lock for token refresh. Collapses concurrent
- * refresh attempts triggered by multiple parallel BFF requests (e.g. several
- * widgets on one page all 401-ing at once) into a single upstream call —
- * closing a gap noted in the existing admin dashboard's BFF, which issues one
- * refresh call per concurrent 401.
+ * Token refresh, deduplicated per session.
  *
- * This dedups within a single Node.js server process only. A horizontally
- * scaled deployment (multiple instances behind a load balancer) would need a
- * distributed lock (e.g. Redis `SETNX`) for full cross-instance dedup — noted
- * as a Phase 2 follow-up in docs/AUTH_SECURITY.md, not required for
- * correctness (refresh token rotation is safe to attempt more than once
- * across instances; it just costs an extra upstream call and, worst case,
- * one instance's refresh call loses a race and its user is signed out).
+ * The backend rotates refresh tokens and blacklists the old one on every
+ * refresh. Two things follow, and both used to break:
+ *
+ *  - Concurrent refreshes must be collapsed *per refresh token*. The lock was
+ *    once a single module-level promise shared by every user, so two users
+ *    refreshing at the same moment could hand the second one the first one's
+ *    access token.
+ *  - A request that started before a rotation still carries the old refresh
+ *    token (a slow upload, or a burst of requests whose responses with the new
+ *    cookies have not reached the browser yet). Presenting the blacklisted
+ *    token failed, and the BFF then cleared the cookies -- signing the learner
+ *    out mid-upload ("Your session has expired"). For a short window the
+ *    result of a rotation is remembered, keyed by a hash of the token it
+ *    replaced, and such a request continues with it instead.
+ *
+ * This state is per Node.js process; the web service runs a single process.
  */
-let refreshPromise: Promise<string | null> | null = null;
+interface TokenPair {
+  access: string;
+  refresh: string;
+}
 
-export async function refreshAccessToken(): Promise<string | null> {
-  if (refreshPromise) return refreshPromise;
+const ROTATION_REUSE_WINDOW_MS = 2 * 60_000;
+const refreshFlights = new Map<string, Promise<TokenPair | null>>();
+const recentRotations = new Map<string, { pair: TokenPair; at: number }>();
 
-  refreshPromise = (async () => {
-    const refresh = await getRefreshToken();
-    if (!refresh) return null;
+function tokenKey(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
+}
 
-    try {
-      const response = await backendFetch(endpoints.auth.refresh, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh }),
-      });
+/** Seconds-since-epoch expiry of a JWT, or null when it cannot be read. Not a verification: only used to decide whether to refresh. */
+export function tokenExpiry(token: string): number | null {
+  const payload = token.split(".")[1];
+  if (!payload) return null;
+  try {
+    const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { exp?: unknown };
+    return typeof claims.exp === "number" ? claims.exp : null;
+  } catch {
+    return null;
+  }
+}
 
-      if (!response.ok) {
-        if (response.status >= 300 && response.status < 400) {
-          throw new BackendResponseError(response.status);
-        }
-        if (response.status >= 500) {
-          throw new BackendResponseError(response.status);
-        }
-        await clearAuthCookies();
-        return null;
-      }
+function validForAtLeast(token: string, seconds: number): boolean {
+  const expiry = tokenExpiry(token);
+  return expiry !== null && expiry * 1000 - Date.now() > seconds * 1000;
+}
 
-      const envelope = (await response.json()) as SuccessEnvelope<RefreshResponseData>;
-      await setAuthCookies({ access: envelope.data.access, refresh: envelope.data.refresh });
-      return envelope.data.access;
-    } catch (error) {
+/** The newest pair issued in place of `refresh` within the reuse window. */
+function latestRotation(refresh: string): TokenPair | null {
+  const now = Date.now();
+  for (const [key, entry] of recentRotations) {
+    if (now - entry.at > ROTATION_REUSE_WINDOW_MS) recentRotations.delete(key);
+  }
+  let pair: TokenPair | null = null;
+  let key = tokenKey(refresh);
+  for (let hops = 0; hops < 10; hops += 1) {
+    const entry = recentRotations.get(key);
+    if (!entry) break;
+    pair = entry.pair;
+    key = tokenKey(entry.pair.refresh);
+  }
+  return pair;
+}
+
+async function rotate(refresh: string): Promise<TokenPair | null> {
+  const key = tokenKey(refresh);
+  const inFlight = refreshFlights.get(key);
+  if (inFlight) return inFlight;
+
+  const flight = (async () => {
+    const response = await backendFetch(endpoints.auth.refresh, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    });
+    if (!response.ok) {
       // Transport, redirect, and upstream 5xx failures are operational
       // outages, not evidence that the refresh token is invalid. Let the BFF
       // classify them and preserve the cookies for a later retry.
-      throw error;
+      if (response.status >= 300 && response.status < 400) {
+        throw new BackendResponseError(response.status);
+      }
+      if (response.status >= 500) {
+        throw new BackendResponseError(response.status);
+      }
+      return null;
     }
+    const envelope = (await response.json()) as SuccessEnvelope<RefreshResponseData>;
+    const pair = { access: envelope.data.access, refresh: envelope.data.refresh };
+    recentRotations.set(key, { pair, at: Date.now() });
+    return pair;
   })();
 
+  refreshFlights.set(key, flight);
   try {
-    return await refreshPromise;
+    return await flight;
   } finally {
-    refreshPromise = null;
+    refreshFlights.delete(key);
   }
+}
+
+export async function refreshAccessToken(): Promise<string | null> {
+  const refresh = await getRefreshToken();
+  if (!refresh) return null;
+
+  let pair = latestRotation(refresh);
+  if (!pair || !validForAtLeast(pair.access, 30)) {
+    pair = await rotate(pair?.refresh ?? refresh);
+  }
+  // Cookies are written here, in the caller's own request, never inside the
+  // shared flight: every caller's response must carry its session's tokens.
+  if (!pair) {
+    await clearAuthCookies();
+    return null;
+  }
+  await setAuthCookies(pair);
+  return pair.access;
+}
+
+/**
+ * An access token that stays valid for at least `seconds`, refreshing first
+ * if needed. Used before an upload: its request carries the cookies it
+ * started with for as long as the file takes to arrive.
+ */
+export async function ensureFreshAccessToken(seconds: number): Promise<string | null> {
+  const access = await getAccessToken();
+  if (access && validForAtLeast(access, seconds)) return access;
+  return refreshAccessToken();
+}
+
+/** Test hook: forget remembered rotations between isolated test cases. */
+export function resetRefreshStateForTests(): void {
+  refreshFlights.clear();
+  recentRotations.clear();
 }
 
 type AuthResult =

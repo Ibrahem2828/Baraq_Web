@@ -1,5 +1,10 @@
-import { NextResponse } from "next/server";
-import { getAccessToken, getRefreshToken, refreshAccessToken } from "@/lib/auth/server";
+import { NextResponse, type NextRequest } from "next/server";
+import {
+  ensureFreshAccessToken,
+  getAccessToken,
+  getRefreshToken,
+  refreshAccessToken,
+} from "@/lib/auth/server";
 import { NO_STORE_HEADERS } from "@/lib/http/no-store";
 
 /**
@@ -30,7 +35,29 @@ import { NO_STORE_HEADERS } from "@/lib/http/no-store";
  * cookies, leaving them for a later retry rather than treating a transient
  * failure as proof of an invalid session.
  */
-export async function GET() {
+/** Upper bound for `minValiditySeconds`: the access token lives 30 minutes. */
+const MAX_MIN_VALIDITY_SECONDS = 25 * 60;
+
+export async function GET(request?: NextRequest) {
+  // `?minValiditySeconds=N`: renew now unless the access token outlives N
+  // seconds. An upload asks for this before it starts, so it never needs a
+  // refresh while its body is still arriving.
+  const minValidity = Number(request?.nextUrl.searchParams.get("minValiditySeconds") ?? 0);
+  if (Number.isFinite(minValidity) && minValidity > 0) {
+    let authenticated = false;
+    try {
+      authenticated = Boolean(
+        await ensureFreshAccessToken(Math.min(minValidity, MAX_MIN_VALIDITY_SECONDS)),
+      );
+    } catch {
+      authenticated = false; // outage, not an invalid session (see above)
+    }
+    return NextResponse.json(
+      { success: true, message: "Success", data: { authenticated } },
+      { headers: NO_STORE_HEADERS },
+    );
+  }
+
   const access = await getAccessToken();
   if (access) {
     return NextResponse.json(

@@ -12,6 +12,9 @@ export interface UploadOptions {
   signal?: AbortSignal;
 }
 
+/** Longer than any upload the server accepts (see server-timeouts.cjs). */
+const UPLOAD_MIN_TOKEN_VALIDITY_SECONDS = 20 * 60;
+
 function responseHeaders(xhr: XMLHttpRequest): Headers {
   const headers = new Headers();
   for (const line of xhr.getAllResponseHeaders().trim().split(/[\r\n]+/)) {
@@ -45,6 +48,12 @@ export async function uploadWithProgress<T>(
   options: UploadOptions = {},
 ): Promise<T> {
   const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
+  // The upload's request keeps the cookies it started with until the whole
+  // file has arrived, so start it with an access token that outlives it.
+  await fetch(`/api/auth/session?minValiditySeconds=${UPLOAD_MIN_TOKEN_VALIDITY_SECONDS}`, {
+    credentials: "same-origin",
+    cache: "no-store",
+  }).catch(() => undefined);
   const csrfToken = await ensureCsrfToken();
 
   return new Promise<T>((resolve, reject) => {
