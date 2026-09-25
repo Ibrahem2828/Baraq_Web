@@ -19,6 +19,8 @@ export function useSetupStudentProfile() {
     mutationFn: setupStudentProfile,
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.auth.studentProfile(), data);
+      // Choosing a stage creates a project per subject server-side.
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.all });
     },
   });
 }
@@ -29,6 +31,8 @@ export function useUpdateStudentProfile() {
     mutationFn: updateStudentProfile,
     onSuccess: (data) => {
       queryClient.setQueryData(queryKeys.auth.studentProfile(), data);
+      // Choosing a stage creates a project per subject server-side.
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.all });
     },
   });
 }
