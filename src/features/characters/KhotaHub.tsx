@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarDays, CalendarRange, ListChecks } from "lucide-react";
+import { CalendarDays, CalendarRange, ListChecks, Plus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useTodayPlan } from "@/features/study-plans/hooks/useStudyPlans";
 import { useStudyPlans } from "@/features/study-plans/hooks/useStudyPlans";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
+import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
+import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
 import type { CharacterDefinition } from "@/config/characters";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -28,20 +31,40 @@ import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
  */
 export function KhotaHub({ character }: { character: CharacterDefinition }) {
   const t = useTranslations();
-  const { projectId } = useActiveProject();
+  const { projectId, project } = useActiveProject();
   const today = useTodayPlan();
   const activePlans = useStudyPlans({ status: "active", project: projectId ?? undefined });
+  const startJob = useStartAIJob();
+  const [pickerOpen, setPickerOpen] = useState(false);
+  // The today/week pages are project-scoped too; keep the project in the URL.
+  const withProject = (href: string) => (projectId ? `${href}?project=${projectId}` : href);
+
+  // Khota could only be *viewed* here: there was no way to ask it for a plan,
+  // and "create your first plan" looped through /study-plans back to this page.
+  function handleScope(scope: SourceScope) {
+    startJob.start({ task_type: character.taskType, ...scope });
+  }
 
   return (
     <div>
       <PageHeader
         title={character.name}
         description={t("khota.hubSubtitle")}
-        actions={<CharacterAvatar character={character} size="lg" />}
+        actions={
+          <>
+            <CharacterAvatar character={character} size="lg" />
+            {projectId ? (
+              <Button onClick={() => setPickerOpen(true)} loading={startJob.isPending}>
+                <Plus className="size-4" aria-hidden="true" />
+                {t("khota.generate")}
+              </Button>
+            ) : null}
+          </>
+        }
       />
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Link href="/characters/khota/today">
+        <Link href={withProject("/characters/khota/today")}>
           <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
             <CalendarDays
               className="size-5 text-[color:var(--color-character-khota)]"
@@ -67,7 +90,7 @@ export function KhotaHub({ character }: { character: CharacterDefinition }) {
           </Card>
         </Link>
 
-        <Link href="/characters/khota/week">
+        <Link href={withProject("/characters/khota/week")}>
           <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
             <CalendarRange
               className="size-5 text-[color:var(--color-character-khota)]"
@@ -130,13 +153,23 @@ export function KhotaHub({ character }: { character: CharacterDefinition }) {
             title={t("khota.noActivePlans")}
             description={t("studyPlans.subtitle")}
             action={
-              <Button asChild>
-                <Link href="/study-plans">{t("khota.createFirstPlan")}</Link>
-              </Button>
+              projectId ? (
+                <Button onClick={() => setPickerOpen(true)}>{t("khota.createFirstPlan")}</Button>
+              ) : null
             }
           />
         )}
       </section>
+      {projectId && project ? (
+        <SourceScopePicker
+          open={pickerOpen}
+          onOpenChange={setPickerOpen}
+          projectId={projectId}
+          projectTitle={project.title}
+          confirmLabel={t("common.confirm")}
+          onConfirm={handleScope}
+        />
+      ) : null}
     </div>
   );
 }

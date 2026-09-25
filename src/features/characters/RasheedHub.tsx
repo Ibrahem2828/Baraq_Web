@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { useRecommendations } from "@/features/results/hooks/useResults";
-import { useCreateAIJob } from "@/features/ai-jobs/hooks/useAIJob";
+import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
 import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
 import type { CharacterDefinition } from "@/config/characters";
@@ -22,19 +22,15 @@ import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
 /** Rasheed's project-scoped hub: performance recommendations derived from this project's sources. */
 export function RasheedHub({ character }: { character: CharacterDefinition }) {
   const t = useTranslations();
-  const router = useRouter();
   const { projectId, project } = useActiveProject();
   const recommendations = useRecommendations({ project: projectId ?? undefined });
-  const createAIJob = useCreateAIJob();
+  const startJob = useStartAIJob();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   if (!projectId || !project) return null;
 
   function handleScope(scope: SourceScope) {
-    createAIJob.mutate(
-      { task_type: character.taskType, ...scope },
-      { onSuccess: (job) => router.push(`/ai-jobs/${job.public_id}`) },
-    );
+    startJob.start({ task_type: character.taskType, ...scope });
   }
 
   return (
@@ -45,7 +41,7 @@ export function RasheedHub({ character }: { character: CharacterDefinition }) {
         actions={
           <>
             <CharacterAvatar character={character} size="lg" />
-            <Button onClick={() => setPickerOpen(true)} loading={createAIJob.isPending}>
+            <Button onClick={() => setPickerOpen(true)} loading={startJob.isPending}>
               <Plus className="size-4" aria-hidden="true" />
               {t("rasheed.generate")}
             </Button>

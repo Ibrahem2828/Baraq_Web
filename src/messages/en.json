@@ -469,7 +469,8 @@
     "plansLink": "All plans",
     "activePlans": "Active plans",
     "noActivePlans": "No active plans yet",
-    "createFirstPlan": "Create your first plan with Khota"
+    "createFirstPlan": "Create your first plan with Khota",
+    "generate": "Create a study plan"
   },
   "fahes": {
     "hubSubtitle": "Your character for quizzes & assessment",

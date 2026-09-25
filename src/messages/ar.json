@@ -469,7 +469,8 @@
     "plansLink": "كل الخطط",
     "activePlans": "الخطط النشطة",
     "noActivePlans": "لا توجد خطط نشطة بعد",
-    "createFirstPlan": "أنشئ خطتك الأولى مع خُطى"
+    "createFirstPlan": "أنشئ خطتك الأولى مع خُطى",
+    "generate": "إنشاء خطة دراسة"
   },
   "fahes": {
     "hubSubtitle": "شخصيتك للاختبارات والتقييم",
