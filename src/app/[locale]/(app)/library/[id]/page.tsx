@@ -1,20 +1,14 @@
 "use client";
 
-import { use, useState } from "react";
+import { use } from "react";
 import { useTranslations } from "next-intl";
-import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/navigation";
 import {
   useSource,
   useProcessSource,
   useSourceCapabilities,
 } from "@/features/sources/hooks/useSources";
-import {
-  useSourceWithCharacter as postUseWithCharacter,
-  type UseWithCharacterInput,
-} from "@/features/sources/api/sourcesApi";
-import { CHARACTER_LIST, type CharacterKey } from "@/config/characters";
-import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
+import { CHARACTER_LIST } from "@/config/characters";
 import type { SourceStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
@@ -38,17 +32,6 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
   const source = useSource(id);
   const capabilities = useSourceCapabilities(id);
   const processSource = useProcessSource();
-  const errorMessage = useApiErrorMessage();
-  const [pendingCharacter, setPendingCharacter] = useState<CharacterKey | null>(null);
-
-  const useWithCharacter = useMutation({
-    mutationFn: (input: UseWithCharacterInput) => postUseWithCharacter(id, input),
-    onSuccess: (response) => {
-      if (response.ai_job?.public_id) {
-        router.push(`/ai-jobs/${response.ai_job.public_id}`);
-      }
-    },
-  });
 
   if (source.isPending) return <LoadingState label={t("common.loading")} />;
   if (source.isError || !source.data) {
@@ -127,11 +110,6 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
           />
         ) : (
           <div className="flex flex-col gap-3">
-            {useWithCharacter.isError ? (
-              <p role="alert" className="text-sm text-[color:var(--color-destructive)]">
-                {errorMessage(useWithCharacter.error)}
-              </p>
-            ) : null}
             <div className="flex flex-wrap gap-3">
               {CHARACTER_LIST.map((character) => {
                 const capability = capabilities.data[character.key];
@@ -171,17 +149,16 @@ export default function SourceDetailPage({ params }: { params: Promise<{ id: str
                     </div>
                   );
                 }
+                // One start flow: the character's page, with this source
+                // already selected and the learner's request box.
+                const query = new URLSearchParams({ source: String(data.id) });
+                if (data.project) query.set("project", data.project);
                 return (
                   <Button
                     key={character.key}
                     variant="secondary"
                     title={capability.message}
-                    loading={useWithCharacter.isPending && pendingCharacter === character.key}
-                    disabled={useWithCharacter.isPending && pendingCharacter !== character.key}
-                    onClick={() => {
-                      setPendingCharacter(character.key);
-                      useWithCharacter.mutate({ character: character.key });
-                    }}
+                    onClick={() => router.push(`/characters/${character.key}?${query.toString()}`)}
                   >
                     {t(`characters.${character.key}.name`)}
                   </Button>

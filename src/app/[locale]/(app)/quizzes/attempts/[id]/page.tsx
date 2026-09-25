@@ -203,6 +203,73 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
                 {t("common.back")}
               </Button>
             </Card>
+
+            {result.data.answers.length > 0 ? (
+              <section aria-labelledby="quiz-review" className="mt-6">
+                <h2 id="quiz-review" className="mb-3 text-lg font-bold text-[color:var(--color-ink)]">
+                  {t("quizzes.result.review")}
+                </h2>
+                <ol className="flex flex-col gap-3">
+                  {[...result.data.answers]
+                    .sort((a, b) => a.order - b.order)
+                    .map((answer, index) => (
+                      <li key={answer.question_id}>
+                        <Card
+                          className={
+                            answer.is_correct
+                              ? "border-[color:var(--color-success)]/40"
+                              : "border-[color:var(--color-destructive)]/40"
+                          }
+                        >
+                          <div className="mb-2 flex items-start justify-between gap-3">
+                            <p className="text-sm font-semibold leading-7 text-[color:var(--color-ink)]">
+                              <span className="me-2 text-[color:var(--color-ink-faint)]">
+                                {t("quizzes.result.questionN", { n: index + 1 })}
+                              </span>
+                              {answer.text}
+                            </p>
+                            <Badge variant={answer.is_correct ? "success" : "destructive"}>
+                              {answer.is_correct ? t("quizzes.result.correct") : t("quizzes.result.wrong")}
+                            </Badge>
+                          </div>
+                          <dl className="flex flex-col gap-1.5 text-sm">
+                            <div className="flex flex-wrap gap-2">
+                              <dt className="text-[color:var(--color-ink-faint)]">
+                                {t("quizzes.result.yourAnswer")}:
+                              </dt>
+                              <dd className="text-[color:var(--color-ink)]">
+                                {answer.selected_choice?.text ||
+                                  answer.text_answer ||
+                                  t("quizzes.result.noAnswer")}
+                              </dd>
+                            </div>
+                            {!answer.is_correct && answer.correct_choice ? (
+                              <div className="flex flex-wrap gap-2">
+                                <dt className="text-[color:var(--color-ink-faint)]">
+                                  {t("quizzes.result.correctAnswer")}:
+                                </dt>
+                                <dd className="font-semibold text-[color:var(--color-success)]">
+                                  {answer.correct_choice.text}
+                                </dd>
+                              </div>
+                            ) : null}
+                            {answer.explanation ? (
+                              <div className="mt-1 rounded-[var(--radius-md)] bg-[color:var(--color-bg-soft)] px-3 py-2">
+                                <dt className="text-xs font-semibold text-[color:var(--color-ink)]">
+                                  {t("quizzes.result.explanation")}
+                                </dt>
+                                <dd className="leading-6 text-[color:var(--color-ink-soft)]">
+                                  {answer.explanation}
+                                </dd>
+                              </div>
+                            ) : null}
+                          </dl>
+                        </Card>
+                      </li>
+                    ))}
+                </ol>
+              </section>
+            ) : null}
           </FadeIn>
         )}
       </div>

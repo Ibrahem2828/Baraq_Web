@@ -1,33 +1,45 @@
 "use client";
 
-import { use } from "react";
-import { useTranslations } from "next-intl";
-import { CheckCircle2, Circle, SkipForward } from "lucide-react";
-import {
-  useStudyPlan,
-  useCompleteTask,
-  useSkipTask,
-  useReopenTask,
-} from "@/features/study-plans/hooks/useStudyPlans";
+import { use, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { CalendarDays, Clock } from "lucide-react";
+import { useStudyPlan } from "@/features/study-plans/hooks/useStudyPlans";
+import { TaskRow } from "@/features/study-plans/TaskRow";
+import type { StudyTask } from "@/types/domain";
 import { OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Progress } from "@/components/ui/Progress";
-import { IconButton } from "@/components/ui/IconButton";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { isApiError } from "@/lib/api/errors";
-import { cn } from "@/lib/utils/cn";
+
+/** Tasks grouped by day, days and tasks in plan order. */
+function byDay(tasks: StudyTask[]): Array<[string, StudyTask[]]> {
+  const days = new Map<string, StudyTask[]>();
+  for (const task of [...tasks].sort((a, b) => a.task_date.localeCompare(b.task_date) || a.order - b.order)) {
+    days.set(task.task_date, [...(days.get(task.task_date) ?? []), task]);
+  }
+  return [...days.entries()];
+}
 
 export default function StudyPlanDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const t = useTranslations();
+  const locale = useLocale();
   const plan = useStudyPlan(id);
-  const completeTask = useCompleteTask();
-  const skipTask = useSkipTask();
-  const reopenTask = useReopenTask();
+  const days = useMemo(() => byDay(plan.data?.tasks ?? []), [plan.data?.tasks]);
+  const dayLabel = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }),
+    [locale],
+  );
+  const shortDate = useMemo(
+    () => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }),
+    [locale],
+  );
+  const asDate = (value: string) => new Date(`${value}T00:00:00`);
 
   if (plan.isPending) return <LoadingState label={t("common.loading")} />;
   if (plan.isError || !plan.data) {
@@ -41,7 +53,6 @@ export default function StudyPlanDetailPage({ params }: { params: Promise<{ id: 
   }
 
   const data = plan.data;
-  const tasks = data.tasks ?? [];
 
   return (
     <div>
@@ -56,7 +67,24 @@ export default function StudyPlanDetailPage({ params }: { params: Promise<{ id: 
         }
       />
 
-      <Card className="mb-6">
+      <Card className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[color:var(--color-ink-soft)]">
+          {data.start_date && data.end_date ? (
+            <span className="flex items-center gap-2">
+              <CalendarDays className="size-4" aria-hidden="true" />
+              {t("studyPlans.planPeriod", {
+                start: shortDate.format(asDate(data.start_date)),
+                end: shortDate.format(asDate(data.end_date)),
+              })}
+            </span>
+          ) : null}
+          {data.daily_study_minutes ? (
+            <span className="flex items-center gap-2">
+              <Clock className="size-4" aria-hidden="true" />
+              {t("studyPlans.dailyMinutes")}: {t("studyPlans.minutesShort", { count: data.daily_study_minutes })}
+            </span>
+          ) : null}
+        </div>
         <Progress
           value={data.completed_tasks}
           max={Math.max(data.total_tasks, 1)}
@@ -71,74 +99,33 @@ export default function StudyPlanDetailPage({ params }: { params: Promise<{ id: 
         {t("studyPlans.tasks")}
       </h2>
 
-      {tasks.length === 0 ? (
+      {days.length === 0 ? (
         <EmptyState
           title={t("emptyStates.generic.title")}
           description={t("emptyStates.generic.description")}
         />
       ) : (
-        <Card className="p-0">
-          <ul>
-            {tasks.map((task) => (
-              <li
-                key={task.id}
-                className="flex items-center gap-3 border-b border-[color:var(--color-border)] px-5 py-4 last:border-0"
-              >
-                <IconButton
-                  aria-label={t("common.confirm")}
-                  size="sm"
-                  onClick={() => completeTask.mutate(task.id)}
-                  disabled={task.status === "completed" || completeTask.isPending}
-                >
-                  {task.status === "completed" ? (
-                    <CheckCircle2
-                      className="size-5 text-[color:var(--color-success)]"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Circle
-                      className="size-5 text-[color:var(--color-ink-faint)]"
-                      aria-hidden="true"
-                    />
-                  )}
-                </IconButton>
-                <div className="flex-1">
-                  <p
-                    className={cn(
-                      "text-sm text-[color:var(--color-ink)]",
-                      task.status === "completed" &&
-                        "text-[color:var(--color-ink-faint)] line-through",
-                    )}
-                  >
-                    {task.title}
-                  </p>
-                  <p className="text-xs text-[color:var(--color-ink-faint)]">
-                    {task.task_date} · {task.estimated_minutes}m
-                  </p>
-                </div>
-                <Badge variant="neutral">{t(`studyPlans.taskStatus.${task.status}`)}</Badge>
-                {task.status === "pending" || task.status === "in_progress" ? (
-                  <IconButton
-                    aria-label={t("common.skip")}
-                    size="sm"
-                    onClick={() => skipTask.mutate(task.id)}
-                    disabled={skipTask.isPending}
-                  >
-                    <SkipForward className="size-4" aria-hidden="true" />
-                  </IconButton>
-                ) : task.status === "skipped" ? (
-                  <button
-                    type="button"
-                    onClick={() => reopenTask.mutate(task.id)}
-                    className="text-xs font-medium text-[color:var(--color-accent)]"
-                  >
-                    {t("common.retry")}
-                  </button>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <div className="flex flex-col gap-4">
+          {days.map(([date, tasks]) => (
+            <section key={date} aria-label={dayLabel.format(asDate(date))}>
+              <h3 className="mb-2 text-sm font-bold text-[color:var(--color-ink)]">
+                {dayLabel.format(asDate(date))}
+                <span className="ms-2 text-xs font-normal text-[color:var(--color-ink-faint)]">
+                  {t("studyPlans.minutesShort", {
+                    count: tasks.reduce((sum, task) => sum + task.estimated_minutes, 0),
+                  })}
+                </span>
+              </h3>
+              <Card className="p-0">
+                <ul>
+                  {tasks.map((task) => (
+                    <TaskRow key={task.id} task={task} showDetails />
+                  ))}
+                </ul>
+              </Card>
+            </section>
+          ))}
+        </div>
       )}
     </div>
   );

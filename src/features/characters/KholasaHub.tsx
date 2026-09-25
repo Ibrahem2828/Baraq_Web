@@ -1,22 +1,22 @@
 "use client";
 
+import { SummaryCards } from "@/features/results/components/ResultCards";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
-import { Link } from "@/i18n/navigation";
 import { useSummaries } from "@/features/results/hooks/useResults";
 import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
 import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
+import type { AIRequestInput } from "@/features/ai-jobs/components/AIRequestFields";
 import type { CharacterDefinition } from "@/config/characters";
+import { usePreselectedSource } from "./usePreselectedSource";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
 
 /** Kholasa's project-scoped hub: every summary produced from this project's sources. */
 export function KholasaHub({ character }: { character: CharacterDefinition }) {
@@ -24,12 +24,13 @@ export function KholasaHub({ character }: { character: CharacterDefinition }) {
   const { projectId, project } = useActiveProject();
   const summaries = useSummaries({ project: projectId ?? undefined });
   const startJob = useStartAIJob();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const preselected = usePreselectedSource();
+  const [pickerOpen, setPickerOpen] = useState(preselected !== null);
 
   if (!projectId || !project) return null;
 
-  function handleScope(scope: SourceScope) {
-    startJob.start({ task_type: character.taskType, ...scope });
+  function handleScope(scope: SourceScope, input: AIRequestInput) {
+    startJob.start({ task_type: character.taskType, ...scope, input: { ...input } });
   }
 
   return (
@@ -63,30 +64,17 @@ export function KholasaHub({ character }: { character: CharacterDefinition }) {
           action={<Button onClick={() => setPickerOpen(true)}>{t("kholasa.generate")}</Button>}
         />
       ) : (
-        <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {summaries.data.items.map((summary) => (
-            <StaggerItem key={summary.id}>
-              <Link href={`/summaries/${summary.id}`} className="block h-full">
-                <Card className="flex h-full flex-col gap-3 transition-colors hover:border-[color:var(--color-border-strong)]">
-                  <h3 className="text-base font-bold text-[color:var(--color-ink)]">
-                    {summary.title}
-                  </h3>
-                  <p className="line-clamp-4 text-sm text-[color:var(--color-ink-soft)]">
-                    {summary.short_summary}
-                  </p>
-                </Card>
-              </Link>
-            </StaggerItem>
-          ))}
-        </StaggerIn>
+        <SummaryCards items={summaries.data.items} />
       )}
 
       <SourceScopePicker
         open={pickerOpen}
         onOpenChange={setPickerOpen}
+        initialSelection={preselected ? [preselected] : undefined}
         projectId={projectId}
         projectTitle={project.title}
-        confirmLabel={t("common.confirm")}
+        confirmLabel={t("aiRequest.start")}
+        request={{ character: "kholasa", summaryLength: true }}
         onConfirm={handleScope}
       />
     </div>

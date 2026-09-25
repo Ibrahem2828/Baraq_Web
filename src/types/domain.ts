@@ -385,6 +385,8 @@ export interface AIJob {
   error_message: string | null;
   /** Present on the detail read (`GET /ai/jobs/{id}/`), omitted from the list. */
   result_payload?: unknown;
+  /** What the job was asked (source ids, the learner's instructions...). */
+  input_payload?: { instructions?: string; learner_goal?: string; [key: string]: unknown };
   provider_account?: string;
   model_name?: string;
   input_tokens?: number;
@@ -395,6 +397,18 @@ export interface AIJob {
   created_at: string;
   updated_at: string;
   completed_at: string | null;
+}
+
+export type RecommendationPriority = "now" | "this_week" | "later";
+
+/** One Rasheed recommendation, as the AI service produces it. */
+export interface RasheedRecommendationItem {
+  title: string;
+  action: string;
+  reason: string;
+  priority: RecommendationPriority;
+  success_measure: string;
+  related_topics: string[];
 }
 
 export interface StudentRecommendation {
@@ -408,7 +422,8 @@ export interface StudentRecommendation {
   overall_score: string | null;
   strengths: string[];
   weaknesses: string[];
-  recommendations: string[];
+  /** Rasheed's structured recommendations (older rows may hold plain strings). */
+  recommendations: Array<RasheedRecommendationItem | string>;
   /**
    * The backend's `next_best_action` is a Django `JSONField(default=dict)` —
    * genuinely a freeform object, not a string. Confirmed live in Phase 2.5
@@ -417,7 +432,7 @@ export interface StudentRecommendation {
    * valid as a React child" crash on the recommendation detail page, which
    * rendered this field directly assuming it was plain text.
    */
-  next_best_action: Record<string, unknown> | null;
+  next_best_action: { label?: string; confidence_note?: string; [key: string]: unknown } | null;
   /** Also a freeform `JSONField(default=dict)` on the backend. */
   source_metrics: Record<string, unknown>;
   is_read: boolean;
@@ -438,6 +453,8 @@ export interface Summary {
   important_terms: string[];
   covered_topics: string[];
   review_questions: string[];
+  /** Kholasa's study cards; absent on summaries made before they were stored. */
+  flashcards?: Array<{ front: string; back: string }>;
   source_references?: string[];
   /** Decimal, serialized as a string. */
   quality_score: string | null;

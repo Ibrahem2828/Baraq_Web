@@ -8,7 +8,9 @@ import { useQuizzes } from "@/features/quizzes/hooks/useQuizzes";
 import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
 import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
+import type { AIRequestInput } from "@/features/ai-jobs/components/AIRequestFields";
 import type { CharacterDefinition } from "@/config/characters";
+import { usePreselectedSource } from "./usePreselectedSource";
 import type { QuizStatus } from "@/types/domain";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -32,13 +34,14 @@ export function FahesHub({ character }: { character: CharacterDefinition }) {
   const { projectId, project } = useActiveProject();
   const quizzes = useQuizzes({ project: projectId ?? undefined });
   const startJob = useStartAIJob();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const preselected = usePreselectedSource();
+  const [pickerOpen, setPickerOpen] = useState(preselected !== null);
 
   // RequireProject already guarantees this, but keep the component safe on its own.
   if (!projectId || !project) return null;
 
-  function handleScope(scope: SourceScope) {
-    startJob.start({ task_type: character.taskType, ...scope });
+  function handleScope(scope: SourceScope, input: AIRequestInput) {
+    startJob.start({ task_type: character.taskType, ...scope, input: { ...input } });
   }
 
   return (
@@ -98,9 +101,11 @@ export function FahesHub({ character }: { character: CharacterDefinition }) {
       <SourceScopePicker
         open={pickerOpen}
         onOpenChange={setPickerOpen}
+        initialSelection={preselected ? [preselected] : undefined}
         projectId={projectId}
         projectTitle={project.title}
-        confirmLabel={t("common.confirm")}
+        confirmLabel={t("aiRequest.start")}
+        request={{ character: "fahes", quizOptions: true }}
         onConfirm={handleScope}
       />
     </div>

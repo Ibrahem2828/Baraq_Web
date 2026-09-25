@@ -140,7 +140,8 @@
   "home": {
     "greeting": "Welcome",
     "todayTasks": "Today's tasks",
-    "quickActions": "Quick actions"
+    "quickActions": "Quick actions",
+    "subtitle": "Today's tasks and your AI characters in one place"
   },
   "emptyStates": {
     "generic": {
@@ -299,6 +300,29 @@
       "sourcesCount": "{count} sources"
     }
   },
+  "aiRequest": {
+    "label": "Your request (optional)",
+    "counter": "{count} / {max}",
+    "hint": {
+      "fahes": "e.g. Focus on unit 2 and make the questions applied",
+      "kholasa": "e.g. Summarize unit 1 only, in short points",
+      "khota": "e.g. A plan for unit 2 only, with a review on the last day",
+      "rasheed": "e.g. I want to raise my physics grade before the exam"
+    },
+    "help": "Say clearly what you want: a unit, a lesson or a style. The assistant follows it within your sources only.",
+    "questionCount": "Number of questions",
+    "difficulty": "Level",
+    "difficultyAuto": "Balanced (automatic)",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "summaryLength": "Summary length",
+    "short": "Short",
+    "detailed": "Detailed",
+    "rasheedTitle": "What is your goal right now?",
+    "rasheedDescription": "Rasheed analyses your quiz results and suggests practical steps. Tell him your goal so he focuses on it.",
+    "start": "Start"
+  },
   "sourceScope": {
     "title": "Choose the source scope",
     "selectedCount": "Selected sources: {selected} of {total}",
@@ -425,7 +449,9 @@
         "generating": "Analysing strengths and weaknesses…",
         "validating": "Reviewing the recommendations…"
       }
-    }
+    },
+    "openResult": "Open the result",
+    "yourRequest": "Your request"
   },
   "studyPlans": {
     "title": "Study Plans",
@@ -466,7 +492,14 @@
       "title": "Week plan",
       "range": "{start} – {end}",
       "emptyDay": "No tasks"
-    }
+    },
+    "minutesShort": "{count} min",
+    "priority": {
+      "low": "Low priority",
+      "medium": "Medium priority",
+      "high": "High priority"
+    },
+    "planPeriod": "{start} → {end}"
   },
   "khota": {
     "hubSubtitle": "Your study-planning companion",
@@ -524,7 +557,13 @@
       "correct": "Correct answers",
       "wrong": "Wrong answers",
       "unanswered": "Unanswered",
-      "recommendations": "Recommendations"
+      "recommendations": "Recommendations",
+      "review": "Answer review",
+      "yourAnswer": "Your answer",
+      "correctAnswer": "Correct answer",
+      "noAnswer": "Not answered",
+      "explanation": "Explanation",
+      "questionN": "Question {n}"
     }
   },
   "recommendations": {
@@ -535,14 +574,32 @@
     "strengths": "Strengths",
     "weaknesses": "Weaknesses",
     "recommendationsList": "Recommendations",
-    "nextAction": "Next best action"
+    "nextAction": "Next best action",
+    "priority": {
+      "now": "Now",
+      "this_week": "This week",
+      "later": "Later"
+    },
+    "step": "Step",
+    "why": "Why",
+    "successMeasure": "Success measure",
+    "relatedTopics": "Related to",
+    "noScore": "No quiz results yet — the analysis gets sharper after your first two quizzes.",
+    "confidence": "Confidence",
+    "scoreOutOf": "{score}%"
   },
   "summaries": {
     "title": "Summaries",
     "subtitle": "Kholasa's smart summaries of your sources",
     "keyPoints": "Key points",
     "importantTerms": "Important terms",
-    "reviewQuestions": "Review questions"
+    "reviewQuestions": "Review questions",
+    "flashcards": "Flashcards",
+    "flashcardHint": "Tap a card to reveal the answer",
+    "showAnswer": "Show answer",
+    "showQuestion": "Show question",
+    "coveredTopics": "Topics covered",
+    "detailed": "Detailed summary"
   },
   "relatedArtifacts": {
     "openSource": "Open original source",

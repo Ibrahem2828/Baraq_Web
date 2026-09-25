@@ -1,12 +1,13 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSummary } from "@/features/results/hooks/useResults";
 import { OpenSourceLink, OpenProjectLink } from "@/features/results/components/RelatedArtifactLinks";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
+import { StructuredText } from "@/components/content/StructuredText";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 
@@ -42,13 +43,21 @@ export default function SummaryDetailPage({ params }: { params: Promise<{ id: st
       />
 
       <div className="flex flex-col gap-6">
+        {data.covered_topics.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2" aria-label={t("summaries.coveredTopics")}>
+            {data.covered_topics.map((topic, index) => (
+              <Chip key={index} tabIndex={-1} className="pointer-events-none">
+                {topic}
+              </Chip>
+            ))}
+          </div>
+        ) : null}
+
         <Card>
-          <h3 className="mb-2 text-base font-bold text-[color:var(--color-ink)]">
-            {t("summaries.title")}
-          </h3>
-          <p className="text-sm leading-relaxed whitespace-pre-line text-[color:var(--color-ink-soft)]">
-            {data.detailed_summary}
-          </p>
+          <h2 className="mb-3 text-base font-bold text-[color:var(--color-ink)]">
+            {t("summaries.detailed")}
+          </h2>
+          <StructuredText text={data.detailed_summary} />
         </Card>
 
         {data.key_points.length > 0 ? (
@@ -85,6 +94,24 @@ export default function SummaryDetailPage({ params }: { params: Promise<{ id: st
           </Card>
         ) : null}
 
+        {data.flashcards && data.flashcards.length > 0 ? (
+          <Card>
+            <h3 className="mb-1 text-base font-bold text-[color:var(--color-ink)]">
+              {t("summaries.flashcards")}
+            </h3>
+            <p className="mb-3 text-xs text-[color:var(--color-ink-faint)]">
+              {t("summaries.flashcardHint")}
+            </p>
+            <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {data.flashcards.map((card, index) => (
+                <li key={index}>
+                  <Flashcard front={card.front} back={card.back} />
+                </li>
+              ))}
+            </ul>
+          </Card>
+        ) : null}
+
         {data.review_questions.length > 0 ? (
           <Card>
             <h3 className="mb-3 text-base font-bold text-[color:var(--color-ink)]">
@@ -101,5 +128,27 @@ export default function SummaryDetailPage({ params }: { params: Promise<{ id: st
         ) : null}
       </div>
     </div>
+  );
+}
+
+/** One study card: the question until the learner asks for the answer. */
+function Flashcard({ front, back }: { front: string; back: string }) {
+  const t = useTranslations("summaries");
+  const [revealed, setRevealed] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={() => setRevealed((value) => !value)}
+      aria-pressed={revealed}
+      aria-label={revealed ? t("showQuestion") : t("showAnswer")}
+      className="flex min-h-28 w-full flex-col justify-center gap-2 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-bg-soft)] p-4 text-start transition-colors hover:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
+    >
+      <span className="text-sm font-semibold text-[color:var(--color-ink)]">{front}</span>
+      {revealed ? (
+        <span className="text-sm leading-6 text-[color:var(--color-accent)]">{back}</span>
+      ) : (
+        <span className="text-xs text-[color:var(--color-ink-faint)]">{t("showAnswer")}</span>
+      )}
+    </button>
   );
 }

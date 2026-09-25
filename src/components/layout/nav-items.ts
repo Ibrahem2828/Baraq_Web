@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Home,
-  Sparkles,
   Library,
   CalendarCheck,
   ListChecks,
@@ -27,9 +26,10 @@ export interface NavItem {
 /** Central nav route contract — mirrors the mobile app's bottom tabs + app stack grouping. */
 // `primary` mirrors the mobile app's 5 bottom tabs exactly (MainTabNavigator.tsx):
 // Home, Plans (Study Plans), Quizzes, Library (Sources), Account (Settings).
+// The characters live on Home (one grid, see CharacterGrid); a separate
+// "Characters" entry opened the same grid a second time.
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", labelKey: "nav.home", icon: Home, primary: true },
-  { href: "/characters", labelKey: "nav.characters", icon: Sparkles },
   { href: "/library", labelKey: "nav.library", icon: Library, primary: true },
   { href: "/study-plans", labelKey: "nav.studyPlans", icon: CalendarCheck, primary: true },
   { href: "/quizzes", labelKey: "nav.quizzes", icon: ListChecks, primary: true },

@@ -140,7 +140,8 @@
   "home": {
     "greeting": "أهلًا بك",
     "todayTasks": "مهام اليوم",
-    "quickActions": "إجراءات سريعة"
+    "quickActions": "إجراءات سريعة",
+    "subtitle": "مهام اليوم وشخصياتك الذكية في مكان واحد"
   },
   "emptyStates": {
     "generic": {
@@ -299,6 +300,29 @@
       "sourcesCount": "{count} مصدر"
     }
   },
+  "aiRequest": {
+    "label": "طلبك (اختياري)",
+    "counter": "{count} / {max}",
+    "hint": {
+      "fahes": "مثال: ركّز على الوحدة الثانية واجعل الأسئلة تطبيقية",
+      "kholasa": "مثال: لخّص الوحدة الأولى فقط بنقاط مختصرة",
+      "khota": "مثال: خطة للوحدة الثانية فقط مع مراجعة في آخر يوم",
+      "rasheed": "مثال: أريد رفع درجتي في الفيزياء قبل الامتحان"
+    },
+    "help": "اكتب ما تريد بوضوح: الوحدة أو الدرس أو الأسلوب. سيلتزم به المساعد ضمن محتوى مصادرك فقط.",
+    "questionCount": "عدد الأسئلة",
+    "difficulty": "المستوى",
+    "difficultyAuto": "متوازن (تلقائي)",
+    "easy": "سهل",
+    "medium": "متوسط",
+    "hard": "صعب",
+    "summaryLength": "طول الملخص",
+    "short": "قصير",
+    "detailed": "مفصّل",
+    "rasheedTitle": "ما هدفك الآن؟",
+    "rasheedDescription": "يحلّل رشيد نتائج اختباراتك ويقترح خطوات عملية. أخبره بهدفك ليركّز عليه.",
+    "start": "ابدأ"
+  },
   "sourceScope": {
     "title": "اختر نطاق المصادر",
     "selectedCount": "المصادر المختارة: {selected} من {total}",
@@ -425,7 +449,9 @@
         "generating": "جارٍ تحليل نقاط القوة والضعف…",
         "validating": "جارٍ مراجعة التوصيات…"
       }
-    }
+    },
+    "openResult": "عرض النتيجة",
+    "yourRequest": "طلبك"
   },
   "studyPlans": {
     "title": "خطط الدراسة",
@@ -466,7 +492,14 @@
       "title": "خطة الأسبوع",
       "range": "{start} – {end}",
       "emptyDay": "لا مهام"
-    }
+    },
+    "minutesShort": "{count} د",
+    "priority": {
+      "low": "أولوية منخفضة",
+      "medium": "أولوية متوسطة",
+      "high": "أولوية عالية"
+    },
+    "planPeriod": "{start} ← {end}"
   },
   "khota": {
     "hubSubtitle": "رفيقك في التخطيط الدراسي",
@@ -524,7 +557,13 @@
       "correct": "إجابات صحيحة",
       "wrong": "إجابات خاطئة",
       "unanswered": "بدون إجابة",
-      "recommendations": "توصيات"
+      "recommendations": "توصيات",
+      "review": "مراجعة الإجابات",
+      "yourAnswer": "إجابتك",
+      "correctAnswer": "الإجابة الصحيحة",
+      "noAnswer": "لم تُجب",
+      "explanation": "الشرح",
+      "questionN": "السؤال {n}"
     }
   },
   "recommendations": {
@@ -535,14 +574,32 @@
     "strengths": "نقاط القوة",
     "weaknesses": "نقاط الضعف",
     "recommendationsList": "التوصيات",
-    "nextAction": "الخطوة التالية"
+    "nextAction": "الخطوة التالية",
+    "priority": {
+      "now": "الآن",
+      "this_week": "هذا الأسبوع",
+      "later": "لاحقًا"
+    },
+    "step": "الخطوة",
+    "why": "السبب",
+    "successMeasure": "مؤشر النجاح",
+    "relatedTopics": "مرتبط بـ",
+    "noScore": "لا توجد نتائج اختبارات بعد — سيصبح التحليل أدق بعد أول اختبارين.",
+    "confidence": "مستوى الثقة",
+    "scoreOutOf": "{score}٪"
   },
   "summaries": {
     "title": "الملخصات",
     "subtitle": "ملخصات خُلاصة الذكية لمصادرك",
     "keyPoints": "النقاط الرئيسية",
     "importantTerms": "المصطلحات المهمة",
-    "reviewQuestions": "أسئلة المراجعة"
+    "reviewQuestions": "أسئلة المراجعة",
+    "flashcards": "بطاقات المراجعة",
+    "flashcardHint": "اضغط البطاقة لإظهار الإجابة",
+    "showAnswer": "إظهار الإجابة",
+    "showQuestion": "إظهار السؤال",
+    "coveredTopics": "الموضوعات المشمولة",
+    "detailed": "الملخص المفصّل"
   },
   "relatedArtifacts": {
     "openSource": "افتح المصدر الأصلي",

@@ -11,6 +11,14 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { cn } from "@/lib/utils/cn";
+import {
+  AIRequestFields,
+  EMPTY_AI_REQUEST,
+  toAIRequestInput,
+  type AIRequestDraft,
+  type AIRequestFieldsConfig,
+  type AIRequestInput,
+} from "@/features/ai-jobs/components/AIRequestFields";
 
 /**
  * How an AI request names the material it should use.
@@ -27,10 +35,9 @@ export type SourceScope = { source: number } | { collection: number } | { source
  * source list query is hard-scoped to `projectId` — there is no control here
  * that could ever list or select a source from a different project.
  *
- * The backend only accepts one `source` OR one `collection` per AI job (never
- * a list of source ids), so selecting more than one source here funnels
- * through the existing collection mechanism: pick an existing collection or
- * create one, then bulk-assign the selected sources into it.
+ * One source is sent as `source`, several as `source_ids` (an ephemeral
+ * selection recorded on the job). With `request`, the learner can also say
+ * what they want ("focus on unit two", a level, a length).
  */
 export function SourceScopePicker({
   open,
@@ -40,6 +47,8 @@ export function SourceScopePicker({
   sourceType,
   singleSelectOnly = false,
   confirmLabel,
+  request,
+  initialSelection,
   onConfirm,
 }: {
   open: boolean;
@@ -51,14 +60,20 @@ export function SourceScopePicker({
   /** Sada's backend rejects a collection scope outright — exactly one source only, no multi-select/grouping UI. */
   singleSelectOnly?: boolean;
   confirmLabel: string;
-  onConfirm: (scope: SourceScope) => void;
+  /** The learner's request (focus, level...) sent with the job, when the character takes one. */
+  request?: AIRequestFieldsConfig;
+  /** Sources selected when the picker first opens (e.g. from a source's page). */
+  initialSelection?: number[];
+  onConfirm: (scope: SourceScope, input: AIRequestInput) => void;
 }) {
   const t = useTranslations();
   const sources = useSources({ project: projectId, source_type: sourceType });
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selected, setSelected] = useState<Set<number>>(() => new Set(initialSelection ?? []));
+  const [draft, setDraft] = useState<AIRequestDraft>(EMPTY_AI_REQUEST);
 
   function reset() {
     setSelected(new Set());
+    setDraft(EMPTY_AI_REQUEST);
   }
 
   function toggle(id: number) {
@@ -77,12 +92,13 @@ export function SourceScopePicker({
   function handleConfirm() {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
+    const input = request ? toAIRequestInput(draft, request) : {};
     onOpenChange(false);
     reset();
     // One source still uses the singular form the backend has always
     // accepted; several travel as an explicit selection that changes nothing
     // in the library.
-    onConfirm(ids.length === 1 ? { source: ids[0] } : { source_ids: ids });
+    onConfirm(ids.length === 1 ? { source: ids[0] } : { source_ids: ids }, input);
   }
 
   // A source outside these states is rejected by the backend for every
@@ -171,6 +187,10 @@ export function SourceScopePicker({
             })}
           </ul>
         )}
+
+        {request && total > 0 ? (
+          <AIRequestFields config={request} value={draft} onChange={setDraft} />
+        ) : null}
       </div>
     </Modal>
   );

@@ -1,23 +1,21 @@
 "use client";
 
+import { RecommendationCards } from "@/features/results/components/ResultCards";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
-import { Link } from "@/i18n/navigation";
 import { useRecommendations } from "@/features/results/hooks/useResults";
 import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
-import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
+import type { AIRequestInput } from "@/features/ai-jobs/components/AIRequestFields";
+import { RasheedGoalDialog } from "./RasheedGoalDialog";
 import type { CharacterDefinition } from "@/config/characters";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
-import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
 
 /** Rasheed's project-scoped hub: performance recommendations derived from this project's sources. */
 export function RasheedHub({ character }: { character: CharacterDefinition }) {
@@ -29,8 +27,9 @@ export function RasheedHub({ character }: { character: CharacterDefinition }) {
 
   if (!projectId || !project) return null;
 
-  function handleScope(scope: SourceScope) {
-    startJob.start({ task_type: character.taskType, ...scope });
+  function handleGoal(input: AIRequestInput) {
+    // Rasheed works from the learner's results in this project, not sources.
+    startJob.start({ task_type: character.taskType, project: projectId ?? undefined, input: { ...input } });
   }
 
   return (
@@ -64,42 +63,14 @@ export function RasheedHub({ character }: { character: CharacterDefinition }) {
           action={<Button onClick={() => setPickerOpen(true)}>{t("rasheed.generate")}</Button>}
         />
       ) : (
-        <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {recommendations.data.items.map((recommendation) => (
-            <StaggerItem key={recommendation.id}>
-              <Link href={`/recommendations/${recommendation.id}`} className="block h-full">
-                <Card className="flex h-full flex-col gap-3 transition-colors hover:border-[color:var(--color-border-strong)]">
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-base font-bold text-[color:var(--color-ink)]">
-                      {recommendation.title}
-                    </h3>
-                    {!recommendation.is_read ? (
-                      <span
-                        className="mt-1.5 size-2 shrink-0 rounded-full bg-[color:var(--color-accent-solid)]"
-                        aria-label={t("notifications.markRead")}
-                      />
-                    ) : null}
-                  </div>
-                  <p className="line-clamp-3 text-sm text-[color:var(--color-ink-soft)]">
-                    {recommendation.summary}
-                  </p>
-                  <Badge variant="accent" className="mt-auto w-fit">
-                    {t("recommendations.overallScore")}: {recommendation.overall_score}
-                  </Badge>
-                </Card>
-              </Link>
-            </StaggerItem>
-          ))}
-        </StaggerIn>
+        <RecommendationCards items={recommendations.data.items} />
       )}
 
-      <SourceScopePicker
+      <RasheedGoalDialog
         open={pickerOpen}
         onOpenChange={setPickerOpen}
-        projectId={projectId}
-        projectTitle={project.title}
-        confirmLabel={t("common.confirm")}
-        onConfirm={handleScope}
+        loading={startJob.isPending}
+        onConfirm={handleGoal}
       />
     </div>
   );

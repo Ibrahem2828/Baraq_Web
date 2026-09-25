@@ -9,7 +9,9 @@ import { useStudyPlans } from "@/features/study-plans/hooks/useStudyPlans";
 import { useActiveProject } from "@/features/projects/ActiveProjectContext";
 import { useStartAIJob } from "@/features/ai-jobs/hooks/useStartAIJob";
 import { SourceScopePicker, type SourceScope } from "@/features/sources/components/SourceScopePicker";
+import type { AIRequestInput } from "@/features/ai-jobs/components/AIRequestFields";
 import type { CharacterDefinition } from "@/config/characters";
+import { usePreselectedSource } from "./usePreselectedSource";
 import { CharacterAvatar } from "@/components/brand/CharacterAvatar";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -35,14 +37,15 @@ export function KhotaHub({ character }: { character: CharacterDefinition }) {
   const today = useTodayPlan();
   const activePlans = useStudyPlans({ status: "active", project: projectId ?? undefined });
   const startJob = useStartAIJob();
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const preselected = usePreselectedSource();
+  const [pickerOpen, setPickerOpen] = useState(preselected !== null);
   // The today/week pages are project-scoped too; keep the project in the URL.
   const withProject = (href: string) => (projectId ? `${href}?project=${projectId}` : href);
 
   // Khota could only be *viewed* here: there was no way to ask it for a plan,
   // and "create your first plan" looped through /study-plans back to this page.
-  function handleScope(scope: SourceScope) {
-    startJob.start({ task_type: character.taskType, ...scope });
+  function handleScope(scope: SourceScope, input: AIRequestInput) {
+    startJob.start({ task_type: character.taskType, ...scope, input: { ...input } });
   }
 
   return (
@@ -164,9 +167,11 @@ export function KhotaHub({ character }: { character: CharacterDefinition }) {
         <SourceScopePicker
           open={pickerOpen}
           onOpenChange={setPickerOpen}
+          initialSelection={preselected ? [preselected] : undefined}
           projectId={projectId}
           projectTitle={project.title}
-          confirmLabel={t("common.confirm")}
+          confirmLabel={t("aiRequest.start")}
+          request={{ character: "khota" }}
           onConfirm={handleScope}
         />
       ) : null}

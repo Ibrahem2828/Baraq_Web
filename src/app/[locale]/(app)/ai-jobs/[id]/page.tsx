@@ -45,6 +45,7 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
   const isTerminal = isTerminalAIJobStatus(data.status);
   const isWorking = !isTerminal;
   const resultRoute = data.result_type ? RESULT_ROUTE[data.result_type] : undefined;
+  const learnerRequest = data.input_payload?.instructions || data.input_payload?.learner_goal || "";
   // Prefer wording specific to what this character is actually doing
   // ("reading your source" reads very differently for Sada than for Fahes),
   // and fall back to the generic stage label when there is no specific copy.
@@ -153,9 +154,16 @@ export default function AIJobProgressPage({ params }: { params: Promise<{ id: st
           </p>
         ) : null}
 
+        {learnerRequest ? (
+          <p className="rounded-[var(--radius-md)] bg-[color:var(--color-bg-soft)] px-3 py-2 text-sm text-[color:var(--color-ink-soft)]">
+            <span className="font-semibold text-[color:var(--color-ink)]">{t("aiJobs.yourRequest")}: </span>
+            {learnerRequest}
+          </p>
+        ) : null}
+
         {data.status === "completed" && resultRoute && data.result_id ? (
           <Button onClick={() => router.push(`${resultRoute}/${data.result_id}`)}>
-            {t("common.seeAll")}
+            {t("aiJobs.openResult")}
           </Button>
         ) : null}
         </div>

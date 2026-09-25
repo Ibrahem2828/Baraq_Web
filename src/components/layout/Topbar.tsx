@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Menu, Bell, LogOut, Settings as SettingsIcon } from "lucide-react";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useCurrentUser, useLogout } from "@/lib/auth/client";
 import { useUnreadNotificationCount } from "@/features/notifications/hooks/useNotifications";
 import { IconButton } from "@/components/ui/IconButton";
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils/cn";
 
 export function Topbar() {
   const t = useTranslations();
+  const router = useRouter();
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
   const { data: unreadCount } = useUnreadNotificationCount();
@@ -76,6 +77,7 @@ export function Topbar() {
             </button>
           }
           onSelect={(value) => {
+            if (value === "settings") router.push("/settings");
             if (value === "logout") logout.mutate();
           }}
           items={[

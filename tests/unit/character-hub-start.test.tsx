@@ -8,12 +8,16 @@ import { getCharacter } from "@/config/characters";
  * nothing.
  */
 
-const { mutate, push, toast, pickerScope } = vi.hoisted(() => ({
+const { mutate, push, toast, pickerScope, pickerInput, search } = vi.hoisted(() => ({
   mutate: vi.fn(),
   push: vi.fn(),
   toast: vi.fn(),
   pickerScope: { source: 42 },
+  pickerInput: { value: {} as Record<string, unknown> },
+  search: { value: "" },
 }));
+
+vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(search.value) }));
 
 vi.mock("next-intl", () => ({ useTranslations: () => (key: string) => key }));
 vi.mock("@/i18n/navigation", () => ({
@@ -31,8 +35,20 @@ vi.mock("@/features/study-plans/hooks/useStudyPlans", () => ({
   useStudyPlans: () => ({ isPending: false, data: { items: [] } }),
 }));
 vi.mock("@/features/sources/components/SourceScopePicker", () => ({
-  SourceScopePicker: ({ open, onConfirm }: { open: boolean; onConfirm: (scope: unknown) => void }) =>
-    open ? <button onClick={() => onConfirm(pickerScope)}>pick-source</button> : null,
+  SourceScopePicker: ({
+    open,
+    onConfirm,
+    initialSelection,
+  }: {
+    open: boolean;
+    onConfirm: (scope: unknown, input: unknown) => void;
+    initialSelection?: number[];
+  }) =>
+    open ? (
+      <button data-initial={JSON.stringify(initialSelection ?? [])} onClick={() => onConfirm(pickerScope, pickerInput.value)}>
+        pick-source
+      </button>
+    ) : null,
 }));
 vi.mock("@/components/brand/CharacterAvatar", () => ({ CharacterAvatar: () => null }));
 
@@ -40,6 +56,8 @@ beforeEach(() => {
   mutate.mockReset();
   push.mockReset();
   toast.mockReset();
+  pickerInput.value = {};
+  search.value = "";
 });
 
 describe("Khota hub", () => {
@@ -54,7 +72,7 @@ describe("Khota hub", () => {
     fireEvent.click(screen.getByText("pick-source"));
 
     expect(mutate).toHaveBeenCalledTimes(1);
-    expect(mutate.mock.calls[0]![0]).toEqual({ task_type: "khota_generate_plan", source: 42 });
+    expect(mutate.mock.calls[0]![0]).toEqual({ task_type: "khota_generate_plan", source: 42, input: {} });
     mutate.mock.calls[0]![1].onSuccess({ public_id: "job-1" });
     expect(push).toHaveBeenCalledWith("/ai-jobs/job-1");
   });
@@ -79,5 +97,23 @@ describe("Khota hub", () => {
     mutate.mock.calls[0]![1].onError(new Error("400"));
     expect(toast).toHaveBeenCalledWith({ title: "حدّد مادة المشروع أولًا", variant: "error" });
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it("sends the learner's request with the job", async () => {
+    pickerInput.value = { instructions: "خطة للوحدة الثانية فقط" };
+    await renderHub();
+    fireEvent.click(screen.getByText("khota.generate"));
+    fireEvent.click(screen.getByText("pick-source"));
+    expect(mutate.mock.calls[0]![0]).toEqual({
+      task_type: "khota_generate_plan",
+      source: 42,
+      input: { instructions: "خطة للوحدة الثانية فقط" },
+    });
+  });
+
+  it("opens with the source preselected when coming from a source's page", async () => {
+    search.value = "project=p-1&source=7";
+    await renderHub();
+    expect(screen.getByText("pick-source").getAttribute("data-initial")).toBe("[7]");
   });
 });
