@@ -98,6 +98,12 @@ export const endpoints = {
     collectionUseWithCharacter: (id: string | number) =>
       `/student-source-collections/${id}/use-with-character/`,
   },
+  classLibrary: {
+    list: "/class-library/",
+    detail: (id: string) => withId("/class-library/", id),
+    download: (id: string) => `/class-library/${id}/download/`,
+    use: (id: string) => `/class-library/${id}/use/`,
+  },
   ai: {
     root: "/ai/",
     capabilities: "/ai/capabilities/",

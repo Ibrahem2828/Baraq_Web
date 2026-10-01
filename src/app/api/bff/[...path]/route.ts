@@ -222,6 +222,11 @@ async function handle(
   if (upstreamRequestId) responseHeaders.set("X-Request-ID", upstreamRequestId);
   const retryAfter = upstream.headers.get("retry-after");
   if (retryAfter) responseHeaders.set("Retry-After", retryAfter);
+  // File downloads (class library): keep the server-chosen file name.
+  const disposition = upstream.headers.get("content-disposition");
+  if (disposition) responseHeaders.set("Content-Disposition", disposition);
+  const nosniff = upstream.headers.get("x-content-type-options");
+  if (nosniff) responseHeaders.set("X-Content-Type-Options", nosniff);
 
   const responseBody = await upstream.arrayBuffer();
   return new NextResponse(responseBody, { status: upstream.status, headers: responseHeaders });

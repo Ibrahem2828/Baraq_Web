@@ -260,7 +260,8 @@
     "newCollection": "مجلد جديد",
     "tabs": {
       "sources": "المصادر",
-      "collections": "المجلدات"
+      "collections": "المجلدات",
+      "class": "مكتبة الشعبة"
     },
     "status": {
       "uploaded": "تم الرفع",
@@ -740,5 +741,27 @@
     "statusActive": "نشط",
     "statusPending": "قيد الانتظار",
     "again": "استخدام رمز آخر"
+  },
+  "classLibrary": {
+    "intro": "ملفات شاركها معلموك ومدرستك: افتحها أو أرسلها مباشرة إلى فاحص وخُلاصة وخُطى وصدى دون تنزيلها ورفعها من جديد.",
+    "wholeOrganization": "كل المؤسسة",
+    "categoryFilter": "تصفية حسب التصنيف",
+    "allCategories": "الكل",
+    "category": {
+      "handout": "ملزمة",
+      "worksheet": "ورقة عمل",
+      "past_exam": "نماذج أسئلة دورات",
+      "recording": "تسجيل معتمد",
+      "other": "أخرى"
+    },
+    "sendTo": "أرسله إلى",
+    "download": "تنزيل",
+    "mb": "م.ب",
+    "emptyTitle": "لا توجد مكتبة شعبة بعد",
+    "emptyDescription": "تظهر هنا ملفات صفّك ومدرستك بعد انضمامك إليها، أو عندما يشارك معلموك أول ملف.",
+    "emptyFilteredTitle": "لا ملفات في هذا التصنيف",
+    "emptyFilteredDescription": "جرّب تصنيفًا آخر.",
+    "joinAction": "الانضمام إلى مدرسة أو صف",
+    "kb": "ك.ب"
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +14,7 @@ import {
   useCreateCollection,
 } from "@/features/sources/hooks/useSources";
 import { UploadSourceDialog } from "@/features/sources/components/UploadSourceDialog";
+import { ClassLibraryTab } from "@/features/class-library/components/ClassLibraryTab";
 import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
 import type { SourceStatus } from "@/types/domain";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -41,7 +43,17 @@ const collectionSchema = z.object({
 });
 type CollectionFormValues = z.infer<typeof collectionSchema>;
 
+// `useSearchParams()` opts a page out of static rendering unless isolated
+// behind a Suspense boundary (as on the login page).
 export default function LibraryPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <LibraryContent />
+    </Suspense>
+  );
+}
+
+function LibraryContent() {
   const t = useTranslations();
   const sources = useSources();
   const collections = useCollections();
@@ -49,6 +61,9 @@ export default function LibraryPage() {
   const errorMessage = useApiErrorMessage();
 
   const [uploadOpen, setUploadOpen] = useState(false);
+  // `?tab=class` (the class-library notification link) opens that tab.
+  const requestedTab = useSearchParams().get("tab");
+  const initialTab = requestedTab === "class" || requestedTab === "collections" ? requestedTab : "sources";
   const [collectionOpen, setCollectionOpen] = useState(false);
   const collectionForm = useForm<CollectionFormValues>({ resolver: zodResolver(collectionSchema) });
 
@@ -167,6 +182,7 @@ export default function LibraryPage() {
       />
 
       <Tabs
+        defaultValue={initialTab}
         items={[
           { value: "sources", label: t("library.tabs.sources"), content: sourcesContent },
           {
@@ -174,6 +190,7 @@ export default function LibraryPage() {
             label: t("library.tabs.collections"),
             content: collectionsContent,
           },
+          { value: "class", label: t("library.tabs.class"), content: <ClassLibraryTab /> },
         ]}
       />
 

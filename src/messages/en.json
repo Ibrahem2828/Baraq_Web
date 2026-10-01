@@ -260,7 +260,8 @@
     "newCollection": "New folder",
     "tabs": {
       "sources": "Sources",
-      "collections": "Folders"
+      "collections": "Folders",
+      "class": "Class library"
     },
     "status": {
       "uploaded": "Uploaded",
@@ -740,5 +741,27 @@
     "statusActive": "Active",
     "statusPending": "Pending",
     "again": "Use a different code"
+  },
+  "classLibrary": {
+    "intro": "Files your teachers and school shared: open them, or send them straight to Fahes, Kholasa, Khota and Sada — no downloading and re-uploading.",
+    "wholeOrganization": "Whole organization",
+    "categoryFilter": "Filter by category",
+    "allCategories": "All",
+    "category": {
+      "handout": "Handout",
+      "worksheet": "Worksheet",
+      "past_exam": "Past exam papers",
+      "recording": "Approved recording",
+      "other": "Other"
+    },
+    "sendTo": "Send to",
+    "download": "Download",
+    "mb": "MB",
+    "emptyTitle": "No class library yet",
+    "emptyDescription": "Your class and school files appear here once you join them, or when your teachers share a first file.",
+    "emptyFilteredTitle": "No files in this category",
+    "emptyFilteredDescription": "Try another category.",
+    "joinAction": "Join a school or class",
+    "kb": "KB"
   }
 }

@@ -53,6 +53,10 @@ export const queryKeys = {
     attempt: (id: string | number) => ["quizAttempts", "detail", idKey(id)] as const,
     questionBank: (filters?: Record<string, unknown>) => ["questionBank", "list", filters] as const,
   },
+  classLibrary: {
+    all: ["class-library"] as const,
+    list: (filters?: Record<string, unknown>) => ["class-library", "list", filters] as const,
+  },
   sources: {
     all: ["sources"] as const,
     list: (filters?: Record<string, unknown>) => ["sources", "list", filters] as const,
