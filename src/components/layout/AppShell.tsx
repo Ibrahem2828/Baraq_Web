@@ -16,7 +16,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh">
       <OfflineBanner />
       <Sidebar />
-      <div className="flex min-h-dvh flex-1 flex-col">
+      {/* `min-w-0`: without it one wide descendant (a tab row, a long
+          <select> option) grows this flex item past the viewport and the
+          whole page, header included, scrolls sideways on a phone. */}
+      <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
         <Topbar />
         {/*
           `main` must be a plain, unconstrained flex item so it stretches to
@@ -31,7 +34,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           the same bug). Splitting stretch (on `main`) from max-width+center
           (on this inner, non-flex-item div) fixes every page at once.
         */}
-        <main className="flex-1 py-8 pb-24 lg:pb-8">
+        <main className="flex-1 py-8 pb-[calc(6rem+env(safe-area-inset-bottom))] lg:pb-8">
           <div className="container-page">{children}</div>
         </main>
       </div>

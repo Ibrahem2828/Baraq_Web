@@ -52,6 +52,10 @@
   }
 
   body {
+    /* Landscape phones: keep content clear of the notch side. Zero on
+       every device without one (and whenever viewport-fit isn't cover). */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     background: var(--color-bg);
     color: var(--color-ink);
     font-family: var(--font-body);
@@ -254,5 +258,14 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
+  }
+
+  /* A row that scrolls sideways by swipe on a phone, without a scrollbar
+     track eating into a 36px-tall pill. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 interface ArtifactRow {
   key: string;
@@ -51,35 +52,35 @@ export function ProjectArtifactsPanel({ projectId }: { projectId: string }) {
   const rows: ArtifactRow[] = [
     ...(quizzes.data?.items ?? []).map((item) => ({
       key: `quiz-${item.id}`,
-      href: `/quizzes/${item.id}`,
+      href: detailHref("quizzes", item.id),
       title: item.title,
       typeLabel: t("workspace.artifacts.types.quiz"),
       createdAt: item.created_at,
     })),
     ...(studyPlans.data?.items ?? []).map((item) => ({
       key: `plan-${item.id}`,
-      href: `/study-plans/${item.id}`,
+      href: detailHref("study-plans", item.id),
       title: item.title,
       typeLabel: t("workspace.artifacts.types.studyPlan"),
       createdAt: item.created_at,
     })),
     ...(summaries.data?.items ?? []).map((item) => ({
       key: `summary-${item.id}`,
-      href: `/summaries/${item.id}`,
+      href: detailHref("summaries", item.id),
       title: item.title,
       typeLabel: t("workspace.artifacts.types.summary"),
       createdAt: item.created_at,
     })),
     ...(transcriptions.data?.items ?? []).map((item) => ({
       key: `transcription-${item.id}`,
-      href: `/transcriptions/${item.id}`,
+      href: detailHref("transcriptions", item.id),
       title: item.title,
       typeLabel: t("workspace.artifacts.types.transcription"),
       createdAt: item.created_at,
     })),
     ...(recommendations.data?.items ?? []).map((item) => ({
       key: `recommendation-${item.id}`,
-      href: `/recommendations/${item.id}`,
+      href: detailHref("recommendations", item.id),
       title: item.title,
       typeLabel: t("workspace.artifacts.types.recommendation"),
       createdAt: item.created_at,

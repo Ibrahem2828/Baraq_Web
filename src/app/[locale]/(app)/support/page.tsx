@@ -26,6 +26,7 @@ import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
 import { useToast } from "@/components/feedback/Toast";
+import { detailHref } from "@/lib/routing/detail-href";
 
 const CATEGORY_VALUES: SupportTicketCategory[] = [
   "technical",
@@ -108,7 +109,7 @@ export default function SupportPage() {
         <StaggerIn className="flex flex-col gap-3">
           {tickets.data.items.map((ticket) => (
             <StaggerItem key={ticket.id}>
-              <Link href={`/support/${ticket.id}`} className="block">
+              <Link href={detailHref("support", ticket.id)} className="block">
                 <Card className="flex flex-wrap items-center justify-between gap-3 transition-colors hover:border-[color:var(--color-border-strong)]">
                   <div>
                     <p className="text-sm font-bold text-[color:var(--color-ink)]">

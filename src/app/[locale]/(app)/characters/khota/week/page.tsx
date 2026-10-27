@@ -47,7 +47,9 @@ export default function KhotaWeekPage() {
     <div>
       <PageHeader title={t("studyPlans.week.title")} description={dateRange} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-7">
+      {/* Seven columns left ~135px per day beside the sidebar: each task's
+          skip button was pushed past the window edge. Days wrap instead. */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {allDates.map((date) => {
           const day = dayByDate.get(date);
           const today = isToday(date);
@@ -55,7 +57,7 @@ export default function KhotaWeekPage() {
             <Card
               key={date}
               className={cn(
-                "flex flex-col gap-2 p-0",
+                "flex min-w-0 flex-col gap-2 p-0",
                 today && "ring-2 ring-[color:var(--color-accent-solid)]",
               )}
             >

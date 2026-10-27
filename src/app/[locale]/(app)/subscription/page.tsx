@@ -55,10 +55,13 @@ export default function SubscriptionPage() {
               </p>
               {data.subscription ? (
                 <Badge
-                  variant={data.subscription.status === "active" ? "success" : "warning"}
+                  variant={data.has_entitlement ? "success" : "warning"}
                   className="mt-1"
                 >
-                  {data.subscription.status}
+                  {!data.has_entitlement &&
+                  (data.subscription.status === "active" || data.subscription.status === "trialing")
+                    ? "expired"
+                    : data.subscription.status}
                 </Badge>
               ) : null}
             </div>

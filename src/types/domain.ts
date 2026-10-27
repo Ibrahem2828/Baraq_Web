@@ -537,6 +537,8 @@ export interface SubscriptionUsage {
 export interface MySubscription {
   plan: SubscriptionPlan;
   subscription: UserSubscriptionRecord;
+  /** Server-authoritative current entitlement; status alone may be stale after period end. */
+  has_entitlement: boolean;
   usage: SubscriptionUsage;
   /** The plan's own figures. NOT what to display — see `effective_limits`. */
   limits: Record<string, number>;

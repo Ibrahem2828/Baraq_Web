@@ -48,7 +48,7 @@ async function spoolDirectories() {
 
 async function post(body: BodyInit, contentType: string, extraHeaders: Record<string, string> = {}) {
   const { NextRequest } = await import("next/server");
-  const { POST } = await import("@/app/api/bff/[...path]/route");
+  const { POST } = await import("@/app/api/bff/[...path]/route.web");
   return POST(
     new NextRequest("https://web.baraqapp.com/api/bff/student-sources", {
       method: "POST",

@@ -40,7 +40,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={Boolean(error) || undefined}
             aria-describedby={cn(descriptionId, errorId) || undefined}
             className={cn(
-              "h-11 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm text-[color:var(--color-ink)] transition-colors duration-[var(--duration-fast)] placeholder:text-[color:var(--color-ink-faint)] focus-visible:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              "h-11 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-4 text-sm text-[color:var(--color-ink)] transition-colors pointer-coarse:text-base duration-[var(--duration-fast)] placeholder:text-[color:var(--color-ink-faint)] focus-visible:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               startSlot && "ps-10",
               endSlot && "pe-10",
               ltrValue && "rtl:text-right",

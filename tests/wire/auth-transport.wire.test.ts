@@ -129,7 +129,7 @@ describe("Web auth transport — what reaches the socket", () => {
 describe("Web BFF — proxied bodies on the socket", () => {
   async function bffPost(path: string[], body: BodyInit, contentType?: string) {
     const { NextRequest } = await import("next/server");
-    const { POST } = await import("@/app/api/bff/[...path]/route");
+    const { POST } = await import("@/app/api/bff/[...path]/route.web");
     const headers: Record<string, string> = {
       origin: "https://web.baraqapp.com",
       host: "web.baraqapp.com",

@@ -30,12 +30,14 @@ export function Tabs({
       onValueChange={onValueChange}
       className={cn("flex flex-col gap-4", className)}
     >
-      <RadixTabs.List className="flex gap-1 rounded-[var(--radius-full)] bg-[color:var(--color-bg-soft)] p-1">
+      {/* Four labels do not fit a 320px phone: the row scrolls sideways
+          instead of widening the whole page. */}
+      <RadixTabs.List className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-[var(--radius-full)] bg-[color:var(--color-bg-soft)] p-1">
         {items.map((item) => (
           <RadixTabs.Trigger
             key={item.value}
             value={item.value}
-            className="flex-1 rounded-[var(--radius-full)] px-4 py-2 text-sm font-semibold text-[color:var(--color-ink-soft)] transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none data-[state=active]:bg-[color:var(--color-surface)] data-[state=active]:text-[color:var(--color-ink)] data-[state=active]:shadow-[var(--shadow-sm)]"
+            className="flex-1 shrink-0 rounded-[var(--radius-full)] px-4 py-2 text-sm font-semibold whitespace-nowrap text-[color:var(--color-ink-soft)] transition-colors focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none data-[state=active]:bg-[color:var(--color-surface)] data-[state=active]:text-[color:var(--color-ink)] data-[state=active]:shadow-[var(--shadow-sm)] pointer-coarse:min-h-11"
           >
             {item.label}
           </RadixTabs.Trigger>

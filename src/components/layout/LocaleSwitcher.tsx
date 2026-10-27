@@ -17,7 +17,9 @@ export function LocaleSwitcher() {
   function switchLocale() {
     const nextLocale =
       routing.locales.find((candidate) => candidate !== locale) ?? routing.defaultLocale;
-    router.replace(pathname, { locale: nextLocale });
+    // Keep the query: `?project=` on a character hub, `?id=` on the app's
+    // detail pages. Without it the other language opened an empty page.
+    router.replace(`${pathname}${window.location.search}`, { locale: nextLocale });
   }
 
   return (

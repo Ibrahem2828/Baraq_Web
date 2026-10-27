@@ -14,6 +14,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 const STATUS_VARIANT: Record<StudyPlanStatus, "neutral" | "info" | "success" | "destructive"> = {
   draft: "neutral",
@@ -69,7 +70,7 @@ export default function StudyPlansPage() {
         <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {plans.data.items.map((plan) => (
             <StaggerItem key={plan.id}>
-              <Link href={`/study-plans/${plan.id}`}>
+              <Link href={detailHref("study-plans", plan.id)}>
                 <Card className="flex h-full flex-col gap-3 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="line-clamp-1 text-base font-bold text-[color:var(--color-ink)]">

@@ -1,11 +1,18 @@
 "use client";
 
+import { loadNativeSession } from "@/lib/auth/load-native-session";
 import { CSRF_COOKIE } from "@/lib/auth/cookie-names";
 import { readClientCookie } from "@/lib/utils/cookies-client";
 import { createRequestId } from "@/lib/utils/request-id";
 import { APP_DEFAULTS } from "@/config/constants";
+import { endpoints } from "./endpoints";
 import type { ErrorEnvelope, SuccessEnvelope } from "./envelope";
 import { ApiError, fromErrorEnvelope, fromNetworkError } from "./errors";
+
+// The app build (scripts/build-native.mjs) or the web one. Read here, not
+// imported: Next inlines the literal, so the other build's branch is
+// removed from this bundle (see docs/MOBILE_APP.md).
+const IS_NATIVE = process.env.NEXT_PUBLIC_BUILD_TARGET === "native";
 
 /**
  * Client-side fetch wrapper. Never talks to the backend directly — every call
@@ -13,6 +20,11 @@ import { ApiError, fromErrorEnvelope, fromNetworkError } from "./errors";
  * injects the `Authorization` header from an HttpOnly cookie server-side.
  * Mirrors the mobile app's `apiClient.ts` behavior (transient-GET retry,
  * request-id correlation) adapted to the BFF architecture.
+ *
+ * The app build (IS_NATIVE) has no BFF: `send()` calls the Django API
+ * directly with the Bearer token from lib/auth/native-session, and does the
+ * BFF's 401 -> refresh once -> retry once itself. Everything above `send()`
+ * is the same for both.
  */
 
 let csrfTokenPromise: Promise<string> | null = null;
@@ -58,6 +70,67 @@ function buildQuery(params?: RequestOptions["params"]): string {
   return query ? `?${query}` : "";
 }
 
+/**
+ * One HTTP exchange with the API, authenticated the way this build does it.
+ *
+ * Web: `/api/bff/<path>` on this origin; the BFF adds the Bearer token from
+ * its HttpOnly cookie, so the browser only proves the request is its own
+ * (double-submit CSRF token on mutations).
+ *
+ * App: `https://api…/api/v1/<path>/` with the Bearer token from memory, no
+ * cookies. A 401 on a request that carried a token gets one refresh and one
+ * retry, as the BFF does; a 401 after that ends the session. So does
+ * deleting the account, which revokes every token.
+ */
+async function send(
+  method: string,
+  normalizedPath: string,
+  query: string,
+  init: { headers: Headers; body?: BodyInit; signal?: AbortSignal },
+): Promise<Response> {
+  if (!IS_NATIVE) {
+    if (MUTATING_METHODS.has(method)) {
+      init.headers.set("X-CSRF-Token", await ensureCsrfToken());
+    }
+    return fetch(`/api/bff/${normalizedPath}${query}`, {
+      method,
+      headers: init.headers,
+      body: init.body,
+      credentials: "same-origin",
+      signal: init.signal,
+    });
+  }
+
+  // Loaded on first use, never imported statically: the web bundle then has
+  // no trace of the app's token handling.
+  const { apiUrl, clearTokens, getAccessToken, refreshAccessToken } = await loadNativeSession();
+  const url = apiUrl(normalizedPath, query);
+  const attempt = (token: string | null) => {
+    if (token) init.headers.set("Authorization", `Bearer ${token}`);
+    else init.headers.delete("Authorization");
+    return fetch(url, {
+      method,
+      headers: init.headers,
+      body: init.body,
+      credentials: "omit",
+      cache: "no-store",
+      signal: init.signal,
+    });
+  };
+
+  const token = await getAccessToken();
+  let response = await attempt(token);
+  if (response.status === 401 && token) {
+    const renewed = await refreshAccessToken();
+    if (renewed) response = await attempt(renewed);
+  }
+  if (response.status === 401 && token) await clearTokens();
+  if (method === "DELETE" && response.ok && `/${normalizedPath}/` === endpoints.users.me) {
+    await clearTokens();
+  }
+  return response;
+}
+
 async function request<T>(
   method: string,
   path: string,
@@ -71,7 +144,7 @@ async function request<T>(
   // 308s it before the route handler runs. The trailing slash Django wants
   // is re-added downstream by `buildTargetPath` in the BFF route handler.
   const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
-  const url = `/api/bff/${normalizedPath}${buildQuery(options.params)}`;
+  const query = buildQuery(options.params);
 
   const headers = new Headers();
   headers.set("X-Request-ID", createRequestId());
@@ -87,23 +160,12 @@ async function request<T>(
     }
   }
 
-  if (MUTATING_METHODS.has(method)) {
-    const csrfToken = await ensureCsrfToken();
-    headers.set("X-CSRF-Token", csrfToken);
-  }
-
   const timeoutSignal = AbortSignal.timeout(options.timeoutMs ?? APP_DEFAULTS.requestTimeoutMs);
   const signal = options.signal ? AbortSignal.any([options.signal, timeoutSignal]) : timeoutSignal;
 
   let response: Response;
   try {
-    response = await fetch(url, {
-      method,
-      headers,
-      body: requestBody,
-      credentials: "same-origin",
-      signal,
-    });
+    response = await send(method, normalizedPath, query, { headers, body: requestBody, signal });
   } catch (error) {
     if (method === "GET" && !options._isRetry && isTransientTransportError(error, undefined)) {
       await new Promise((resolve) => setTimeout(resolve, 350));
@@ -155,10 +217,14 @@ export async function requestPaginated<T>(
   options?: RequestOptions,
 ): Promise<{ items: T[]; count: number; next: string | null; previous: string | null }> {
   const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
-  const url = `/api/bff/${normalizedPath}${buildQuery(options?.params)}`;
   const headers = new Headers({ "X-Request-ID": createRequestId() });
 
-  const response = await fetch(url, { method: "GET", headers, credentials: "same-origin" });
+  let response: Response;
+  try {
+    response = await send("GET", normalizedPath, buildQuery(options?.params), { headers });
+  } catch (error) {
+    throw fromNetworkError(error);
+  }
   if (!response.ok) {
     const envelope = (await response.json().catch(() => null)) as ErrorEnvelope | null;
     throw fromErrorEnvelope(envelope, response.status, response.headers);

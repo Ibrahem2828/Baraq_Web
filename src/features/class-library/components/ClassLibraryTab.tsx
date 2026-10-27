@@ -135,14 +135,16 @@ export function ClassLibraryTab() {
                         </div>
                       </>
                     ) : null}
-                    <a
-                      href={libraryDownloadHref(item.public_id)}
-                      download
-                      className="inline-flex items-center gap-1 self-start text-sm font-semibold text-[color:var(--color-accent)] hover:underline"
-                    >
-                      <Download className="size-4" aria-hidden="true" />
-                      {t("classLibrary.download")}
-                    </a>
+                    {libraryDownloadHref(item.public_id) ? (
+                      <a
+                        href={libraryDownloadHref(item.public_id) ?? undefined}
+                        download
+                        className="inline-flex items-center gap-1 self-start text-sm font-semibold text-[color:var(--color-accent)] hover:underline"
+                      >
+                        <Download className="size-4" aria-hidden="true" />
+                        {t("classLibrary.download")}
+                      </a>
+                    ) : null}
                   </div>
                 </Card>
               </StaggerItem>

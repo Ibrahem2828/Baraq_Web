@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only what Capacitor's file chooser needs: a photo taken for an upload is
+     written to the app's own Pictures folder (BridgeWebChromeClient). The
+     template shared the whole external storage root. -->
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-files-path name="camera_captures" path="Pictures/" />
+    <cache-path name="cache" path="." />
+</paths>

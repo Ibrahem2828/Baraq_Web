@@ -303,3 +303,17 @@ Arabic auth page even though the Latin families were not used. All families rema
 self-hosted with `display: "swap"`, but their automatic preload is disabled; the browser
 now discovers only the font faces required by the active locale. Above-the-fold auth
 images retain intentional Next Image priority.
+
+## 14. The mobile app uses Bearer tokens, not the BFF
+
+The Android/iOS app (docs/MOBILE_APP.md) is a static bundle with no server of
+its own, so §1-§5 do not apply to it. It calls the Django API directly, as
+the Expo app does: the access token stays in memory, and the refresh token is
+kept in the Android Keystore / iOS Keychain (never localStorage or a cookie),
+rotated through the same single-flight refresh
+(`src/lib/auth/native-session.ts`). No cookie is sent, so there is no CSRF
+surface. The trade-off is that script running in the app's WebView could read
+the in-memory access token; the app's CSP (`src/design-system/NativeHead.tsx`)
+allows scripts only from the bundle itself, and connections only to the
+bundle and the API. None of this code is present in the web bundle
+(`npm run check:bundle`).

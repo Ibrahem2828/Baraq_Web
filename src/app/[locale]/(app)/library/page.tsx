@@ -29,6 +29,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 const STATUS_VARIANT: Record<SourceStatus, "neutral" | "info" | "success" | "destructive"> = {
   uploaded: "neutral",
@@ -96,7 +97,7 @@ function LibraryContent() {
     <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {sources.data.items.map((source) => (
         <StaggerItem key={source.id}>
-          <Link href={`/library/${source.id}`}>
+          <Link href={detailHref("library", source.id)}>
             <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="line-clamp-1 text-base font-bold text-[color:var(--color-ink)]">
@@ -138,7 +139,7 @@ function LibraryContent() {
     <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {collections.data.items.map((collection) => (
         <StaggerItem key={collection.id}>
-          <Link href={`/library/collections/${collection.id}`}>
+          <Link href={detailHref("library/collections", collection.id)}>
             <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="line-clamp-1 text-base font-bold text-[color:var(--color-ink)]">

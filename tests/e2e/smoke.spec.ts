@@ -31,7 +31,7 @@ test.describe("smoke", () => {
   test("login page renders the expected form fields", async ({ page }) => {
     await page.goto("/ar/login");
     await expect(page.getByLabel("البريد الإلكتروني")).toBeVisible();
-    await expect(page.getByLabel("كلمة المرور")).toBeVisible();
+    await expect(page.getByLabel("كلمة المرور", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "دخول" })).toBeVisible();
   });
 
@@ -66,7 +66,7 @@ test.describe("authenticated flows", () => {
     }
     await page.goto(next ? `/ar/login?next=${encodeURIComponent(next)}` : "/ar/login");
     await page.getByLabel("البريد الإلكتروني").fill(STUDENT_EMAIL);
-    await page.getByLabel("كلمة المرور").fill(STUDENT_PASSWORD);
+    await page.getByLabel("كلمة المرور", { exact: true }).fill(STUDENT_PASSWORD);
     await page.getByRole("button", { name: "دخول" }).click();
     // The auth route writes HttpOnly cookies before the browser reaches its
     // destination. Do not navigate a test to the next protected page until

@@ -38,6 +38,7 @@ jobs:
       # `headers()` is resolved at build time, so this is the only place
       # the shipped values can be checked.
       - run: npm run check:headers
+      - run: npm run check:bundle
       - name: Build production Docker image
         shell: bash
         run: |
@@ -63,3 +64,7 @@ jobs:
           done
           docker logs "$container_id"
           exit 1
+      # The mobile app's static bundle (docs/MOBILE_APP.md). Last: it reuses
+      # .next for its intermediates. The script fails on any web-only API
+      # path left in the bundle.
+      - run: npm run build:native

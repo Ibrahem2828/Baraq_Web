@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import SourceDetailPage from "@/app/[locale]/(app)/library/[id]/page";
+import SourceDetailPage from "@/app/[locale]/(app)/library/[id]/page.web";
 import type { SourceStatus, StudentSource } from "@/types/domain";
 
 /**

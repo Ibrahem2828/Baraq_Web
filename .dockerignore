@@ -11,3 +11,7 @@ blob-report
 *.key
 .env*
 !.env.production
+# The mobile app's native project and static bundle: not part of the web image.
+android
+ios
+out

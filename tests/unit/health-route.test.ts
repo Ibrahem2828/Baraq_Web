@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GET } from "@/app/api/health/route";
+import { GET } from "@/app/api/health/route.web";
 
 describe("GET /api/health", () => {
   it("returns a cheap non-cached liveness response without internal details", async () => {

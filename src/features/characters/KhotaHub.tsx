@@ -22,6 +22,7 @@ import { Progress } from "@/components/ui/Progress";
 import { LoadingState } from "@/components/feedback/LoadingState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 /**
  * Khota's character page is a real workflow hub, not the generic
@@ -130,7 +131,7 @@ export function KhotaHub({ character }: { character: CharacterDefinition }) {
           <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {activePlans.data.items.map((plan) => (
               <StaggerItem key={plan.id}>
-                <Link href={`/study-plans/${plan.id}`}>
+                <Link href={detailHref("study-plans", plan.id)}>
                   <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="line-clamp-1 text-sm font-bold text-[color:var(--color-ink)]">

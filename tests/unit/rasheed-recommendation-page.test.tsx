@@ -46,7 +46,7 @@ vi.mock("@/features/results/components/RelatedArtifactLinks", () => ({ OpenProje
 
 describe("Rasheed's recommendation page", () => {
   it("renders each recommendation as a structured card, never as JSON", async () => {
-    const { default: Page } = await import("@/app/[locale]/(app)/recommendations/[id]/page");
+    const { default: Page } = await import("@/app/[locale]/(app)/recommendations/[id]/page.web");
     // `use(params)` suspends on first render: flush it inside act().
     const params = Promise.resolve({ id: "1" });
     let container!: HTMLElement;

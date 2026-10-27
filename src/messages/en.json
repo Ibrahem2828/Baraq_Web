@@ -88,7 +88,9 @@
       "codeInvalid": "Incorrect code",
       "codeExpired": "This code has expired — request a new one",
       "tooManyAttempts": "Too many attempts — request a new code",
-      "missingEmail": "This page can't be opened directly — please register first"
+      "missingEmail": "This page can't be opened directly — please register first",
+      "checkSpam": "Not there? Check your spam or promotions folder; the code can take a minute to arrive.",
+      "wrongEmail": "Wrong email? Register again"
     },
     "forgotPassword": {
       "title": "Reset your password",

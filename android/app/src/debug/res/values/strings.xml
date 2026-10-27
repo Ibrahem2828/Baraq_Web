@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The preview (debug) build's launcher name, so it cannot be mistaken for the store app. -->
+<resources>
+    <string name="app_name">برّاق تجريبي</string>
+    <string name="title_activity_main">برّاق تجريبي</string>
+</resources>

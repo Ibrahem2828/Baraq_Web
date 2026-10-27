@@ -1,9 +1,15 @@
 "use client";
 
+import { loadNativeSession } from "@/lib/auth/load-native-session";
 import { createRequestId } from "@/lib/utils/request-id";
 import { ensureCsrfToken } from "./client";
 import type { ErrorEnvelope, SuccessEnvelope } from "./envelope";
 import { ApiError, fromErrorEnvelope } from "./errors";
+
+// The app build (scripts/build-native.mjs) or the web one. Read here, not
+// imported: Next inlines the literal, so the other build's branch is
+// removed from this bundle (see docs/MOBILE_APP.md).
+const IS_NATIVE = process.env.NEXT_PUBLIC_BUILD_TARGET === "native";
 
 export interface UploadOptions {
   /** Called with the fraction of the request body sent so far (0..1). */
@@ -17,7 +23,10 @@ const UPLOAD_MIN_TOKEN_VALIDITY_SECONDS = 20 * 60;
 
 function responseHeaders(xhr: XMLHttpRequest): Headers {
   const headers = new Headers();
-  for (const line of xhr.getAllResponseHeaders().trim().split(/[\r\n]+/)) {
+  for (const line of xhr
+    .getAllResponseHeaders()
+    .trim()
+    .split(/[\r\n]+/)) {
     const index = line.indexOf(":");
     if (index > 0) headers.append(line.slice(0, index).trim(), line.slice(index + 1).trim());
   }
@@ -48,13 +57,26 @@ export async function uploadWithProgress<T>(
   options: UploadOptions = {},
 ): Promise<T> {
   const normalizedPath = path.replace(/^\/+/, "").replace(/\/+$/, "");
-  // The upload's request keeps the cookies it started with until the whole
-  // file has arrived, so start it with an access token that outlives it.
-  await fetch(`/api/auth/session?minValiditySeconds=${UPLOAD_MIN_TOKEN_VALIDITY_SECONDS}`, {
-    credentials: "same-origin",
-    cache: "no-store",
-  }).catch(() => undefined);
-  const csrfToken = await ensureCsrfToken();
+  // The upload's request keeps the credentials it started with until the
+  // whole file has arrived, so start it with an access token that outlives it.
+  let url: string;
+  let authHeaders: Record<string, string>;
+  let endSession: (() => Promise<void>) | null = null;
+  if (IS_NATIVE) {
+    // The app sends the token itself (lib/auth/native-session).
+    const { apiUrl, clearTokens, getAccessToken } = await loadNativeSession();
+    endSession = clearTokens;
+    url = apiUrl(normalizedPath);
+    const token = await getAccessToken(UPLOAD_MIN_TOKEN_VALIDITY_SECONDS).catch(() => null);
+    authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
+  } else {
+    await fetch(`/api/auth/session?minValiditySeconds=${UPLOAD_MIN_TOKEN_VALIDITY_SECONDS}`, {
+      credentials: "same-origin",
+      cache: "no-store",
+    }).catch(() => undefined);
+    url = `/api/bff/${normalizedPath}`;
+    authHeaders = { "X-CSRF-Token": await ensureCsrfToken() };
+  }
 
   return new Promise<T>((resolve, reject) => {
     if (options.signal?.aborted) {
@@ -62,14 +84,15 @@ export async function uploadWithProgress<T>(
       return;
     }
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `/api/bff/${normalizedPath}`);
-    xhr.withCredentials = true;
+    xhr.open("POST", url);
+    xhr.withCredentials = !IS_NATIVE;
     xhr.setRequestHeader("X-Request-ID", createRequestId());
-    xhr.setRequestHeader("X-CSRF-Token", csrfToken);
+    for (const [name, value] of Object.entries(authHeaders)) xhr.setRequestHeader(name, value);
     xhr.setRequestHeader("Accept", "application/json");
 
     xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && event.total > 0) options.onProgress?.(event.loaded / event.total);
+      if (event.lengthComputable && event.total > 0)
+        options.onProgress?.(event.loaded / event.total);
     };
     xhr.onload = () => {
       const body = parse(xhr.responseText);
@@ -78,6 +101,7 @@ export async function uploadWithProgress<T>(
         resolve((body as SuccessEnvelope<T> | null)?.data as T);
         return;
       }
+      if (xhr.status === 401 && authHeaders.Authorization) void endSession?.();
       reject(fromErrorEnvelope(body as ErrorEnvelope | null, xhr.status, responseHeaders(xhr)));
     };
     xhr.onerror = () =>

@@ -11,7 +11,7 @@ vi.mock("@/lib/auth/server", () => ({
   validateMutationCsrf: mocks.validateMutationCsrf,
 }));
 
-import { POST } from "@/app/api/auth/login/route";
+import { POST } from "@/app/api/auth/login/route.web";
 
 function request(body: unknown) {
   return new NextRequest("https://web.baraqapp.com/api/auth/login", {

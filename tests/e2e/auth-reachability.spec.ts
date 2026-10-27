@@ -32,7 +32,7 @@ test.describe("auth pages are always reachable — cookie state must not matter"
     await page.goto("/en/login");
     await expect(page).toHaveURL(/\/en\/login$/);
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
   });
 
   test("a fake refresh cookie does not hide the login form", async ({ page }) => {
@@ -91,7 +91,7 @@ test.describe("English locale auth pages", () => {
   test("/en/login renders the login form and links to Create account", async ({ page }) => {
     await page.goto("/en/login");
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Password")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Create account" })).toBeVisible();
   });
@@ -133,7 +133,7 @@ test.describe("wrong credentials", () => {
   test("a wrong password shows an error and stays on /en/login", async ({ page }) => {
     await page.goto("/en/login");
     await page.getByLabel("Email").fill("nobody@example.com");
-    await page.getByLabel("Password").fill("DefinitelyWrongPassword123!");
+    await page.getByLabel("Password", { exact: true }).fill("DefinitelyWrongPassword123!");
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page.getByText("Incorrect email or password")).toBeVisible();
     await expect(page).toHaveURL(/\/en\/login$/);

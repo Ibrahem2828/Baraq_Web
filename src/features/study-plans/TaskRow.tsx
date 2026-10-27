@@ -46,79 +46,86 @@ export function TaskRow({
   const isTerminal = task.status === "completed" || task.status === "skipped";
 
   return (
-    <li className="flex items-center gap-3 border-b border-[color:var(--color-border)] px-4 py-3 last:border-0">
-      <button
-        type="button"
-        onClick={() => completeTask.mutate(task.id)}
-        disabled={task.status === "completed" || isPending}
-        aria-label={t("studyPlans.taskActions.complete")}
-        className="shrink-0"
-      >
-        {task.status === "completed" ? (
-          <CheckCircle2 className="size-5 text-[color:var(--color-success)]" aria-hidden="true" />
-        ) : (
-          <Circle className="size-5 text-[color:var(--color-ink-faint)]" aria-hidden="true" />
-        )}
-      </button>
-
-      <div className="min-w-0 flex-1">
-        <p
-          className={cn(
-            "text-sm text-[color:var(--color-ink)]",
-            !showDetails && "truncate",
-            task.status === "completed" && "text-[color:var(--color-ink-faint)] line-through",
-          )}
+    <li className="@container border-b border-[color:var(--color-border)] last:border-0">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <button
+          type="button"
+          onClick={() => completeTask.mutate(task.id)}
+          disabled={task.status === "completed" || isPending}
+          aria-label={t("studyPlans.taskActions.complete")}
+          // A 44px target around the 20px circle; the negative margin keeps
+          // the row's layout exactly as it was.
+          className="-m-3 flex size-11 shrink-0 items-center justify-center"
         >
-          {task.title}
-        </p>
-        {showPlan && task.plan ? (
-          <p className="truncate text-xs text-[color:var(--color-ink-faint)]">
-            {task.plan.subject.name} · {task.plan.title}
-          </p>
-        ) : null}
-        {showDetails && task.description ? (
-          <p className="mt-0.5 text-xs leading-5 text-[color:var(--color-ink-soft)]">
-            {task.description}
-          </p>
-        ) : null}
-        {showDetails && task.priority === "high" ? (
-          <Badge variant={PRIORITY_BADGE.high} className="mt-1">
-            {t("studyPlans.priority.high")}
-          </Badge>
-        ) : null}
-      </div>
+          {task.status === "completed" ? (
+            <CheckCircle2 className="size-5 text-[color:var(--color-success)]" aria-hidden="true" />
+          ) : (
+            <Circle className="size-5 text-[color:var(--color-ink-faint)]" aria-hidden="true" />
+          )}
+        </button>
 
-      <Badge variant={STATUS_BADGE[task.status]} className="hidden sm:inline-flex">
-        {t(`studyPlans.taskStatus.${task.status}`)}
-      </Badge>
-
-      <span className="hidden shrink-0 text-xs text-[color:var(--color-ink-faint)] sm:inline">
-        {t("studyPlans.minutesShort", { count: task.estimated_minutes })}
-      </span>
-
-      <div className="flex shrink-0 items-center gap-1">
-        {!isTerminal ? (
-          <IconButton
-            size="sm"
-            variant="ghost"
-            aria-label={t("studyPlans.taskActions.skip")}
-            disabled={isPending}
-            onClick={() => skipTask.mutate(task.id)}
+        <div className="min-w-0 flex-1">
+          <p
+            className={cn(
+              "text-sm text-[color:var(--color-ink)]",
+              !showDetails && "truncate",
+              task.status === "completed" && "text-[color:var(--color-ink-faint)] line-through",
+            )}
           >
-            <SkipForward className="size-4" aria-hidden="true" />
-          </IconButton>
-        ) : null}
-        {isTerminal ? (
-          <IconButton
-            size="sm"
-            variant="ghost"
-            aria-label={t("studyPlans.taskActions.reopen")}
-            disabled={isPending}
-            onClick={() => reopenTask.mutate(task.id)}
-          >
-            <RotateCcw className="size-4" aria-hidden="true" />
-          </IconButton>
-        ) : null}
+            {task.title}
+          </p>
+          {showPlan && task.plan ? (
+            <p className="truncate text-xs text-[color:var(--color-ink-faint)]">
+              {task.plan.subject.name} · {task.plan.title}
+            </p>
+          ) : null}
+          {showDetails && task.description ? (
+            <p className="mt-0.5 text-xs leading-5 text-[color:var(--color-ink-soft)]">
+              {task.description}
+            </p>
+          ) : null}
+          {showDetails && task.priority === "high" ? (
+            <Badge variant={PRIORITY_BADGE.high} className="mt-1">
+              {t("studyPlans.priority.high")}
+            </Badge>
+          ) : null}
+        </div>
+
+        {/* Status and minutes appear when the row itself has room (a
+          container query), not when the window does: a narrow day column in
+          the week grid is as tight as a phone. */}
+        <Badge variant={STATUS_BADGE[task.status]} className="hidden @md:inline-flex">
+          {t(`studyPlans.taskStatus.${task.status}`)}
+        </Badge>
+
+        <span className="hidden shrink-0 text-xs text-[color:var(--color-ink-faint)] @md:inline">
+          {t("studyPlans.minutesShort", { count: task.estimated_minutes })}
+        </span>
+
+        <div className="flex shrink-0 items-center gap-1">
+          {!isTerminal ? (
+            <IconButton
+              size="sm"
+              variant="ghost"
+              aria-label={t("studyPlans.taskActions.skip")}
+              disabled={isPending}
+              onClick={() => skipTask.mutate(task.id)}
+            >
+              <SkipForward className="size-4" aria-hidden="true" />
+            </IconButton>
+          ) : null}
+          {isTerminal ? (
+            <IconButton
+              size="sm"
+              variant="ghost"
+              aria-label={t("studyPlans.taskActions.reopen")}
+              disabled={isPending}
+              onClick={() => reopenTask.mutate(task.id)}
+            >
+              <RotateCcw className="size-4" aria-hidden="true" />
+            </IconButton>
+          ) : null}
+        </div>
       </div>
     </li>
   );

@@ -40,7 +40,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             aria-invalid={Boolean(error) || undefined}
             aria-describedby={errorId}
             className={cn(
-              "h-11 w-full appearance-none rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] ps-4 pe-10 text-sm text-[color:var(--color-ink)] transition-colors duration-[var(--duration-fast)] focus-visible:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+              "h-11 w-full appearance-none rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] ps-4 pe-10 text-sm text-[color:var(--color-ink)] transition-colors pointer-coarse:text-base duration-[var(--duration-fast)] focus-visible:border-[color:var(--color-accent-solid)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)]/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
               error && "border-[color:var(--color-destructive)]",
               className,
             )}

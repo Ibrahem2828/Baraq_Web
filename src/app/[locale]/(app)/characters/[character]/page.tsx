@@ -15,6 +15,11 @@ function isCharacterKey(value: string): value is CharacterKey {
   return value in CHARACTERS;
 }
 
+/** The five characters are a fixed set, so every hub page is built ahead (the app, a static export, needs this; the web gets prerendered pages). */
+export function generateStaticParams() {
+  return Object.keys(CHARACTERS).map((character) => ({ character }));
+}
+
 /**
  * Every supported character has a real hub. Availability and entitlement are
  * determined by the backend capabilities contract, never by a browser-only

@@ -20,7 +20,11 @@ export function PageHeader({
           <p className="max-w-2xl text-sm text-[color:var(--color-ink-soft)]">{description}</p>
         ) : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center gap-3">{actions}</div> : null}
+      {/* Wraps rather than shrink-0: two labelled buttons are wider than a
+          320px phone (library: "New folder" + "Upload a source"). */}
+      {actions ? (
+        <div className="flex max-w-full flex-wrap items-center gap-3">{actions}</div>
+      ) : null}
     </div>
   );
 }

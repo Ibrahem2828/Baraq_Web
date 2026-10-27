@@ -5,6 +5,7 @@ import { useToast } from "@/components/feedback/Toast";
 import { useApiErrorMessage } from "@/lib/api/useApiErrorMessage";
 import type { CreateAIJobInput } from "@/features/ai-jobs/api/aiJobsApi";
 import { useCreateAIJob } from "./useAIJob";
+import { detailHref } from "@/lib/routing/detail-href";
 
 /**
  * Start a character's job from its hub: open the job page when it is
@@ -20,7 +21,7 @@ export function useStartAIJob() {
 
   function start(input: CreateAIJobInput) {
     createAIJob.mutate(input, {
-      onSuccess: (job) => router.push(`/ai-jobs/${job.public_id}`),
+      onSuccess: (job) => router.push(detailHref("ai-jobs", job.public_id)),
       onError: (error) => toast({ title: errorMessage(error), variant: "error" }),
     });
   }

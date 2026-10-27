@@ -7,6 +7,7 @@ import type { StudentRecommendation, Summary, Transcription } from "@/types/doma
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 /**
  * Result cards shared by each character's hub and its all-projects page,
@@ -38,7 +39,7 @@ function ResultGrid<T extends { id: number }>({
 
 export function SummaryCards({ items }: { items: Summary[] }) {
   return (
-    <ResultGrid items={items} href={(item) => `/summaries/${item.id}`}>
+    <ResultGrid items={items} href={(item) => detailHref("summaries", item.id)}>
       {(summary) => (
         <>
           <h3 className="text-base font-bold text-[color:var(--color-ink)]">{summary.title}</h3>
@@ -52,7 +53,7 @@ export function SummaryCards({ items }: { items: Summary[] }) {
 export function RecommendationCards({ items }: { items: StudentRecommendation[] }) {
   const t = useTranslations();
   return (
-    <ResultGrid items={items} href={(item) => `/recommendations/${item.id}`}>
+    <ResultGrid items={items} href={(item) => detailHref("recommendations", item.id)}>
       {(recommendation) => (
         <>
           <div className="flex items-start justify-between gap-3">
@@ -80,7 +81,7 @@ export function RecommendationCards({ items }: { items: StudentRecommendation[] 
 export function TranscriptionCards({ items }: { items: Transcription[] }) {
   const t = useTranslations();
   return (
-    <ResultGrid items={items} href={(item) => `/transcriptions/${item.id}`}>
+    <ResultGrid items={items} href={(item) => detailHref("transcriptions", item.id)}>
       {(transcription) => (
         <>
           <h3 className="text-base font-bold text-[color:var(--color-ink)]">{transcription.title}</h3>

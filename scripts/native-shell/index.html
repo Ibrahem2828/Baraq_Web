@@ -1,0 +1,73 @@
+<!doctype html>
+<!--
+  The app's entry document (copied to out/index.html by scripts/build-native.mjs).
+
+  Capacitor's local server answers every path without a file extension
+  (`/ar/quizzes/`) with this one file: it cannot map a path to the
+  exported `ar/quizzes/index.html` itself. So this page does what a static
+  web host would: it fetches the exported page for the current path and
+  replaces itself with it, leaving the address unchanged, so Next.js starts
+  on the right route. That only happens on a cold start or a full reload;
+  navigation inside the app is client-side and never comes back here.
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- The same policy as src/design-system/NativeHead.tsx, filled in at
+         build time: document.open() keeps this document's policy, and both
+         would apply to the page written into it. -->
+    <meta http-equiv="Content-Security-Policy" content="%NATIVE_CSP%" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #0b0e1a;
+      }
+      @media (prefers-color-scheme: light) {
+        html,
+        body {
+          background: #f5f3fb;
+        }
+      }
+    </style>
+    <script>
+      (function () {
+        var loc = window.location;
+        var path = loc.pathname;
+        if (path === "/" || path === "/index.html") {
+          var saved = null;
+          try {
+            saved = window.localStorage.getItem("baraq_locale");
+          } catch (e) {}
+          path = "/" + (saved === "en" ? "en" : "ar") + "/";
+        } else if (path.charAt(path.length - 1) !== "/") {
+          path += "/";
+        }
+        if (path !== loc.pathname) {
+          window.history.replaceState(null, "", path + loc.search + loc.hash);
+        }
+
+        function render(html) {
+          document.open();
+          document.write(html);
+          document.close();
+        }
+        fetch(path + "index.html", { cache: "no-store" })
+          .then(function (response) {
+            return response.ok
+              ? response.text()
+              : fetch("/404.html").then(function (notFound) {
+                  return notFound.text();
+                });
+          })
+          .then(render)
+          .catch(function () {
+            render("<p style='font-family:sans-serif;padding:2rem'>برّاق</p>");
+          });
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

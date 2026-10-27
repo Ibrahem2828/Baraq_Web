@@ -13,6 +13,16 @@ onboarding, empty-states, success-states). Static assets are imported as ES modu
 by public URL, so `next/image` gets automatic width/height inference and build-time
 optimization.
 
+## What a build ships (2026-09-26)
+
+`assets.ts` imports only what a screen renders: the five 512px character avatars (WebP),
+`logos/logo_baraq_arabic_transparent.webp` (288px, derived from the 1254px Arabic PNG
+master) and `images/backgrounds/bg_home_soft_gems.webp` (derived from the PNG of the same
+name). Every imported file is copied into `.next/static/media` whether used or not; the
+previous all-inclusive registry put 94MB of unused PNGs into every build and Docker image.
+The PNG masters and the unused illustrations below stay on disk; import one again when a
+screen starts using it.
+
 ## What's genuinely good and wired
 
 | Category | Files | Status |

@@ -54,7 +54,49 @@ const securityHeaders = [
     : []),
 ];
 
-const nextConfig: NextConfig = {
+// `BUILD_TARGET=native` (scripts/build-native.mjs) builds the static export
+// packaged into the mobile app; anything else is the web server build.
+const isNativeBuild = process.env.BUILD_TARGET === "native";
+
+// A route file named `*.web.ts(x)` exists only on the web (the BFF and auth
+// route handlers, the `[id]` detail pages, the server-read join page);
+// `*.native.tsx` only in the app (its `view?id=` detail pages
+// and client-read join page). Plain `page.tsx` is shared. Next resolves a
+// route file by its extension, so `page.web.tsx` is not a page in the app
+// build and `page.native.tsx` is not one on the web.
+const pageExtensions = isNativeBuild
+  ? ["native.tsx", "native.ts", "tsx", "ts"]
+  : ["web.tsx", "web.ts", "tsx", "ts"];
+
+// Inlined into client code as a literal for both builds. Unset, Next leaves
+// `process.env.NEXT_PUBLIC_BUILD_TARGET` as a runtime lookup and neither
+// build's `IS_NATIVE` branches are removed (the web bundle carried the app's
+// token code, and the reverse).
+const buildTargetEnv = { NEXT_PUBLIC_BUILD_TARGET: isNativeBuild ? "native" : "web" };
+
+const nativeConfig: NextConfig = {
+  env: buildTargetEnv,
+  output: "export",
+  pageExtensions,
+  // With `output: "export"` this is the exported bundle itself (Capacitor's
+  // webDir). Build intermediates still go to .next, so an app build replaces
+  // a local web production build there (never .next/dev).
+  distDir: "out",
+  // Every page exported as `<route>/index.html`, the layout
+  // scripts/native-shell/index.html resolves a path to.
+  trailingSlash: true,
+  reactStrictMode: true,
+  poweredByHeader: false,
+  // No image server in the app; the images that ship are already WebP and
+  // sized for how they are shown (see src/assets/assets.ts).
+  images: { unoptimized: true },
+  // Response headers do not exist in a static export; the app's CSP is a
+  // <meta> tag (src/design-system/NativeHead.tsx).
+};
+
+const webConfig: NextConfig = {
+  env: buildTargetEnv,
+  pageExtensions,
   output: "standalone",
   reactStrictMode: true,
   skipTrailingSlashRedirect: true,
@@ -71,4 +113,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(isNativeBuild ? nativeConfig : webConfig);

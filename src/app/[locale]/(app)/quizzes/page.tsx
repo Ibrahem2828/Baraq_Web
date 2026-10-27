@@ -15,6 +15,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 const STATUS_BADGE_VARIANT: Record<QuizStatus, "neutral" | "success" | "warning"> = {
   draft: "neutral",
@@ -96,9 +97,9 @@ export default function QuizzesPage() {
                 <Card
                   role="link"
                   tabIndex={0}
-                  onClick={() => router.push(`/quizzes/${quiz.id}`)}
+                  onClick={() => router.push(detailHref("quizzes", quiz.id))}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter") router.push(`/quizzes/${quiz.id}`);
+                    if (event.key === "Enter") router.push(detailHref("quizzes", quiz.id));
                   }}
                   className="flex h-full cursor-pointer flex-col justify-between transition-shadow hover:shadow-[var(--shadow-md)]"
                 >

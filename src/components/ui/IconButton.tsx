@@ -7,8 +7,10 @@ export interface IconButtonProps extends Omit<ButtonProps, "size"> {
   size?: "sm" | "md" | "lg";
 }
 
+// A touch screen gets the 44px minimum target at every size; a mouse keeps
+// the denser 36px `sm`.
 const SIZE_CLASS: Record<NonNullable<IconButtonProps["size"]>, string> = {
-  sm: "size-9",
+  sm: "size-9 pointer-coarse:size-11",
   md: "size-11",
   lg: "size-13",
 };

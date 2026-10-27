@@ -37,7 +37,7 @@ export function Modal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-[fade-in_var(--duration-normal)_var(--ease-brand)]" />
         <Dialog.Content
           className={cn(
-            "fixed inset-0 z-50 m-auto flex h-fit max-h-[85vh] w-[min(92vw,32rem)] flex-col overflow-y-auto rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-[var(--shadow-md)] focus:outline-none data-[state=open]:animate-[scale-in_var(--duration-normal)_var(--ease-brand)]",
+            "fixed inset-0 z-50 m-auto flex h-fit max-h-[85dvh] w-[min(92vw,32rem)] flex-col overflow-y-auto overscroll-contain rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-6 shadow-[var(--shadow-md)] focus:outline-none data-[state=open]:animate-[scale-in_var(--duration-normal)_var(--ease-brand)]",
             className,
           )}
         >
@@ -58,7 +58,7 @@ export function Modal({
           <div className="mt-4 flex-1">{children}</div>
           {footer ? <div className="mt-6 flex items-center justify-end gap-3">{footer}</div> : null}
           <Dialog.Close
-            className="end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
+            className="end-3 absolute top-3 flex size-9 items-center justify-center rounded-full pointer-coarse:size-11 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)] focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent-solid)] focus-visible:outline-none"
             aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />

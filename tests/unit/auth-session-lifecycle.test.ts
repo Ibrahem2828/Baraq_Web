@@ -17,8 +17,8 @@ vi.mock("@/lib/auth/server", () => ({
   validateMutationCsrf: mocks.validateMutationCsrf,
 }));
 
-import { GET as session } from "@/app/api/auth/session/route";
-import { POST as logout } from "@/app/api/auth/logout/route";
+import { GET as session } from "@/app/api/auth/session/route.web";
+import { POST as logout } from "@/app/api/auth/logout/route.web";
 
 describe("Web auth session lifecycle routes", () => {
   beforeEach(() => {

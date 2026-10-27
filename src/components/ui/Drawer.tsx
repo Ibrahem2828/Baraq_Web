@@ -35,7 +35,7 @@ export function Drawer({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm data-[state=open]:animate-[fade-in_var(--duration-fast)_var(--ease-brand)] data-[state=closed]:animate-[fade-out_var(--duration-fast)_var(--ease-brand)]" />
         <Dialog.Content
           className={cn(
-            "inset-y-0 fixed z-50 flex h-full w-[min(85vw,20rem)] flex-col overflow-y-auto border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[var(--shadow-md)] focus:outline-none",
+            "inset-y-0 fixed z-50 flex h-full w-[min(85vw,20rem)] flex-col overflow-y-auto overscroll-contain border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-[var(--shadow-md)] focus:outline-none",
             side === "start"
               ? "start-0 animate-drawer-start border-e [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]"
               : "end-0 animate-drawer-end border-s [animation-duration:var(--duration-normal)] [animation-timing-function:var(--ease-brand)]",
@@ -52,7 +52,7 @@ export function Drawer({
             </Dialog.Title>
           )}
           <Dialog.Close
-            className="end-4 absolute top-4 rounded-full p-1.5 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
+            className="end-4 absolute top-[calc(1rem+env(safe-area-inset-top))] flex size-9 items-center justify-center rounded-full pointer-coarse:size-11 text-[color:var(--color-ink-faint)] transition-colors hover:bg-[color:var(--color-bg-soft)]"
             aria-label={t("common.close")}
           >
             <X className="size-4" aria-hidden="true" />

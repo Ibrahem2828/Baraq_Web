@@ -19,7 +19,7 @@ export const buttonVariants = cva(
         destructive: "bg-[color:var(--color-destructive)] text-white hover:brightness-95",
       },
       size: {
-        sm: "h-9 px-4 text-xs",
+        sm: "h-9 px-4 text-xs pointer-coarse:h-11",
         md: "h-11 px-5",
         lg: "h-13 px-7 text-base",
         icon: "size-11",

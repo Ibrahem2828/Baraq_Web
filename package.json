@@ -16,10 +16,17 @@
     "format:check": "prettier --check .",
     "audit": "npm audit --omit=dev",
     "validate:env": "node scripts/validate-env.mjs",
-  "check:headers": "node scripts/check-security-headers.mjs",
+    "check:headers": "node scripts/check-security-headers.mjs",
+    "check:bundle": "node scripts/check-bundle-split.mjs",
+    "build:native": "node scripts/build-native.mjs",
+    "android:sync": "node scripts/build-native.mjs --sync",
+    "serve:native": "node scripts/serve-native.mjs",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {
+    "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@hookform/resolvers": "^5.9.1",
     "@radix-ui/react-avatar": "^1.2.6",
     "@radix-ui/react-dialog": "^1.1.23",
@@ -45,6 +52,7 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",

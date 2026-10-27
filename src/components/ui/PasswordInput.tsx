@@ -19,7 +19,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, Omit<InputProps, "type
           <button
             type="button"
             onClick={() => setVisible((value) => !value)}
-            className="pointer-events-auto text-[color:var(--color-ink-faint)] hover:text-[color:var(--color-ink)]"
+            // The whole 44px field height is the target, not just the 16px icon.
+            className="pointer-events-auto -me-3 flex size-11 items-center justify-center text-[color:var(--color-ink-faint)] hover:text-[color:var(--color-ink)]"
             aria-label={visible ? t("hidePassword") : t("showPassword")}
             tabIndex={-1}
           >

@@ -5,6 +5,7 @@ import { FileText, FolderKanban } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useSource } from "@/features/sources/hooks/useSources";
 import { Badge } from "@/components/ui/Badge";
+import { detailHref } from "@/lib/routing/detail-href";
 
 /**
  * "Open the original source" — 04_WEB_APP.md §6/§11: a character's result
@@ -20,7 +21,7 @@ export function OpenSourceLink({ sourceId }: { sourceId: number | null | undefin
   if (!sourceId || !source.data) return null;
 
   return (
-    <Link href={`/library/${sourceId}`}>
+    <Link href={detailHref("library", sourceId)}>
       <Badge variant="neutral" className="inline-flex items-center gap-1.5">
         <FileText className="size-3.5" aria-hidden="true" />
         {t("relatedArtifacts.openSource")}
@@ -35,7 +36,7 @@ export function OpenProjectLink({ projectId }: { projectId: string | null | unde
   if (!projectId) return null;
 
   return (
-    <Link href={`/projects/${projectId}`}>
+    <Link href={detailHref("projects", projectId)}>
       <Badge variant="accent" className="inline-flex items-center gap-1.5">
         <FolderKanban className="size-3.5" aria-hidden="true" />
         {t("relatedArtifacts.openProject")}

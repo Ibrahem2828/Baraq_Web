@@ -57,7 +57,17 @@ export function sendLibraryItem(id: string, character?: AIJobCharacter) {
   return apiClient.post<UseLibraryItemResult>(endpoints.classLibrary.use(id), character ? { character } : {});
 }
 
-/** Same-origin download through the BFF (session cookie, no token in the URL). */
-export function libraryDownloadHref(id: string) {
+// Read here, not imported: Next inlines the literal, so the web-only branch
+// below is removed from the app bundle (see docs/MOBILE_APP.md).
+const IS_NATIVE = process.env.NEXT_PUBLIC_BUILD_TARGET === "native";
+
+/**
+ * Same-origin download through the BFF (session cookie, no token in the URL).
+ * The app has no BFF and no cookie to hand a plain link, and no native save
+ * path yet, so it gets no download link: `null`. Sending the file to one of
+ * the learner's projects (the primary action) works in both builds.
+ */
+export function libraryDownloadHref(id: string): string | null {
+  if (IS_NATIVE) return null;
   return `/api/bff${endpoints.classLibrary.download(id)}`;
 }

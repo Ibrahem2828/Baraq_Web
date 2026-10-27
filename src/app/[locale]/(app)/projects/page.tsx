@@ -14,6 +14,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 export default function ProjectsPage() {
   const t = useTranslations();
@@ -56,7 +57,7 @@ export default function ProjectsPage() {
         <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {projects.data.items.map((project) => (
             <StaggerItem key={project.public_id}>
-              <Link href={`/projects/${project.public_id}`}>
+              <Link href={detailHref("projects", project.public_id)}>
                 <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="line-clamp-1 text-base font-bold text-[color:var(--color-ink)]">

@@ -21,6 +21,7 @@ import { LoadingState } from "@/components/feedback/LoadingState";
 import { ErrorState } from "@/components/feedback/ErrorState";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { StaggerIn, StaggerItem } from "@/components/motion/FadeIn";
+import { detailHref } from "@/lib/routing/detail-href";
 
 const STATUS_VARIANT: Record<QuizStatus, "neutral" | "success" | "warning"> = {
   draft: "neutral",
@@ -78,7 +79,7 @@ export function FahesHub({ character }: { character: CharacterDefinition }) {
         <StaggerIn className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quizzes.data.items.map((quiz) => (
             <StaggerItem key={quiz.id}>
-              <Link href={`/quizzes/${quiz.id}`}>
+              <Link href={detailHref("quizzes", quiz.id)}>
                 <Card className="flex h-full flex-col gap-2 transition-shadow duration-[var(--duration-normal)] hover:shadow-[var(--shadow-md)]">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="line-clamp-1 text-sm font-bold text-[color:var(--color-ink)]">

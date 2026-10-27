@@ -188,6 +188,14 @@ function VerifyEmailForm() {
             : t("auth.verifyEmail.resend")}
         </button>
       </p>
+      <p className="mt-3 text-center text-xs text-[color:var(--color-ink-soft)]" data-testid="otp-spam-hint">
+        {t("auth.verifyEmail.checkSpam")}
+      </p>
+      <p className="mt-2 text-center text-xs">
+        <Link href="/register" className="font-semibold text-[color:var(--color-accent)]">
+          {t("auth.verifyEmail.wrongEmail")}
+        </Link>
+      </p>
     </FadeIn>
   );
 }

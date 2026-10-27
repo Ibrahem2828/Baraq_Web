@@ -29,7 +29,7 @@ describe("account deletion through the BFF", () => {
 
   it("forwards DELETE /users/me/ and clears HttpOnly auth cookies on success", async () => {
     backendFetch.mockResolvedValue(Response.json({ success: true, data: { message: "deleted" } }));
-    const { DELETE } = await import("@/app/api/bff/[...path]/route");
+    const { DELETE } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest("https://web.baraqapp.com/api/bff/users/me", {
       method: "DELETE",
       headers: { origin: "https://web.baraqapp.com", host: "web.baraqapp.com" },
@@ -62,7 +62,7 @@ describe("generic BFF transport contract", () => {
 
   it("normalizes the Django slash, preserves query encoding, and forwards safe correlation headers", async () => {
     backendFetch.mockResolvedValue(Response.json({ success: true, data: [] }));
-    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const { GET } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest(
       "https://web.baraqapp.com/api/bff/subjects?page=2&search=%D8%B9%D9%84%D9%88%D9%85",
       {
@@ -93,7 +93,7 @@ describe("generic BFF transport contract", () => {
       backendFetch.mockResolvedValue(
         Response.json({ success: true, data: { email: payload.email } }, { status: 201 }),
       );
-      const handlers = await import("@/app/api/bff/[...path]/route");
+      const handlers = await import("@/app/api/bff/[...path]/route.web");
       const request = new NextRequest("https://web.baraqapp.com/api/bff/auth/register", {
         method,
         headers: {
@@ -121,7 +121,7 @@ describe("generic BFF transport contract", () => {
 
   it("forwards multipart uploads byte-for-byte without rebuilding the incoming boundary", async () => {
     backendFetch.mockResolvedValue(Response.json({ success: true }, { status: 201 }));
-    const { POST } = await import("@/app/api/bff/[...path]/route");
+    const { POST } = await import("@/app/api/bff/[...path]/route.web");
     const boundary = "----browser-generated-boundary";
     const multipartBody = [
       `--${boundary}`,
@@ -162,7 +162,7 @@ describe("generic BFF transport contract", () => {
   });
 
   it("rejects an externally-routable catch-all path before calling the backend", async () => {
-    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const { GET } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest("https://web.baraqapp.com/api/bff/https:/evil.example/path");
 
     const response = await GET(request, {
@@ -181,7 +181,7 @@ describe("generic BFF transport contract", () => {
     ["trailing slash", ["subjects", ""]],
   ] as const)("canonicalizes the %s browser form without a redirect", async (_label, segments) => {
     backendFetch.mockResolvedValue(Response.json({ success: true, data: [] }));
-    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const { GET } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest("https://web.baraqapp.com/api/bff/subjects/");
 
     const response = await GET(request, {
@@ -198,7 +198,7 @@ describe("generic BFF transport contract", () => {
     backendFetch.mockResolvedValue(
       new Response(null, { status: 301, headers: { location: "/api/v1/subjects/" } }),
     );
-    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const { GET } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest("https://web.baraqapp.com/api/bff/subjects");
 
     const response = await GET(request, { params: Promise.resolve({ path: ["subjects"] }) });
@@ -211,7 +211,7 @@ describe("generic BFF transport contract", () => {
   it("returns a safe gateway error when Django is unreachable", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     backendFetch.mockRejectedValue(new Error("network unavailable"));
-    const { GET } = await import("@/app/api/bff/[...path]/route");
+    const { GET } = await import("@/app/api/bff/[...path]/route.web");
     const request = new NextRequest("https://web.baraqapp.com/api/bff/subjects");
 
     const response = await GET(request, { params: Promise.resolve({ path: ["subjects"] }) });
