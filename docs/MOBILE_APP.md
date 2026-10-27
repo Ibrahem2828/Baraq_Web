@@ -161,9 +161,13 @@ In a desktop browser the secure-storage plugin falls back to localStorage
 
 ## Not done yet
 
-- Not run on a real device or emulator: status bars, the keyboard, the
-  hardware back button, and the file picker (including camera capture) are
-  untested on Android itself.
+- Verified on an Android 15 emulator (Pixel 6, x86_64): the release APK installs,
+  launches, shows the login and register screens, reaches `api.baraqapp.com`
+  from the WebView (a wrong password returns the server's own error), updates in
+  place over the previous build, and the hardware Back button walks history
+  (`MainActivity` handles it: Capacitor core does not) before closing the app.
+  Not yet checked on physical hardware: the keyboard on small screens, the file
+  picker and camera capture, gesture navigation on vendor skins.
 - Google Play: not planned (the app is self-distributed, see above).
 - App Links / deep links: invitation and password-reset links still open
   the web app.
