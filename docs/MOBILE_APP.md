@@ -96,7 +96,7 @@ file runs on ARM and x86 devices, Android 7.0 (API 24) and newer.
 One command builds everything:
 
 ```bash
-export JAVA_HOME="D:araaq	oolchain\jdk-21.0.12.1+1" ANDROID_HOME="D:araaq	oolchainndroid-sdk"
+export JAVA_HOME="D:\baraaq\toolchain\jdk-21.0.12.1+1" ANDROID_HOME="D:\baraaq\toolchain\android-sdk"
 npm run android:release        # -> dist/android/baraq-<version>.apk, .apk.sha256, latest.json
 ```
 
