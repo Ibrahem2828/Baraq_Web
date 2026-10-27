@@ -52,3 +52,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Distributable Android build output (scripts/android-release.mjs)
+/dist/

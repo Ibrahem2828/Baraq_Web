@@ -86,25 +86,57 @@ The app's origin is `https://localhost`. The backend must:
 Until that commit is deployed, the app cannot sign in against production:
 the browser preflight fails.
 
-## Release build and signing
+## Release build, signing and distribution
 
-`assembleDebug` always works. `assembleRelease` (R8 minify + resource
-shrinking, about 7.7 MB) **fails** unless `android/keystore.properties`
-exists (gitignored):
+The app is **not** published on Google Play. It is distributed as one signed
+universal APK from `https://baraqapp.com/download/` (the download page lives in
+the website repo, see its README). The APK has no native libraries, so the same
+file runs on ARM and x86 devices, Android 7.0 (API 24) and newer.
 
-```properties
-storeFile=../keys/baraq-upload.jks
-storePassword=...
-keyAlias=upload
-keyPassword=...
+One command builds everything:
+
+```bash
+export JAVA_HOME="D:araaq	oolchain\jdk-21.0.12.1+1" ANDROID_HOME="D:araaq	oolchainndroid-sdk"
+npm run android:release        # -> dist/android/baraq-<version>.apk, .apk.sha256, latest.json
 ```
 
-Create the upload key once (`keytool -genkeypair -v -keystore baraq-upload.jks
--alias upload -keyalg RSA -keysize 2048 -validity 10000`), keep it and its
-passwords outside the repository in two backed-up places, and enrol in Play
-App Signing. To exercise R8 on a machine without the key:
-`./gradlew assembleRelease -PallowDebugSignedRelease=true` (signed with the
-debug key: never distribute it). Raise `versionCode` for every store upload.
+It runs the native build and its bundle guard, `gradlew clean assembleRelease`
+(R8 minify + resource shrinking), then **refuses to produce output** unless
+`apksigner` verifies the signature, the signer is not the debug key, the package
+is `com.baraq.app`, `versionCode`/`versionName`/`minSdk` match the Gradle files,
+and the APK is not debuggable. `--verify-only` re-runs the checks on the APK
+already built.
+
+### The signing key (never lose it)
+
+Updates install over an existing app **only if signed with the same key**. If
+the key is lost, every installed phone must uninstall and reinstall. The key is
+`baraq-release.jks` (alias `baraq`, RSA 4096, valid to 2056). Keep it, and
+`android/keystore.properties` (gitignored; `storeFile`, `storePassword`,
+`keyAlias`, `keyPassword`), outside the repository in at least two separate
+places. Signing certificate SHA-256 (also shown on the download page):
+`3F:C3:53:83:DE:0F:B0:57:AC:04:69:EB:52:89:92:02:2C:EC:F8:6B:60:E3:48:D1:E9:08:57:1B:EB:A0:EA:72`.
+
+`assembleRelease` without `keystore.properties` fails on purpose.
+`-PallowDebugSignedRelease=true` produces a debug-signed APK for a local R8
+check only: never distribute it.
+
+### Versioning
+
+`versionCode = major*10000 + minor*100 + patch` (1.0.0 = 10000). Raise it for
+every release: Android refuses to update to an equal or lower code. Change
+`versionName` and `versionCode` together in `android/app/build.gradle`.
+
+### Publishing a release
+
+1. Bump the version, run `npm run android:release`.
+2. Copy the `.apk` and `.apk.sha256` to the server's downloads folder, then
+   `latest.json` last (the page switches when the manifest becomes valid).
+3. Keep the previous APK there so old links keep working.
+
+The app has no in-app update prompt yet: `latest.json` (readable from the app's
+origin) is published so one can be added; until then users update by
+downloading the new APK and installing it over the old one.
 
 ## What differs in the app
 
@@ -132,8 +164,7 @@ In a desktop browser the secure-storage plugin falls back to localStorage
 - Not run on a real device or emulator: status bars, the keyboard, the
   hardware back button, and the file picker (including camera capture) are
   untested on Android itself.
-- The real upload key and Play App Signing enrolment (owner action); the
-  R8 release build itself is verified.
+- Google Play: not planned (the app is self-distributed, see above).
 - App Links / deep links: invitation and password-reset links still open
   the web app.
 - Push notifications: the backend has no device-token model; notifications

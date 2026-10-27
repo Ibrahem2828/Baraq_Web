@@ -20,6 +20,7 @@
     "check:bundle": "node scripts/check-bundle-split.mjs",
     "build:native": "node scripts/build-native.mjs",
     "android:sync": "node scripts/build-native.mjs --sync",
+    "android:release": "node scripts/android-release.mjs",
     "serve:native": "node scripts/serve-native.mjs",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
